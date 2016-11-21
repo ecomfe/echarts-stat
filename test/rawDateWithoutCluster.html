@@ -1,0 +1,97 @@
+<!DOCTYPE>
+<html>
+    <head>
+        <meta charset='utf-8'>
+        <script src="esl.js"></script>
+        <script src="config.js"></script>
+        <script src="lib/jquery.min.js"></script>
+    </head>
+    <body>
+        <style>
+            html, body, #main {
+                width: 100%;
+                height: 100%;
+            }
+        </style>
+        <div id="main"></div>
+        <script>
+
+            require([
+                'echarts',
+                'echarts-stat/clustering',
+                'echarts/chart/scatter',
+                'echarts/component/legend',
+                'echarts/component/grid',
+                'echarts/component/tooltip'
+            ], function (echarts, clustering) {
+
+                var chart = echarts.init(document.getElementById('main'));
+
+                $.getJSON('./data/clustering_dataset2.json')
+                .done(function (data) {
+
+// console.log(data);
+
+                    // var biKmeans = clustering.hierKMeans(data, 3);
+                    // var clusterAssment = biKmeans.clusterAssment;
+                    // var centroids = biKmeans.centroids;
+                    // var ptsInCluster = [];
+                    // for (var i = 0; i < 3; i++) {
+                    //     ptsInCluster[i] = [];
+                    //     for (var j = 0; j < clusterAssment.length; j++) {
+                    //         if (clusterAssment[j][0] === i) {
+                    //             ptsInCluster[i].push(data[j]);
+                    //         }
+                    //     }
+                    // }
+                    var color = ['#7fc97f','#beaed4','#fdc086'];
+//                     var series = [];
+//                     for (i = 0; i < 3; i++) {
+//                         series.push({
+//                             name: 'scatter' + i,
+//                             type: 'scatter',
+//                             label: {
+//                                 emphasis: {
+//                                     show: true
+//                                 }
+//                             },
+//                             data: ptsInCluster[i],
+//                             // color: color[i]
+//                         },{
+//                             name: 'scatter' + i,
+//                             type: 'scatter',
+//                             data: [centroids[i]],
+//                             symbol: 'diamond',
+//                             // color: color[i]
+//                         });
+//                     }
+// console.log(series);
+                    chart.setOption({
+                        // legend: {
+                        //     data: ['scatter0', 'scatter1', 'scatter2']
+                        // },
+                        tooltip: {
+                            trigger: 'axis',
+                            axisPointer: {
+                                type: 'cross'
+                            }
+                        },
+                        xAxis: {
+                            type: 'value'
+                        },
+                        yAxis: {
+                            tyep: 'value'
+                        },
+                        series: {
+                            name: 'scatter0',
+                            type: 'scatter',
+                            data: data
+                        },
+                        color: color
+                    });
+
+                });
+            });
+        </script>
+    </body>
+</html>
