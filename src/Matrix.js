@@ -43,16 +43,6 @@ define(function (require) {
     };
 
     /**
-     * [set description]
-     * @param {[type]} index [description]
-     * @param {[type]} value [description]
-     * @param {[type]}       [description]
-     */
-    Matrix.prototype.set = function (index, value, ) {
-
-    };
-
-    /**
      * Resize the matrix to the given size.
      * @param  {Array.<number>} size    the new size the matrix should have.
      * @param  {number} defaultValue    Defaule value, filled in on new entries,
@@ -80,6 +70,10 @@ define(function (require) {
      */
     Matrix.prototype.valueof = function () {
         return this._data;
+    }
+
+    Matrix.prototype.subset = function () {
+
     }
 
     return Matrix;
