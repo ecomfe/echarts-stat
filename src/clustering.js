@@ -11,7 +11,7 @@ define(function (require) {
 
     /**
      * KMeans of clustering algorithm
-     * @param  {Array.<number>} dataSet    two-dimension array
+     * @param  {Array.<Array.<number>>} dataSet    two-dimension array
      * @param  {number} k   the number of clusters in a dataset
      * @return {Object}
      */
@@ -68,6 +68,7 @@ define(function (require) {
      * @return {Object}
      */
     function meanInColumn (dataList) {
+
         var size = arraySize(dataList);
         var meanArray = [];
         var sum;
@@ -87,6 +88,7 @@ define(function (require) {
      * The combine of hierarchical clustering and k-means.
      * @param  {Array} dataset   two-dimension array.
      * @param  {[type]} k   the number of clusters in a dataset
+     * @param  {boolean}  stepByStep
      * @return {}
      */
     function hierKMeans(dataSet, k, stepByStep) {
