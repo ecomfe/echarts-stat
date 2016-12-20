@@ -1,0 +1,120 @@
+<!DOCTYPE>
+<html>
+    <head>
+        <meta charset='utf-8'>
+        <script src="esl.js"></script>
+        <script src="config.js"></script>
+        <script src="lib/jquery.min.js"></script>
+    </head>
+    <body>
+        <style>
+            html, body, #main {s
+                width: 100%;
+                height: 100%;
+            }
+        </style>
+        <div id="main"></div>
+        <script>
+
+            require([
+                'echarts',
+                'echarts-stat/regression',
+                'echarts/chart/scatter',
+                'echarts/chart/line',
+                'echarts/component/legend',
+                'echarts/component/grid',
+                'echarts/component/tooltip'
+            ], function (echarts, regression) {
+
+                var chart = echarts.init(document.getElementById('main'));
+
+                $.getJSON('./data/regression_test.json')
+                .done(function (data) {
+
+                    var data = [
+                        [0.067732, 3.176513],
+                        [0.42781, 3.816464],
+                        [0.995731, 'a'],
+                        [0.738336, 4.256571],
+                        [0.981083, 4.560815],
+                        [, 3.929515],
+                        [0.378887, 3.52617],
+                        [0.033859, ],
+                        [0.132791, 3.110301],
+                        [null, 3.149813],
+                        [0.247809, 3.476346],
+                        [0.64827, 4.119688],
+                        [0.731209, 4.282233],
+                        [0.236833, 3.486582],
+                        [0.969788, 4.655492],
+                        [0.607492, 3.965162],
+                        [0.358622, 3.5149],
+                        [0.147846, 3.125947],
+                        [0.63782, 4.094115],
+                        [0.230372, 3.476039],
+                        [0.070237, 3.21061]
+                    ];
+
+
+                    var myRegression = regression('polynomial', data, 3);
+
+                    myRegression.points.sort(function (a, b) {
+                        return a[0] - b[0];
+                    });
+
+                    chart.setOption({
+                        legend: {
+                            data: ['scatter', 'line']
+                        },
+                        tooltip: {
+                            trigger: 'axis',
+                            axisPointer: {
+                                type: 'cross'
+                            }
+                        },
+                        xAxis: {
+                            type: 'value',
+                            splitLine: {
+                                show: false
+                            },
+                            splitNumber: 20
+                        },
+                        yAxis: {
+                            type: 'value',
+                            min: 2,
+                            max: 5,
+                            splitLine: {
+                                show: false
+                            }
+                        },
+                        series: [{
+                            name: 'scatter',
+                            type: 'scatter',
+                            label: {
+                                emphasis: {
+                                    show: true
+                                }
+                            },
+                            data: data
+                         },{
+                            name: 'line',
+                            type: 'line',
+                            showSymbol: false,
+                            // smooth: true,
+                            // label: {
+                            //     emphasis: {
+                            //         show: true,
+                            //         position: 'top',
+                            //         formatter: function (params) {
+                            //             return params.value;
+                            //         }
+                            //     }
+                            // },
+                            data: myRegression.points
+                        }]
+                    });
+                });
+            });
+        </script>
+    </body>
+</html>

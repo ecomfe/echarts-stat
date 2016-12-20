@@ -2,6 +2,7 @@ define(function (require) {
 
     var array = require('./utils/array');
     var isArray = array.isArray;
+    var dataPreprocess = require('./utils/dataPreprocess');
 
     var regreMethods = {
 
@@ -12,31 +13,35 @@ define(function (require) {
          */
         linear: function(data) {
 
+            var predata = dataPreprocess(data);
             var sumX = 0;
             var sumY = 0;
             var sumXY = 0;
             var sumXX = 0;
-            var len = data.length;
+            var len = predata.length;
 
             for (var i = 0; i < len; i++) {
-                sumX += data[i][0];
-                sumY += data[i][1];
-                sumXY += data[i][0] * data[i][1];
-                sumXX += data[i][0] * data[i][0];
+                sumX += predata[i][0];
+                sumY += predata[i][1];
+                sumXY += predata[i][0] * predata[i][1];
+                sumXX += predata[i][0] * predata[i][0];
             }
 
             var gradient = ((len * sumXY) - (sumX * sumY)) / ((len * sumXX) - (sumX * sumX));
             var intercept = (sumY / len) - ((gradient * sumX) / len);
 
             var result = [];
-            for (var j = 0; j < data.length; j++) {
-                var coordinate = [data[j][0], gradient * data[j][0] + intercept];
+            for (var j = 0; j < predata.length; j++) {
+                var coordinate = [predata[j][0], gradient * predata[j][0] + intercept];
                 result.push(coordinate);
             }
 
             return {
                 points: result,
-                parameter: [gradient, intercept]
+                parameter: {
+                    gradient: gradient,
+                    intercept: intercept
+                }
             };
         },
 
@@ -48,25 +53,28 @@ define(function (require) {
          */
         linearThroughOrigin: function(data) {
 
+            var predata = dataPreprocess(data);
             var sumXX = 0;
             var sumXY = 0;
 
-            for (var i = 0; i < data.length; i++) {
-                sumXX += data[i][0] * data[i][0];
-                sumXY += data[i][0] * data[i][1];
+            for (var i = 0; i < predata.length; i++) {
+                sumXX += predata[i][0] * predata[i][0];
+                sumXY += predata[i][0] * predata[i][1];
             }
 
             var gradient = sumXY / sumXX;
             var result = [];
 
-            for (var j = 0; j < data.length; j++) {
-                var coordinate = [data[j][0], data[j][0] * gradient];
+            for (var j = 0; j < predata.length; j++) {
+                var coordinate = [predata[j][0], predata[j][0] * gradient];
                 result.push(coordinate);
             }
 
             return {
                 points: result,
-                parameter: [gradient]
+                parameter: {
+                    gradient: gradient
+                }
             };
         },
 
@@ -77,6 +85,7 @@ define(function (require) {
          */
         exponential: function(data) {
 
+            var predata = dataPreprocess(data);
             var sumX = 0;
             var sumY = 0;
             var sumXXY = 0;
@@ -84,13 +93,13 @@ define(function (require) {
             var sumXYlny = 0;
             var sumXY = 0;
 
-            for (var i = 0; i < data.length; i++) {
-                sumX += data[i][0];
-                sumY += data[i][1];
-                sumXY += data[i][0] * data[i][1];
-                sumXXY += data[i][0] * data[i][0] * data[i][1];
-                sumYlny += data[i][1] * Math.log(data[i][1]);
-                sumXYlny += data[i][0] * data[i][1] * Math.log(data[i][1]);
+            for (var i = 0; i < predata.length; i++) {
+                sumX += predata[i][0];
+                sumY += predata[i][1];
+                sumXY += predata[i][0] * predata[i][1];
+                sumXXY += predata[i][0] * predata[i][0] * predata[i][1];
+                sumYlny += predata[i][1] * Math.log(predata[i][1]);
+                sumXYlny += predata[i][0] * predata[i][1] * Math.log(predata[i][1]);
             }
 
             var denominator = (sumY * sumXXY) - (sumXY * sumXY);
@@ -98,14 +107,17 @@ define(function (require) {
             var index = (sumY * sumXYlny - sumXY * sumYlny) / denominator;
             var result = [];
 
-            for (var j = 0; j < data.length; j++) {
-                var coordinate = [data[j][0], coefficient * Math.pow(Math.E, index * data[j][0])];
+            for (var j = 0; j < predata.length; j++) {
+                var coordinate = [predata[j][0], coefficient * Math.pow(Math.E, index * predata[j][0])];
                 result.push(coordinate);
             }
 
             return {
                 points: result,
-                parameter: [coefficient, index]
+                parameter: {
+                    coefficient: coefficient,
+                    index: index
+                }
             };
 
         },
@@ -117,30 +129,34 @@ define(function (require) {
          */
         logarithmic: function(data) {
 
+            var predata = dataPreprocess(data);
             var sumlnx = 0;
             var sumYlnx = 0;
             var sumY = 0;
             var sumlnxlnx = 0;
 
-            for (var i = 0; i < data.length; i++) {
-                sumlnx += Math.log(data[i][0]);
-                sumYlnx += data[i][1] * Math.log(data[i][0]);
-                sumY += data[i][1];
-                sumlnxlnx += Math.pow(Math.log(data[i][0]), 2);
+            for (var i = 0; i < predata.length; i++) {
+                sumlnx += Math.log(predata[i][0]);
+                sumYlnx += predata[i][1] * Math.log(predata[i][0]);
+                sumY += predata[i][1];
+                sumlnxlnx += Math.pow(Math.log(predata[i][0]), 2);
             }
 
             var gradient = (i * sumYlnx - sumY * sumlnx) / (i * sumlnxlnx - sumlnx * sumlnx);
             var intercept = (sumY - gradient * sumlnx) / i;
             var result = [];
 
-            for (var j = 0; j < data.length; j++) {
-                var coordinate = [data[j][0], gradient * Math.log(data[j][0]) + intercept];
+            for (var j = 0; j < predata.length; j++) {
+                var coordinate = [predata[j][0], gradient * Math.log(predata[j][0]) + intercept];
                 result.push(coordinate);
             }
 
             return {
                 points: result,
-                parameter: [gradient, intercept]
+                parameter: {
+                    gradient: gradient,
+                    intercept: intercept
+                }
             };
 
         },
@@ -153,6 +169,7 @@ define(function (require) {
          */
         polynomial: function(data, order) {
 
+            var predata = dataPreprocess(data);
             if (typeof order === 'undefined') {
                 order = 2;
             }
@@ -162,17 +179,17 @@ define(function (require) {
             var k = order + 1;
 
             for (var i = 0; i < k; i++) {
-                var sumA = 0
-                for (var n = 0; n < data.length; n++) {
-                    sumA += data[n][1] * Math.pow(data[n][0], i);
+                var sumA = 0;
+                for (var n = 0; n < predata.length; n++) {
+                    sumA += predata[n][1] * Math.pow(predata[n][0], i);
                 }
                 lhs.push(sumA);
 
                 var temp = [];
                 for (var j = 0; j < k; j++) {
                     var sumB = 0;
-                    for (var m = 0; m < data.length; m++) {
-                        sumB += Math.pow(data[m][0], i + j);
+                    for (var m = 0; m < predata.length; m++) {
+                        sumB += Math.pow(predata[m][0], i + j);
                     }
                     temp.push(sumB);
                 }
@@ -183,12 +200,12 @@ define(function (require) {
             var coeArray = gaussianElimination(coeMatrix, k);
             var result = [];
 
-            for (var i = 0; i < data.length; i++) {
-                var value = 0
+            for (var i = 0; i < predata.length; i++) {
+                var value = 0;
                 for (var n = 0; n < coeArray.length; n++) {
-                    value += coeArray[n] * Math.pow(data[i][0], n);
+                    value += coeArray[n] * Math.pow(predata[i][0], n);
                 }
-                result.push([data[i][0], value]);
+                result.push([predata[i][0], value]);
             }
 
             return {
@@ -224,7 +241,7 @@ define(function (require) {
                 matrix[k][maxColumn] = temp;
             }
             for (var n = i + 1; n < matrix.length - 1; n++) {
-                for (m = matrix.length - 1; m >= i; m--) {
+                for (var m = matrix.length - 1; m >= i; m--) {
                     matrix[m][n] -= matrix[m][i] / matrix[i][i] * matrix[i][n];
                 }
             }
@@ -234,7 +251,7 @@ define(function (require) {
         var len = matrix.length - 1;
         for (var j = matrix.length - 2; j >= 0; j--) {
             var temp = 0;
-            for (var i = j + 1; i < matrix.length －1; i++) {
+            for (var i = j + 1; i < matrix.length - 1; i++) {
                 temp += matrix[i][j] * data[i];
             }
             data[j] = (matrix[len][j] - temp) / matrix[j][j];
