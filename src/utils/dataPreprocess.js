@@ -6,10 +6,6 @@ define(function (require) {
     var number = require('./number');
     var isNumber = number.isNumber;
 
-
-    // var globalObj = typeof window === 'undefined' ? global: window;
-    // var Float64Array = typeof globalObj.Float64Array === 'undefined' ? Array : globalObj.Float64Array;
-
     /**
      * Data preprocessing, filter the wrong data object.
      *  for example [12,] --- missing y value
@@ -22,7 +18,7 @@ define(function (require) {
     function dataPreprocess (data) {
 
         if (!isArray(data)) {
-            throw new TypeError('Invalid data type');
+            throw new TypeError('Invalid data type, you should input an array');
         }
         var predata = [];
         var arraySize = size(data);

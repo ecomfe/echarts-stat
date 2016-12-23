@@ -1,5 +1,6 @@
 define(function (require) {
 
+    var dataPreprocess = require('./utils/dataPreprocess');
     var array = require('./utils/array');
     var arraySize = array.size;
     var sumInColumn = array.sumInColumn;
@@ -11,15 +12,21 @@ define(function (require) {
 
     /**
      * KMeans of clustering algorithm
-     * @param  {Array.<Array.<number>>} dataSet    two-dimension array
+     * @param  {Array.<Array.<number>>} data  two-dimension array
      * @param  {number} k   the number of clusters in a dataset
      * @return {Object}
      */
-    function kMeans(dataSet, k) {
+    function kMeans(data, k) {
+
+        var dataSet = dataPreprocess(data);
         var size = arraySize(dataSet);
         // create array to assign data points to centroids, also holds SE of each point
         var clusterAssigned = zeros(size[0], 2);
         var centroids = createRandCent(dataSet, k);
+
+
+// console.log(centroids);
+
         var clusterChanged = true;
         var minDist;
         var minIndex;
@@ -54,6 +61,9 @@ define(function (require) {
                 centroids[i] = meanInColumn(ptsInClust);
             }
         }
+
+// console.log(centroids);
+
         var clusterWithKmeans = {
             centroids: centroids,
             clusterAssigned: clusterAssigned
@@ -86,12 +96,14 @@ define(function (require) {
 
     /**
      * The combine of hierarchical clustering and k-means.
-     * @param  {Array} dataset   two-dimension array.
+     * @param  {Array} data   two-dimension array.
      * @param  {[type]} k   the number of clusters in a dataset
      * @param  {boolean}  stepByStep
      * @return {}
      */
-    function hierKMeans(dataSet, k, stepByStep) {
+    function hierKMeans(data, k, stepByStep) {
+
+        var dataSet = dataPreprocess(data);
         var size = arraySize(dataSet);
         var clusterAssment = zeros(size[0], 2);
         // initial center point
@@ -112,12 +124,16 @@ define(function (require) {
         var result = {
             isEnd: false
         };
+
         function oneStep() {
+            //the existing clusters are continuously divided
+            //until the number of clusters is k
             if (index < k) {
                 lowestSSE = Infinity;
                 var centSplit;
                 var newCentroid;
                 var newClusterAss;
+
                 for (var j = 0; j < centList.length; j++) {
                     ptsInClust = [];
                     ptsNotClust = [];
@@ -139,6 +155,7 @@ define(function (require) {
                         newClusterAss = clusterInfo.clusterAssigned;
                     }
                 }
+
                 for (var i = 0; i < newClusterAss.length; i++) {
                     if (newClusterAss[i][0] === 0) {
                         newClusterAss[i][0] = centSplit;
@@ -147,6 +164,7 @@ define(function (require) {
                         newClusterAss[i][0] = centList.length;
                     }
                 }
+
                 centList[centSplit] = newCentroid[0];
                 centList.push(newCentroid[1]);
                 for ( i = 0, j = 0; i < clusterAssment.length && j < newClusterAss.length; i++) {
@@ -155,8 +173,22 @@ define(function (require) {
                         clusterAssment[i][1] = newClusterAss[j++][1];
                     }
                 }
+
+                var pointInClust = [];
+                for (var i = 0; i < centList.length; i++) {
+                    pointInClust[i] = [];
+                    for (var j = 0; j < clusterAssment.length; j++) {
+                        if (clusterAssment[j][0] === i) {
+                            pointInClust[i].push(dataSet[j]);
+                        }
+                    }
+                }
+
                 result.clusterAssment = clusterAssment;
                 result.centroids = centList;
+                result.pointsInCluster = pointInClust;
+
+
                 index++;
             }
             else {
@@ -178,60 +210,7 @@ define(function (require) {
         else {
             return step;
         }
-        //the existing clusters are continuously divided
-        //until the number of clusters is k
-        // while (centList.length < k) {
-        //     lowestSSE = Infinity;
-        //     var centSplit;
-        //     var newCentroid;
-        //     var newClusterAss;
-        //     for (var j = 0; j < centList.length; j++) {
-        //         ptsInClust = [];
-        //         ptsNotClust = [];
-        //         for (var i = 0; i < clusterAssment.length; i++) {
-        //             if (clusterAssment[i][0] === j) {
-        //                 ptsInClust.push(dataSet[i]);
-        //             }
-        //             else {
-        //                 ptsNotClust.push(clusterAssment[i][1]);
-        //             }
-        //         }
-        //         clusterInfo = kMeans(ptsInClust, 2);
-        //         sseSplit = sumInColumn(clusterInfo.clusterAssigned, 1);
-        //         sseNotSplit = arraySum(ptsNotClust);
-        //         if (sseSplit + sseNotSplit < lowestSSE) {
-        //             lowestSSE = sseNotSplit + sseSplit;
-        //             centSplit = j;
-        //             newCentroid = clusterInfo.centroids;
-        //             newClusterAss = clusterInfo.clusterAssigned;
-        //         }
-        //     }
-        //     for (var i = 0; i < newClusterAss.length; i++) {
-        //         if (newClusterAss[i][0] === 0) {
-        //             newClusterAss[i][0] = centSplit;
-        //         }
-        //         else if (newClusterAss[i][0] === 1) {
-        //             newClusterAss[i][0] = centList.length;
-        //         }
-        //     }
-        //     centList[centSplit] = newCentroid[0];
-        //     centList.push(newCentroid[1]);
-        //     for ( i = 0, j = 0; i < clusterAssment.length && j < newClusterAss.length; i++) {
-        //         if (clusterAssment[i][0] === centSplit) {
-        //             clusterAssment[i][0] = newClusterAss[j][0];
-        //             clusterAssment[i][1] = newClusterAss[j++][1];
-        //         }
-        //     }
 
-        //     cb && cb({
-        //         clusterAssment: clusterAssment,
-        //         centroids: centList
-        //     });
-        // }
-        // return {
-        //     clusterAssment: clusterAssment,
-        //     centroids: centList
-        // };
     }
 
     /**
@@ -244,6 +223,9 @@ define(function (require) {
         var size = arraySize(dataSet);
         //constructs a two-dimensional array with all values 0
         var centroids = zeros(k, size[1]);
+
+console.log(centroids);
+
         var minJ;
         var maxJ;
         var rangeJ;
@@ -260,7 +242,7 @@ define(function (require) {
                 }
             }
             rangeJ = maxJ - minJ;
-            for (var i = 1; i < k; i++) {
+            for (var i = 0; i < k; i++) {
                 centroids[i][j] = minJ + rangeJ * Math.random();
             }
         }

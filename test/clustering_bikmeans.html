@@ -1,0 +1,82 @@
+<!DOCTYPE>
+<html>
+    <head>
+        <meta charset='utf-8'>
+        <script src="esl.js"></script>
+        <script src="config.js"></script>
+        <script src="lib/jquery.min.js"></script>
+    </head>
+    <body>
+        <style>
+            html, body, #main {
+                width: 100%;
+                height: 100%;
+            }
+        </style>
+        <div id="main"></div>
+        <script>
+
+            require([
+                'echarts',
+                'echarts-stat/clustering',
+                'echarts/chart/scatter',
+                'echarts/component/legend',
+                'echarts/component/grid',
+                'echarts/component/tooltip',
+                'echarts/component/visualMap',
+                'echarts/component/markPoint'
+            ], function (echarts, clustering) {
+
+                var chart = echarts.init(document.getElementById('main'));
+
+                $.getJSON('./data/clustering_dataset2.json')
+                .done(function (data) {
+
+                    var clusterNumber = 5;
+                    var result = clustering.hierKMeans(data, clusterNumber, false);
+
+// console.log(result);
+                    var centroids = result.centroids;
+
+console.log(centroids);
+                    var ptsInCluster = result.pointsInCluster;
+                    var series = [];
+
+                    for (var i = 0; i < centroids.length; i++) {
+                        series.push({
+                            name: 'cluster' + i,
+                            type: 'scatter',
+                            data: ptsInCluster[i],
+                            markPoint: {
+                                data: [{
+                                    coord: centroids[i]
+                                }]
+                            }
+                        });
+                    }
+// console.log(series);
+
+                    chart.setOption({
+                        legend: {
+                            data: []
+                        },
+                        tooltip: {
+                            trigger: 'axis',
+                            axisPointer: {
+                                type: 'cross'
+                            }
+                        },
+                        xAxis: {
+                            type: 'value'
+                        },
+                        yAxis: {
+                            type: 'value'
+                        },
+                        series: series
+                    });
+
+                });
+            });
+        </script>
+    </body>
+</html>
