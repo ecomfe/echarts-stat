@@ -33,7 +33,7 @@
                 $.getJSON('./data/clustering_dataset2.json')
                 .done(function (data) {
 
-                    var clusterNumber = 5;
+                    var clusterNumber = 6;
                     var step = clustering.hierKMeans(data, clusterNumber, true);
                     var result;
                     var option = {
@@ -43,7 +43,7 @@
                             height: 300,
                             width: 10,
                             inverse: true,
-                            playInterval: 300,
+                            playInterval: 250,
                             symbol: 'none',
                             orient: 'vertical',
                             axisType: 'category',
@@ -81,7 +81,6 @@
                         var centroids = result.centroids;
                         var ptsInCluster = result.pointsInCluster;
                         var color = ['#7fc97f','#beaed4','#fdc086','#000','#a33', '#c99'];
-                        // var color1 = ['#4e7c4e','#716383','#6f5c4a','#000','#a44']
                         var series = [];
                         var visualMap = [];
                         for (i = 0; i < k; i++) {
@@ -107,17 +106,7 @@
                                         coord: centroids[i]
                                     }]
                                 }
-                            }
-                            //     name: 'scatter' + i,
-                            //     type: 'scatter',
-                            //     data: [centroids[i]],
-                            //     symbol: 'diamond',
-                            //     itemStyle: {
-                            //         normal: {
-                            //             color: color1[i]
-                            //         }
-                            //     }
-                            );
+                            });
 
                             visualMap.push({
                                 show: false,
@@ -129,7 +118,7 @@
                                         ? [color[i - 1], color[i]]
                                         : [color[i], color[i]]
                                 }
-                            })
+                            });
                         }
                         return {
                             tooltip: {

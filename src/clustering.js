@@ -23,10 +23,6 @@ define(function (require) {
         // create array to assign data points to centroids, also holds SE of each point
         var clusterAssigned = zeros(size[0], 2);
         var centroids = createRandCent(dataSet, k);
-
-
-// console.log(centroids);
-
         var clusterChanged = true;
         var minDist;
         var minIndex;
@@ -61,8 +57,6 @@ define(function (require) {
                 centroids[i] = meanInColumn(ptsInClust);
             }
         }
-
-// console.log(centroids);
 
         var clusterWithKmeans = {
             centroids: centroids,
@@ -223,9 +217,6 @@ define(function (require) {
         var size = arraySize(dataSet);
         //constructs a two-dimensional array with all values 0
         var centroids = zeros(k, size[1]);
-
-console.log(centroids);
-
         var minJ;
         var maxJ;
         var rangeJ;

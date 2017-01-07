@@ -151,12 +151,15 @@ define(function (require) {
                 result.push(coordinate);
             }
 
+            var string = 'y = ' + Math.round(intercept * 100) / 100 + ' + ' + Math.round(gradient * 100) / 100 + 'ln(x)';
+
             return {
                 points: result,
                 parameter: {
                     gradient: gradient,
                     intercept: intercept
-                }
+                },
+                expression: string
             };
 
         },
@@ -198,6 +201,7 @@ define(function (require) {
             coeMatrix.push(lhs);
 
             var coeArray = gaussianElimination(coeMatrix, k);
+
             var result = [];
 
             for (var i = 0; i < predata.length; i++) {

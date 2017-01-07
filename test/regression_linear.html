@@ -8,7 +8,7 @@
     </head>
     <body>
         <style>
-            html, body, #main {
+            html, body, #main {s
                 width: 100%;
                 height: 100%;
             }
@@ -28,19 +28,19 @@
 
                 var chart = echarts.init(document.getElementById('main'));
 
-                $.getJSON('./data/regression_test.json')
+                $.getJSON('./data/regression_data0.json')
                 .done(function (data) {
 
-                    var myRegression = regression('polynomial', data, 3);
+                    var myRegression = regression('linear', data);
 
                     myRegression.points.sort(function (a, b) {
                         return a[0] - b[0];
                     });
 
                     chart.setOption({
-                        legend: {
-                            data: ['scatter', 'line']
-                        },
+                        // legend: {
+                        //     data: ['scatter', 'line']
+                        // },
                         tooltip: {
                             trigger: 'axis',
                             axisPointer: {
@@ -50,17 +50,19 @@
                         xAxis: {
                             type: 'value',
                             splitLine: {
-                                show: false
+                                lineStyle: {
+                                    type: 'dashed'
+                                }
                             },
-                            splitNumber: 20
                         },
                         yAxis: {
                             type: 'value',
-                            min: 2,
-                            max: 5,
+                            min: 1.5,
                             splitLine: {
-                                show: false
-                            }
+                                lineStyle: {
+                                    type: 'dashed'
+                                }
+                            },
                         },
                         series: [{
                             name: 'scatter',

@@ -32,13 +32,9 @@
                 $.getJSON('./data/clustering_dataset2.json')
                 .done(function (data) {
 
-                    var clusterNumber = 5;
+                    var clusterNumber = 3;
                     var result = clustering.hierKMeans(data, clusterNumber, false);
-
-// console.log(result);
                     var centroids = result.centroids;
-
-console.log(centroids);
                     var ptsInCluster = result.pointsInCluster;
                     var series = [];
 
@@ -54,7 +50,6 @@ console.log(centroids);
                             }
                         });
                     }
-// console.log(series);
 
                     chart.setOption({
                         legend: {
