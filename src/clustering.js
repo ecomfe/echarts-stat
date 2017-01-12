@@ -1,9 +1,9 @@
 define(function (require) {
 
-    var dataPreprocess = require('./utils/dataPreprocess');
-    var array = require('./utils/array');
+    var dataPreprocess = require('./util/dataPreprocess');
+    var array = require('./util/array');
     var arraySize = array.size;
-    var sumInColumn = array.sumInColumn;
+    var sumOfColumn = array.sumOfColumn;
     var arraySum = array.sum;
     var zeros = array.zeros;
     var isArray = array.isArray;
@@ -18,23 +18,23 @@ define(function (require) {
      */
     function kMeans(data, k) {
 
-        var dataSet = dataPreprocess(data);
-        var size = arraySize(dataSet);
+        var size = arraySize(data);
         // create array to assign data points to centroids, also holds SE of each point
         var clusterAssigned = zeros(size[0], 2);
-        var centroids = createRandCent(dataSet, k);
+        var centroids = createRandCent(data, k);
         var clusterChanged = true;
         var minDist;
         var minIndex;
         var distIJ;
         var ptsInClust;
+
         while (clusterChanged) {
             clusterChanged = false;
             for (var i = 0; i < size[0]; i++) {
                 minDist = Infinity;
                 minIndex = -1;
                 for (var j = 0; j < k; j++) {
-                    distIJ = distEclud(dataSet[i], centroids[j]);
+                    distIJ = distEuclid(data[i], centroids[j]);
                     if (distIJ < minDist) {
                         minDist = distIJ;
                         minIndex = j;
@@ -51,10 +51,10 @@ define(function (require) {
                 ptsInClust = [];
                 for (var j = 0; j < clusterAssigned.length; j++) {
                     if (clusterAssigned[j][0] === i) {
-                        ptsInClust.push(dataSet[j]);
+                        ptsInClust.push(data[j]);
                     }
                 }
-                centroids[i] = meanInColumn(ptsInClust);
+                centroids[i] = meanInColumns(ptsInClust);
             }
         }
 
@@ -69,9 +69,9 @@ define(function (require) {
      * Calculate the average of each column in a two-dimensional array
      *  and returns the values as an array.
      * @param  {Array.<Array>} dataList two-dimensional array
-     * @return {Object}
+     * @return {Array}
      */
-    function meanInColumn (dataList) {
+    function meanInColumns(dataList) {
 
         var size = arraySize(dataList);
         var meanArray = [];
@@ -95,17 +95,17 @@ define(function (require) {
      * @param  {boolean}  stepByStep
      * @return {}
      */
-    function hierKMeans(data, k, stepByStep) {
+    function hierarchicalKMeans(data, k, stepByStep) {
 
         var dataSet = dataPreprocess(data);
         var size = arraySize(dataSet);
         var clusterAssment = zeros(size[0], 2);
         // initial center point
-        var centroid0 = meanInColumn(dataSet);
+        var centroid0 = meanInColumns(dataSet);
         var centList = [centroid0];
         var squareError;
         for (var i = 0; i < size[0]; i++) {
-            squareError = distEclud(dataSet[i], centroid0);
+            squareError = distEuclid(dataSet[i], centroid0);
             clusterAssment[i][1] = mathPow(squareError, 2);
         }
         var lowestSSE;
@@ -140,7 +140,7 @@ define(function (require) {
                         }
                     }
                     clusterInfo = kMeans(ptsInClust, 2);
-                    sseSplit = sumInColumn(clusterInfo.clusterAssigned, 1);
+                    sseSplit = sumOfColumn(clusterInfo.clusterAssigned, 1);
                     sseNotSplit = arraySum(ptsNotClust);
                     if (sseSplit + sseNotSplit < lowestSSE) {
                         lowestSSE = sseNotSplit + sseSplit;
@@ -246,28 +246,24 @@ define(function (require) {
      * @param  {Array.<nnumber>}  vec2
      * @return {number}
      */
-    function distEclud(vec1, vec2) {
+    function distEuclid(vec1, vec2) {
 
         if (!isArray(vec1) && !isArray(vec2)) {
             return mathSqrt(mathPow(vec1 - vec2, 2));
         }
-        var temp = [];
+
+        var powerSum = 0;
         //subtract the corresponding elements in the vectors
         for (var i = 0; i < vec1.length; i++) {
-            temp[i] = vec1[i] - vec2[i];
+            powerSum += mathPow(vec1[i] - vec2[i], 2);
         }
-        var powerSum = 0;
-        for (var i = 0; i < temp.length; i++) {
-            powerSum += mathPow(temp[i], 2);
-        }
+
         return mathSqrt(powerSum);
     }
 
-    var clustering = {
+    return {
         kMeans: kMeans,
-        hierKMeans: hierKMeans
+        hierarchicalKMeans: hierarchicalKMeans
     };
-
-    return clustering;
 
 });

@@ -1,26 +1,26 @@
 define(function (require) {
 
-    var array = require('../utils/array');
+    var array = require('../util/array');
     var isArray = array.isArray;
-    var number = require('../utils/number');
+    var number = require('../util/number');
     var isNumber = number.isNumber;
 
     /**
-     * Is a method for computing the max value of a list of numbers,
-     * which will filtering other data tyoes.
+     * Is a method for computing the median value of a list of numbers,
+     * which will filter other data types.
      * @param  {Array.<number>} data
      * @return {number}
      */
     function median(data) {
 
         if (!isArray(data)) {
-            throw new TypeError('Invalid data type, you should input an array');
+            throw new Error('Invalid data type, you should input an array');
         }
         var predata = [];
         var len = data.length;
         for (var i = 0; i < len; i++) {
             if (isNumber(data[i])) {
-                predata.push(data[i])
+                predata.push(data[i]);
             }
         }
 
@@ -28,13 +28,15 @@ define(function (require) {
             return a - b;
         });
 
+        var medianData;
+
         if ((len % 2) === 0) {
             var n = len / 2;
-            var medianData = (predata[n] + predata[n+1]) / 2;
+            medianData = (predata[n] + predata[n + 1]) / 2;
         }
         else {
             var m = (len + 1) / 2;
-            var medianData = predata[m];
+            medianData = predata[m];
         }
 
         return medianData;

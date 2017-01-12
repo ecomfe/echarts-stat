@@ -34,7 +34,7 @@
                 .done(function (data) {
 
                     var clusterNumber = 6;
-                    var step = clustering.hierKMeans(data, clusterNumber, true);
+                    var step = clustering.hierarchicalKMeans(data, clusterNumber, true);
                     var result;
                     var option = {
                         timeline: {

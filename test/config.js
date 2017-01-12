@@ -19,5 +19,5 @@ require.config({
             name: 'zrender'
         }
     ]
-    // urlArgs: '_v_=' + +new Date()
+
 });

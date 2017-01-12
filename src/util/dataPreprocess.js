@@ -11,14 +11,14 @@ define(function (require) {
      *  for example [12,] --- missing y value
      *              [,12] --- missing x value
      *              [12, b] --- incorrect y value
-     *              [a, 12] --- incorrect x value
+     *              ['a', 12] --- incorrect x value
      * @param  {Array.<Array>} data
      * @return {Array.<Array.<number>>}
      */
-    function dataPreprocess (data) {
+    function dataPreprocess(data) {
 
         if (!isArray(data)) {
-            throw new TypeError('Invalid data type, you should input an array');
+            throw new Error('Invalid data type, you should input an array');
         }
         var predata = [];
         var arraySize = size(data);

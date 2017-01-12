@@ -1,20 +1,20 @@
 define(function (require) {
 
-    var array = require('../utils/array');
+    var array = require('../util/array');
     var isArray = array.isArray;
-    var number = require('../utils/number');
+    var number = require('../util/number');
     var isNumber = number.isNumber;
 
     /**
      * Is a method for computing the min value of a list of numbers,
-     * which will filtering other data types.
+     * which will filter other data types.
      * @param  {Array.<number>} data
      * @return {number}
      */
     function min(data) {
 
         if (!isArray(data)) {
-            throw new TypeError('Invalid data type, you should input an array');
+            throw new Error('Invalid data type, you should input an array');
         }
 
         var minData = Infinity;

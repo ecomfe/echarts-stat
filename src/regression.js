@@ -1,8 +1,8 @@
 define(function (require) {
 
-    var array = require('./utils/array');
-    var isArray = array.isArray;
-    var dataPreprocess = require('./utils/dataPreprocess');
+    var array = require('./util/array');
+    var dataPreprocess = require('./util/dataPreprocess');
+
 
     var regreMethods = {
 
@@ -11,7 +11,7 @@ define(function (require) {
          * @param  {Array.<Array.<number>>} data two-dimensional array
          * @return {Object}
          */
-        linear: function(data) {
+        linear: function (data) {
 
             var predata = dataPreprocess(data);
             var sumX = 0;
@@ -36,12 +36,15 @@ define(function (require) {
                 result.push(coordinate);
             }
 
+            var string = 'y = ' + Math.round(gradient * 100) / 100 + 'x + ' + Math.round(intercept * 100) / 100;
+
             return {
                 points: result,
                 parameter: {
                     gradient: gradient,
                     intercept: intercept
-                }
+                },
+                expression: string
             };
         },
 
@@ -51,7 +54,7 @@ define(function (require) {
          * @param  {Array.<Array>} data  two-dimensional number array
          * @return {Object}
          */
-        linearThroughOrigin: function(data) {
+        linearThroughOrigin: function (data) {
 
             var predata = dataPreprocess(data);
             var sumXX = 0;
@@ -70,11 +73,14 @@ define(function (require) {
                 result.push(coordinate);
             }
 
+            var string = 'y = ' + Math.round(gradient * 100) / 100 + 'x';
+
             return {
                 points: result,
                 parameter: {
                     gradient: gradient
-                }
+                },
+                expression: string
             };
         },
 
@@ -83,7 +89,7 @@ define(function (require) {
          * @param  {Array.<Array.<number>>} data  two-dimensional number array
          * @return {Object}
          */
-        exponential: function(data) {
+        exponential: function (data) {
 
             var predata = dataPreprocess(data);
             var sumX = 0;
@@ -112,12 +118,15 @@ define(function (require) {
                 result.push(coordinate);
             }
 
+            var string = 'y = ' + Math.round(coefficient * 100) / 100 + 'e^(' + Math.round(index * 100) / 100 + 'x)';
+
             return {
                 points: result,
                 parameter: {
                     coefficient: coefficient,
                     index: index
-                }
+                },
+                expression: string
             };
 
         },
@@ -127,7 +136,7 @@ define(function (require) {
          * @param  {Array.<Array.<number>>} data  two-dimensional number array
          * @return {Object}
          */
-        logarithmic: function(data) {
+        logarithmic: function (data) {
 
             var predata = dataPreprocess(data);
             var sumlnx = 0;
@@ -170,7 +179,7 @@ define(function (require) {
          * @param  {number} order  order of polynomials
          * @return {Object}
          */
-        polynomial: function(data, order) {
+        polynomial: function (data, order) {
 
             var predata = dataPreprocess(data);
             if (typeof order === 'undefined') {
@@ -212,9 +221,23 @@ define(function (require) {
                 result.push([predata[i][0], value]);
             }
 
+            var string = 'y = ';
+            for (var i = coeArray.length - 1; i >= 0; i--) {
+                if (i > 1) {
+                    string += Math.round(coeArray[i] * Math.pow(10, i + 1)) / Math.pow(10, i + 1) + 'x^' + i + ' + ';
+                }
+                else if (i === 1) {
+                    string += Math.round(coeArray[i] * 100) / 100 + 'x' + ' + ';
+                }
+                else {
+                    string += Math.round(coeArray[i] * 100) / 100;
+                }
+            }
+
             return {
                 points: result,
-                parameter: coeArray
+                parameter: coeArray,
+                expression: string
             };
 
         }
@@ -251,7 +274,7 @@ define(function (require) {
             }
         }
 
-        var data = new Array(number);
+        var data = Array(number);
         var len = matrix.length - 1;
         for (var j = matrix.length - 2; j >= 0; j--) {
             var temp = 0;
@@ -265,11 +288,10 @@ define(function (require) {
         return data;
     }
 
-    var regression = function(regreMethod, data, order) {
+    var regression = function (regreMethod, data, order) {
 
-        if (typeof regreMethod === 'string') {
-            return regreMethods[regreMethod](data, order);
-        }
+        return regreMethods[regreMethod](data, order);
+
     };
 
     return regression;

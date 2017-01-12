@@ -3,28 +3,24 @@ define(function (require) {
     /**
      * Test whether value is a number.
      * @param  {*}  value
-     * @return {Boolean}
+     * @return {boolean}
      */
     function isNumber(value) {
-        return typeof value === 'number';
+        return typeof value === 'number' && !isNaN(value);
     }
 
     /**
      * Test if a number is integer.
      * @param  {number}  value
-     * @return {Boolean}
+     * @return {boolean}
      */
     function isInteger(value) {
-        return isFinite(value)
-        ? (value === Math.round(value))
-        : false;
+        return isFinite(value) && value === Math.round(value);
     }
 
-    var number = {
+    return {
         isNumber: isNumber,
         isInteger: isInteger
     };
-
-    return number;
 
 });

@@ -28,56 +28,67 @@
 
                 var chart = echarts.init(document.getElementById('main'));
 
-                $.getJSON('./data/regression_linearThroughOrigin.json')
-                .done(function (data) {
+                var data = [
+                    [0, 0],
+                    [1, 2],
+                    [2, 3],
+                    [3, 4],
+                    [4, 5],
+                    [5, 8],
+                    [6, 7],
+                    [7, 7],
+                    [8, 10],
+                    [9, 14],
+                    [10, 10],
+                    [11, 11],
+                    ['12', '12'],
+                    [13, 15]
+                ];
 
-                    var myRegression = regression('linearThroughOrigin', data);
+                var myRegression = regression('linearThroughOrigin', data);
 
-                    myRegression.points.sort(function (a, b) {
-                        return a[0] - b[0];
-                    });
+                myRegression.points.sort(function (a, b) {
+                    return a[0] - b[0];
+                });
 
-                    chart.setOption({
-                        legend: {
-                            data: ['scatter', 'line']
+                chart.setOption({
+                    legend: {
+                        data: ['scatter', 'line']
+                    },
+                    tooltip: {
+                        trigger: 'axis',
+                        axisPointer: {
+                            type: 'cross'
+                        }
+                    },
+                    xAxis: {
+                        type: 'value',
+                        splitLine: {
+                            show: false
                         },
-                        tooltip: {
-                            trigger: 'axis',
-                            axisPointer: {
-                                type: 'cross'
+                        splitNumber: 20
+                    },
+                    yAxis: {
+                        type: 'value',
+                        splitLine: {
+                            show: false
+                        }
+                    },
+                    series: [{
+                        name: 'scatter',
+                        type: 'scatter',
+                        label: {
+                            emphasis: {
+                                show: true
                             }
                         },
-                        xAxis: {
-                            type: 'value',
-                            splitLine: {
-                                show: false
-                            },
-                            splitNumber: 20
-                        },
-                        yAxis: {
-                            type: 'value',
-                            min: 2,
-                            max: 5,
-                            splitLine: {
-                                show: false
-                            }
-                        },
-                        series: [{
-                            name: 'scatter',
-                            type: 'scatter',
-                            label: {
-                                emphasis: {
-                                    show: true
-                                }
-                            },
-                            data: data
-                         },{
-                            name: 'line',
-                            type: 'line',
-                            showSymbol: false,
-                            data: myRegression.points
-                        }]
-                    });
+                        data: data
+                     },{
+                        name: 'line',
+                        type: 'line',
+                        showSymbol: false,
+                        data: myRegression.points
+                    }]
                 });
             });
         </script>

@@ -33,7 +33,7 @@
                 .done(function (data) {
 
                     var clusterNumber = 3;
-                    var result = clustering.hierKMeans(data, clusterNumber, false);
+                    var result = clustering.hierarchicalKMeans(data, clusterNumber, false);
                     var centroids = result.centroids;
                     var ptsInCluster = result.pointsInCluster;
                     var series = [];

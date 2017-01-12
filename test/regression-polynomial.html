@@ -23,61 +23,107 @@
                 'echarts/chart/line',
                 'echarts/component/legend',
                 'echarts/component/grid',
-                'echarts/component/tooltip'
+                'echarts/component/tooltip',
+                'echarts/component/markPoint',
+                'echarts/component/title'
             ], function (echarts, regression) {
 
                 var chart = echarts.init(document.getElementById('main'));
 
-                $.getJSON('./data/regression_test.json')
-                .done(function (data) {
+                var data = [
+                        [96.24, 11.35],
+                        [33.09, 85.11],
+                        [57.60, 36.61],
+                        [36.77, 27.26],
+                        [20.10, 6.72],
+                        [45.53, 36.37],
+                        [110.07, 80.13],
+                        [72.05, 20.88],
+                        [39.82, 37.15],
+                        [48.05, 70.50],
+                        [0.85, 2.57],
+                        [51.66, 63.70],
+                        [61.07, 127.13],
+                        [64.54, 33.59],
+                        [35.50, 25.01],
+                        [226.55, 664.02],
+                        [188.60, 175.31],
+                        [81.31, 108.68]
+                    ];
 
-                    var myRegression = regression('polynomial', data, 3);
+                var myRegression = regression('polynomial', data, 3);
 
-                    myRegression.points.sort(function (a, b) {
-                        return a[0] - b[0];
-                    });
+                myRegression.points.sort(function (a, b) {
+                    return a[0] - b[0];
+                });
 
-                    chart.setOption({
-                        legend: {
-                            data: ['scatter', 'line']
-                        },
-                        tooltip: {
-                            trigger: 'axis',
-                            axisPointer: {
-                                type: 'cross'
+                chart.setOption({
+
+                    tooltip: {
+                        trigger: 'axis',
+                        axisPointer: {
+                            type: 'cross'
+                        }
+                    },
+                    title: {
+                        text: '20 家公司的净利润和主营业务收入（百万元）',
+                        left: 'center',
+                        top: 16
+                    },
+                    xAxis: {
+                        type: 'value',
+                        splitLine: {
+                            lineStyle: {
+                                type: 'dashed'
                             }
                         },
-                        xAxis: {
-                            type: 'value',
-                            splitLine: {
-                                show: false
-                            },
-                            splitNumber: 20
-                        },
-                        yAxis: {
-                            type: 'value',
-                            min: 2,
-                            max: 5,
-                            splitLine: {
-                                show: false
+                        splitNumber: 20
+                    },
+                    yAxis: {
+                        type: 'value',
+                        min: -40,
+                        splitLine: {
+                            lineStyle: {
+                                type: 'dashed'
+                            }
+                        }
+                    },
+                    series: [{
+                        name: 'scatter',
+                        type: 'scatter',
+                        label: {
+                            emphasis: {
+                                show: true
                             }
                         },
-                        series: [{
-                            name: 'scatter',
-                            type: 'scatter',
-                            label: {
-                                emphasis: {
-                                    show: true
+                        data: data
+                     },{
+                        name: 'line',
+                        type: 'line',
+                        smooth: true,
+                        showSymbol: false,
+                        data: myRegression.points,
+                        markPoint: {
+                            itemStyle: {
+                                normal: {
+                                    color: 'transparent'
                                 }
                             },
-                            data: data
-                         },{
-                            name: 'line',
-                            type: 'line',
-                            showSymbol: false,
-                            data: myRegression.points
-                        }]
-                    });
+                            label: {
+                                normal: {
+                                    show: true,
+                                    formatter: myRegression.expression,
+                                    textStyle: {
+                                        color: '#333',
+                                        fontSize: 14
+                                    }
+                                }
+                            },
+                            data: [{
+                                coord: myRegression.points[myRegression.points.length - 1]
+                            }]
+                        }
+                    }]
                 });
             });
         </script>
