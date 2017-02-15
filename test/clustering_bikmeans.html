@@ -35,6 +35,7 @@
                     var clusterNumber = 3;
                     var result = clustering.hierarchicalKMeans(data, clusterNumber, false);
                     var centroids = result.centroids;
+
                     var ptsInCluster = result.pointsInCluster;
                     var series = [];
 
@@ -44,6 +45,31 @@
                             type: 'scatter',
                             data: ptsInCluster[i],
                             markPoint: {
+                                symbolSize: 30,
+                                label: {
+                                    normal: {
+                                        show: false
+                                    },
+                                    emphasis: {
+                                        show: true,
+                                        // offset: [10, 80]
+                                        position: 'top',
+                                        formatter: function (params) {
+
+                                            return Math.round(params.data.coord[0] * 100) / 100 + '  '
+                                                + Math.round(params.data.coord[1] * 100) / 100 + ' ';
+                                        },
+                                        textStyle: {
+                                            color: '#000'
+                                        }
+                                    }
+                                },
+
+                                itemStyle: {
+                                    normal: {
+                                        opacity: 0.8
+                                    }
+                                },
                                 data: [{
                                     coord: centroids[i]
                                 }]

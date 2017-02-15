@@ -1,0 +1,69 @@
+{
+  "author": {
+    "name": "Roman Shtylman",
+    "email": "shtylman@gmail.com"
+  },
+  "name": "process",
+  "description": "process information for node.js and browsers",
+  "keywords": [
+    "process"
+  ],
+  "scripts": {
+    "test": "mocha test.js",
+    "browser": "zuul --no-coverage --ui mocha-bdd --local 8080 -- test.js"
+  },
+  "version": "0.11.9",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/shtylman/node-process.git"
+  },
+  "license": "MIT",
+  "browser": "./browser.js",
+  "main": "./index.js",
+  "engines": {
+    "node": ">= 0.6.0"
+  },
+  "devDependencies": {
+    "mocha": "2.2.1",
+    "zuul": "^3.10.3"
+  },
+  "gitHead": "7d8c3702a8bbc43fa55f4bab74b150aef37001dd",
+  "bugs": {
+    "url": "https://github.com/shtylman/node-process/issues"
+  },
+  "_id": "process@0.11.9",
+  "_shasum": "7bd5ad21aa6253e7da8682264f1e11d11c0318c1",
+  "_from": "process@>=0.11.0 <0.12.0",
+  "_npmVersion": "3.8.6",
+  "_nodeVersion": "5.12.0",
+  "_npmUser": {
+    "name": "cwmma",
+    "email": "calvin.metcalf@gmail.com"
+  },
+  "dist": {
+    "shasum": "7bd5ad21aa6253e7da8682264f1e11d11c0318c1",
+    "tarball": "https://registry.npmjs.org/process/-/process-0.11.9.tgz"
+  },
+  "maintainers": [
+    {
+      "name": "coolaj86",
+      "email": "coolaj86@gmail.com"
+    },
+    {
+      "name": "cwmma",
+      "email": "calvin.metcalf@gmail.com"
+    },
+    {
+      "name": "defunctzombie",
+      "email": "shtylman@gmail.com"
+    }
+  ],
+  "_npmOperationalInternal": {
+    "host": "packages-16-east.internal.npmjs.com",
+    "tmp": "tmp/process-0.11.9.tgz_1472587751718_0.8843140550889075"
+  },
+  "directories": {},
+  "_resolved": "https://registry.npmjs.org/process/-/process-0.11.9.tgz",
+  "readme": "ERROR: No README data found!",
+  "homepage": "https://github.com/shtylman/node-process#readme"
+}

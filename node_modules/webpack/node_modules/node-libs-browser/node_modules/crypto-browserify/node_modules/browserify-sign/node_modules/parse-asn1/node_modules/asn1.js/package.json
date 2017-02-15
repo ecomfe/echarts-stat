@@ -1,0 +1,63 @@
+{
+  "name": "asn1.js",
+  "version": "4.9.1",
+  "description": "ASN.1 encoder and decoder",
+  "main": "lib/asn1.js",
+  "scripts": {
+    "test": "mocha --reporter spec test/*-test.js rfc/2560/test/*-test.js rfc/5280/test/*-test.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/indutny/asn1.js.git"
+  },
+  "keywords": [
+    "asn.1",
+    "der"
+  ],
+  "author": {
+    "name": "Fedor Indutny"
+  },
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/indutny/asn1.js/issues"
+  },
+  "homepage": "https://github.com/indutny/asn1.js",
+  "devDependencies": {
+    "mocha": "^2.3.4"
+  },
+  "dependencies": {
+    "bn.js": "^4.0.0",
+    "inherits": "^2.0.1",
+    "minimalistic-assert": "^1.0.0"
+  },
+  "gitHead": "33e8f17800306ed28150ef8b6db71efa812552e5",
+  "_id": "asn1.js@4.9.1",
+  "_shasum": "48ba240b45a9280e94748990ba597d216617fd40",
+  "_from": "asn1.js@>=4.0.0 <5.0.0",
+  "_npmVersion": "3.10.8",
+  "_nodeVersion": "7.0.0",
+  "_npmUser": {
+    "name": "indutny",
+    "email": "fedor@indutny.com"
+  },
+  "dist": {
+    "shasum": "48ba240b45a9280e94748990ba597d216617fd40",
+    "tarball": "https://registry.npmjs.org/asn1.js/-/asn1.js-4.9.1.tgz"
+  },
+  "maintainers": [
+    {
+      "name": "fedor.indutny",
+      "email": "fedor.indutny@gmail.com"
+    },
+    {
+      "name": "indutny",
+      "email": "fedor@indutny.com"
+    }
+  ],
+  "_npmOperationalInternal": {
+    "host": "packages-12-west.internal.npmjs.com",
+    "tmp": "tmp/asn1.js-4.9.1.tgz_1482877947207_0.6697999401949346"
+  },
+  "directories": {},
+  "_resolved": "https://registry.npmjs.org/asn1.js/-/asn1.js-4.9.1.tgz"
+}

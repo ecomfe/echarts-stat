@@ -1,0 +1,19 @@
+{
+  "name": "ecStat",
+  "version": "1.0.0",
+  "description": "a statistical tool",
+  "main": "index.js",
+  "author": {
+    "name": "Deqing",
+    "email": "annong035@gmail.com"
+  },
+  "license": "BSD",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ecomfe/echarts-stat"
+  },
+  "devDependencies": {
+    "webpack": "^1.13.3",
+    "webpack-link": "^0.2.0"
+  }
+}

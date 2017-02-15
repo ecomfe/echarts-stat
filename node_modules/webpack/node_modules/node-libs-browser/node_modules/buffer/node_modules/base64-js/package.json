@@ -1,0 +1,71 @@
+{
+  "name": "base64-js",
+  "version": "1.2.0",
+  "description": "Base64 encoding/decoding in pure JS",
+  "keywords": [
+    "base64"
+  ],
+  "homepage": "https://github.com/beatgammit/base64-js",
+  "bugs": {
+    "url": "https://github.com/beatgammit/base64-js/issues"
+  },
+  "license": "MIT",
+  "author": {
+    "name": "T. Jameson Little",
+    "email": "t.jameson.little@gmail.com"
+  },
+  "files": [
+    "test",
+    "index.js",
+    "base64js.min.js"
+  ],
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/beatgammit/base64-js.git"
+  },
+  "scripts": {
+    "build": "browserify -s base64js -r ./ | uglifyjs -m > base64js.min.js",
+    "lint": "standard",
+    "test": "npm run lint && npm run unit",
+    "unit": "tape test/*.js"
+  },
+  "devDependencies": {
+    "benchmark": "^2.1.0",
+    "browserify": "^13.0.0",
+    "standard": "*",
+    "tape": "4.x",
+    "uglify-js": "^2.6.2"
+  },
+  "gitHead": "18bb7b2f20af653e60ae186bd879d3c4e6e6d8e6",
+  "_id": "base64-js@1.2.0",
+  "_shasum": "a39992d723584811982be5e290bb6a53d86700f1",
+  "_from": "base64-js@>=1.0.2 <2.0.0",
+  "_npmVersion": "3.10.3",
+  "_nodeVersion": "6.5.0",
+  "_npmUser": {
+    "name": "feross",
+    "email": "feross@feross.org"
+  },
+  "dist": {
+    "shasum": "a39992d723584811982be5e290bb6a53d86700f1",
+    "tarball": "https://registry.npmjs.org/base64-js/-/base64-js-1.2.0.tgz"
+  },
+  "maintainers": [
+    {
+      "name": "beatgammit",
+      "email": "t.jameson.little@gmail.com"
+    },
+    {
+      "name": "feross",
+      "email": "feross@feross.org"
+    }
+  ],
+  "_npmOperationalInternal": {
+    "host": "packages-16-east.internal.npmjs.com",
+    "tmp": "tmp/base64-js-1.2.0.tgz_1474574119286_0.4763944323640317"
+  },
+  "directories": {},
+  "_resolved": "https://registry.npmjs.org/base64-js/-/base64-js-1.2.0.tgz",
+  "readme": "ERROR: No README data found!"
+}

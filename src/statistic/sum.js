@@ -1,8 +1,8 @@
 define(function (require) {
 
-    var array = require('../utils/array');
+    var array = require('../util/array');
     var isArray = array.isArray;
-    var number = require('../utils/number');
+    var number = require('../util/number');
     var isNumber = number.isNumber;
 
     /**

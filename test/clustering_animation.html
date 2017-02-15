@@ -43,7 +43,7 @@
                             height: 300,
                             width: 10,
                             inverse: true,
-                            playInterval: 250,
+                            playInterval: 2500,
                             symbol: 'none',
                             orient: 'vertical',
                             axisType: 'category',
@@ -65,22 +65,23 @@
                         options: []
                     };
 
-                    var gradientMax = 10;
+                    // var gradientMax = 10;
 
                     for (var i = 0; !(result = step.next()).isEnd; i++) {
-                        for (var j = 0; j < gradientMax; j++) {
-                            option.options.push(getOption(result, clusterNumber, j));
-                            option.timeline.data.push(i + '-' + j);
-                        }
+
+                        option.options.push(getOption(result, clusterNumber));
+                        option.timeline.data.push(i + '');
+
                     }
 
                     chart.setOption(option);
 
-                    function getOption(result, k, gradient) {
+                    function getOption(result, k) {
                         var clusterAssment = result.clusterAssment;
                         var centroids = result.centroids;
                         var ptsInCluster = result.pointsInCluster;
-                        var color = ['#7fc97f','#beaed4','#fdc086','#000','#a33', '#c99'];
+                        var color = ['#c23531','#2f4554', '#61a0a8', '#d48265', '#91c7ae','#749f83',  '#ca8622', '#bda29a','#6e7074', '#546570', '#c4ccd3'];
+                        // var color = ['#7fc97f','#beaed4','#fdc086','#000','#a33', '#c99'];
                         var series = [];
                         var visualMap = [];
                         for (i = 0; i < k; i++) {
@@ -93,32 +94,49 @@
                                     }
                                 },
                                 animation: false,
-                                data: echarts.util.map(ptsInCluster[i], function (val) {
-                                    return [val[0], val[1], gradient];
-                                }),
+                                data: ptsInCluster[i],
                                 markPoint: {
+                                    symbolSize: 29,
                                     label: {
                                         normal: {
-                                            show: true
+                                            show: false
+                                        },
+                                        emphasis: {
+                                            show: true,
+                                            position: 'top',
+                                            formatter: function (params) {
+
+                                                return Math.round(params.data.coord[0] * 100) / 100 + '  '
+                                                    + Math.round(params.data.coord[1] * 100) / 100 + ' ';
+                                            },
+                                            textStyle: {
+                                            color: '#000'
+                                            }
+                                        }
+
+                                    },
+                                    itemStyle: {
+                                        normal: {
+                                            opacity: 0.7
                                         }
                                     },
-                                    data : [{
+                                    data: [{
                                         coord: centroids[i]
                                     }]
                                 }
                             });
 
-                            visualMap.push({
-                                show: false,
-                                dimension: 2,
-                                seriesIndex: i,
-                                max: gradientMax,
-                                inRange: {
-                                    color: i > 1
-                                        ? [color[i - 1], color[i]]
-                                        : [color[i], color[i]]
-                                }
-                            });
+                            // visualMap.push({
+                            //     show: false,
+                            //     dimension: 2,
+                            //     seriesIndex: i,
+                            //     max: gradientMax,
+                            //     inRange: {
+                            //         color: i > 1
+                            //             ? [color[i - 1], color[i]]
+                            //             : [color[i], color[i]]
+                            //     }
+                            // });
                         }
                         return {
                             tooltip: {
