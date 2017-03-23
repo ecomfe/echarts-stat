@@ -9,16 +9,16 @@ It works both in node.js and in the browser.
 If you use npm, you can install it with:
 
 ```sh
- npm install ecStat
+ npm install echarts-stat
  ```
- 
+
 Otherwise, download this tool from [dist directory](https://github.com/ecomfe/echarts-stat/tree/master/dist):
 
 ```html
 <script src='./dist/ecStat.js'></script>
 <script>
 
-var result = ecStat.clustering.hierarchicalKMeans(data, clusterNumber, false); 
+var result = ecStat.clustering.hierarchicalKMeans(data, clusterNumber, false);
 
 </script>
 ```
@@ -39,7 +39,7 @@ var result = ecStat.clustering.hierarchicalKMeans(data, clusterNumber, stepBySte
 ```
 ##### Parameter
 
-* data － `Two-dimensional Numeric Array`,  each data point can have more than two numeric attributes in the original data set. In the following example, `data[0]` is called `data point` and `data[0][1]` is one of the numeric attributes of `data[0]`. 
+* data － `Two-dimensional Numeric Array`,  each data point can have more than two numeric attributes in the original data set. In the following example, `data[0]` is called `data point` and `data[0][1]` is one of the numeric attributes of `data[0]`.
 
   ```js
   var data = [
@@ -48,7 +48,7 @@ var result = ecStat.clustering.hierarchicalKMeans(data, clusterNumber, stepBySte
 		[11, 12, 13, 14, 15],
 		...
 	    ];
-  ``` 
+  ```
 * clusterNumer － `number`, the number of clusters generated
 * stepByStep － `Boolean`, control whether doing the clustering step by step
 
@@ -68,7 +68,7 @@ var result = ecStat.clustering.hierarchicalKMeans(data, clusterNumber, stepBySte
 	result.clusterAssment = [
 
 		[1, 0.145],
-		[2, 0.680], 
+		[2, 0.680],
 		[0, 1.022],
 		...
 	];
@@ -79,7 +79,7 @@ var result = ecStat.clustering.hierarchicalKMeans(data, clusterNumber, stepBySte
 			[0.335, -3.376],
 			[-0.994, -0.884],
 			...
-		], 
+		],
 		...
 	];
 	```
@@ -88,9 +88,9 @@ var result = ecStat.clustering.hierarchicalKMeans(data, clusterNumber, stepBySte
 
 You can not only do cluster analysis through this interface, but also use [ECharts](https://github.com/ecomfe/echarts) to visualize the results.
 
-Note: the clustering algorithm can handle multiple numeric attributes, but for the convenience of visualization, two numeric attributes are chosen here as an example.  
+Note: the clustering algorithm can handle multiple numeric attributes, but for the convenience of visualization, two numeric attributes are chosen here as an example.
 
-##### Directly visualize the results of clustering 
+##### Directly visualize the results of clustering
 
 ```html
 <script src='https://cdn.bootcss.com/echarts/3.4.0/echarts.js'></script>
@@ -98,7 +98,7 @@ Note: the clustering algorithm can handle multiple numeric attributes, but for t
 <script>
 
 var clusterNumber = 3;
-var result = ecStat.clustering.hierarchicalKMeans(data, clusterNumber, false); 
+var result = ecStat.clustering.hierarchicalKMeans(data, clusterNumber, false);
 
 </script>
 ```
@@ -113,9 +113,9 @@ var result = ecStat.clustering.hierarchicalKMeans(data, clusterNumber, false);
 <script src='https://cdn.bootcss.com/echarts/3.4.0/echarts.js'></script>
 <script src='./dist/ecStat.js'></script>
 <script>
-	
+
 var clusterNumber = 6;
-var result = ecStat.clustering.hierarchicalKMeans(data, clusterNumber, true); 
+var result = ecStat.clustering.hierarchicalKMeans(data, clusterNumber, true);
 
 </script>
 ```
@@ -127,7 +127,7 @@ var result = ecStat.clustering.hierarchicalKMeans(data, clusterNumber, true);
 
 ### Regression
 
-Regression algorithm can according to the value of the dependent and independent variables of the data set, fitting out a curve to reflect their trends. The regression algorithm here only supports two numeric attributes. 
+Regression algorithm can according to the value of the dependent and independent variables of the data set, fitting out a curve to reflect their trends. The regression algorithm here only supports two numeric attributes.
 
 #### Syntax
 ```
@@ -172,7 +172,7 @@ var myRegression = ecStat.regression(regressionType, data, order);
 
 You can not only do regression analysis through this interface, you can also use [ECharts](https://github.com/ecomfe/echarts) to visualize the results.
 
-##### Linear Regression 
+##### Linear Regression
 
 ```html
 <script src='https://cdn.bootcss.com/echarts/3.4.0/echarts.js'></script>
@@ -194,7 +194,7 @@ var myRegression = ecStat.regression('linear', data);
 <script src='https://cdn.bootcss.com/echarts/3.4.0/echarts.js'></script>
 <script src='./dist/ecStat.js'></script>
 <script>
-	
+
 var myRegression = ecStat.regression('exponential', data);
 
 </script>
@@ -210,7 +210,7 @@ var myRegression = ecStat.regression('exponential', data);
 <script src='https://cdn.bootcss.com/echarts/3.4.0/echarts.js'></script>
 <script src='./dist/ecStat.js'></script>
 <script>
-	
+
 var myRegression = ecStat.regression('logarithmic', data);
 
 </script>
@@ -226,7 +226,7 @@ var myRegression = ecStat.regression('logarithmic', data);
 <script src='https://cdn.bootcss.com/echarts/3.4.0/echarts.js'></script>
 <script src='./dist/ecStat.js'></script>
 <script>
-	
+
 var myRegression = ecStat.regression('polynomial', data, 3);
 
 </script>
@@ -251,7 +251,7 @@ var maxValue = ecStat.statistic.max(dataList);
 ##### Parameter
 
 * dataList : `Array.<number>`
- 
+
 ##### Return Value
 
 * maxValue: `number`, the maximum value of the data list
@@ -266,7 +266,7 @@ var minValue = ecStat.statistic.min(dataList);
 ##### Parameter
 
 * dataList : `Array.<number>`
- 
+
 ##### Return Value
 
 * minValue: `number`, the minimum value of the data list
@@ -281,7 +281,7 @@ var meanValue = ecStat.statistic.mean(dataList);
 ##### Parameter
 
 * dataList : `Array.<number>`
- 
+
 ##### Return Value
 
 * meanValue: `number`, the average of the data list
@@ -296,7 +296,7 @@ var medianValue = ecStat.statistic.median(dataList);
 ##### Parameter
 
 * dataList : `Array.<number>`
- 
+
 ##### Return Value
 
 * medianValue: `number`, the median of the data list
@@ -311,7 +311,7 @@ var sumValue = ecStat.statistic.sum(dataList);
 ##### Parameter
 
 * dataList : `Array.<number>`
- 
+
 ##### Return Value
 
 * sumValue: `number`, the sum of the data list

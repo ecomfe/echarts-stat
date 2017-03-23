@@ -1,7 +1,7 @@
 {
-  "name": "ecStat",
+  "name": "echarts-stat",
   "version": "1.0.0",
-  "description": "a statistical tool",
+  "description": "a statistical tool for ECharts",
   "main": "index.js",
   "author": {
     "name": "Deqing",
