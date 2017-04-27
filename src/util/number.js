@@ -6,6 +6,8 @@ define(function (require) {
      * @return {boolean}
      */
     function isNumber(value) {
+
+        value = (value === null ? NaN : +value);
         return typeof value === 'number' && !isNaN(value);
     }
 

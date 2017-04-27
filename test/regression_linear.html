@@ -18,21 +18,21 @@
 
             require([
                 'echarts',
-                'echarts-stat/regression',
+                'ecStat',
                 'echarts/chart/scatter',
                 'echarts/chart/line',
                 'echarts/component/legend',
                 'echarts/component/markPoint',
                 'echarts/component/grid',
                 'echarts/component/tooltip'
-            ], function (echarts, regression) {
+            ], function (echarts, ecStat) {
 
                 var chart = echarts.init(document.getElementById('main'));
 
                 $.getJSON('./data/regression_data0.json')
                 .done(function (data) {
 
-                    var myRegression = regression('linear', data);
+                    var myRegression = ecStat.regression('linear', data);
 
                     myRegression.points.sort(function (a, b) {
                         return a[0] - b[0];

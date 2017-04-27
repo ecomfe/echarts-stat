@@ -18,7 +18,7 @@
 
             require([
                 'echarts',
-                'echarts-stat/clustering',
+                'ecStat',
                 'echarts/chart/scatter',
                 'echarts/component/legend',
                 'echarts/component/timeline',
@@ -26,7 +26,7 @@
                 'echarts/component/tooltip',
                 'echarts/component/visualMap',
                 'echarts/component/markPoint'
-            ], function (echarts, clustering) {
+            ], function (echarts, ecStat) {
 
                 var chart = echarts.init(document.getElementById('main'));
 
@@ -34,7 +34,7 @@
                 .done(function (data) {
 
                     var clusterNumber = 6;
-                    var step = clustering.hierarchicalKMeans(data, clusterNumber, true);
+                    var step = ecStat.clustering.hierarchicalKMeans(data, clusterNumber, true);
                     var result;
                     var option = {
                         timeline: {

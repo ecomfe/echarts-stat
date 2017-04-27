@@ -22,15 +22,29 @@ define(function (require) {
         }
         var predata = [];
         var arraySize = size(data);
-        for (var i = 0; i < arraySize[0]; i++) {
-            var isCorrect = true;
-            for (var j = 0; j < arraySize[1]; j++) {
-                if (!isNumber(data[i][j])) {
-                    isCorrect = false;
+
+        if (arraySize.length === 1) {
+
+            for (var i = 0; i < arraySize[0]; i++) {
+
+                if (isNumber(data[i])) {
+                    predata.push(data[i]);
                 }
             }
-            if (isCorrect) {
-                predata.push(data[i]);
+        }
+        else if (arraySize.length === 2) {
+
+            for (var i = 0; i < arraySize[0]; i++) {
+
+                var isCorrect = true;
+                for (var j = 0; j < arraySize[1]; j++) {
+                    if (!isNumber(data[i][j])) {
+                        isCorrect = false;
+                    }
+                }
+                if (isCorrect) {
+                    predata.push(data[i]);
+                }
             }
         }
         return predata;

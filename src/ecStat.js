@@ -4,7 +4,8 @@ define(function (require) {
 
         clustering: require('./clustering'),
         regression: require('./regression'),
-        statistic: require('./statistic')
+        statistic: require('./statistic'),
+        histogram: require('./histogram')
 
     };
 

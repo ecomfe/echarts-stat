@@ -18,7 +18,7 @@
 
             require([
                 'echarts',
-                'echarts-stat/regression',
+                'ecStat',
                 'echarts/chart/scatter',
                 'echarts/chart/line',
                 'echarts/component/legend',
@@ -26,7 +26,7 @@
                 'echarts/component/tooltip',
                 'echarts/component/markPoint',
                 'echarts/component/title'
-            ], function (echarts, regression) {
+            ], function (echarts, ecStat) {
 
                 var chart = echarts.init(document.getElementById('main'));
 
@@ -51,7 +51,7 @@
                                 [18, 79395.7]
                             ];
 
-                var myRegression = regression('exponential', dataSH);
+                var myRegression = ecStat.regression('exponential', dataSH);
 
                 myRegression.points.sort(function (a, b) {
                     return a[0] - b[0];

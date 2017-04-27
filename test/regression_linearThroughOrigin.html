@@ -18,13 +18,13 @@
 
             require([
                 'echarts',
-                'echarts-stat/regression',
+                'ecStat',
                 'echarts/chart/scatter',
                 'echarts/chart/line',
                 'echarts/component/legend',
                 'echarts/component/grid',
                 'echarts/component/tooltip'
-            ], function (echarts, regression) {
+            ], function (echarts, ecStat) {
 
                 var chart = echarts.init(document.getElementById('main'));
 
@@ -45,7 +45,7 @@
                     [13, 15]
                 ];
 
-                var myRegression = regression('linearThroughOrigin', data);
+                var myRegression = ecStat.regression('linearThroughOrigin', data);
 
                 myRegression.points.sort(function (a, b) {
                     return a[0] - b[0];

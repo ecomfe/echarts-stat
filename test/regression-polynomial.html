@@ -18,7 +18,7 @@
 
             require([
                 'echarts',
-                'echarts-stat/regression',
+                'ecStat',
                 'echarts/chart/scatter',
                 'echarts/chart/line',
                 'echarts/component/legend',
@@ -26,7 +26,7 @@
                 'echarts/component/tooltip',
                 'echarts/component/markPoint',
                 'echarts/component/title'
-            ], function (echarts, regression) {
+            ], function (echarts, ecStat) {
 
                 var chart = echarts.init(document.getElementById('main'));
 
@@ -51,7 +51,7 @@
                         [81.31, 108.68]
                     ];
 
-                var myRegression = regression('polynomial', data, 3);
+                var myRegression = ecStat.regression('polynomial', data, 3);
 
                 myRegression.points.sort(function (a, b) {
                     return a[0] - b[0];

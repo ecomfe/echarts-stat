@@ -1,6 +1,5 @@
 define(function (require) {
 
-    var number = require('./number');
     var objToString = Object.prototype.toString;
 
     /**
@@ -69,12 +68,20 @@ define(function (require) {
         return sum;
     }
 
+    function ascending(a, b) {
+
+        return a > b ? 1 : a < b ? -1 : a === b ? 0 : NaN;
+
+    }
+
+
     return {
         size: size,
         isArray: isArray,
         zeros: zeros,
         sum: sum,
-        sumOfColumn: sumOfColumn
+        sumOfColumn: sumOfColumn,
+        ascending: ascending
     };
 
 });

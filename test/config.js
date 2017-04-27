@@ -4,9 +4,9 @@ require.config({
     },
     packages: [
         {
-            main: 'echarts-stat',
+            main: 'ecStat',
             location: '../src',
-            name: 'echarts-stat'
+            name: 'ecStat'
         },
         {
             main: 'echarts',
