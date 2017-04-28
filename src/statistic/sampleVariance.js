@@ -6,7 +6,11 @@ define(function (require) {
     var isNumber = number.isNumber;
     var mean = require('./mean');
 
-
+    /**
+     * Computing the variance of list of sample
+     * @param  {Array.<number>} data
+     * @return {bunber}      [description]
+     */
     function sampleVariance (data) {
 
         if (isArray(data) && data.length >= 2) {

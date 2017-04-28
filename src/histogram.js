@@ -30,6 +30,7 @@ define(function (require) {
 
         var step = tickStep(minValue, maxValue, binsNumber);
 
+        // return the xAxis coordinate for each bins, except the end point of the value
         var rangeArray = range(Math.ceil(minValue / step) * step, Math.floor(maxValue / step) * step, step);
 
         var len = rangeArray.length;
@@ -67,8 +68,11 @@ define(function (require) {
     }
 
     /**
-     *
+     * Computing the length of each step
      * @see  https://github.com/d3/d3-array/blob/master/src/ticks.js
+     * @param {number} start
+     * @param {number} stop
+     * @param {number} count
      */
     function tickStep(start, stop, count) {
 
@@ -94,8 +98,11 @@ define(function (require) {
     }
 
     /**
-     *
-     *
+     * Computing range array
+     * @param  {number} start
+     * @param  {number} stop
+     * @param  {number} step
+     * @return {Array.<number>}
      */
     function range(start, stop, step) {
 
@@ -143,7 +150,11 @@ define(function (require) {
         return start;
     }
 
-
+    /**
+     * Four kinds of threshold methods used to
+     * compute how much bins the histogram should be divided
+     * @type {Object}
+     */
     var thresholdMethod = {
 
         squareRoot: function (data) {
