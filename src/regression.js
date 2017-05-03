@@ -1,8 +1,6 @@
 define(function (require) {
 
-    var array = require('./util/array');
     var dataPreprocess = require('./util/dataPreprocess');
-
 
     var regreMethods = {
 
@@ -160,7 +158,11 @@ define(function (require) {
                 result.push(coordinate);
             }
 
-            var string = 'y = ' + Math.round(intercept * 100) / 100 + ' + ' + Math.round(gradient * 100) / 100 + 'ln(x)';
+            var string =
+                'y = '
+                + Math.round(intercept * 100) / 100
+                + ' + '
+                + Math.round(gradient * 100) / 100 + 'ln(x)';
 
             return {
                 points: result,
@@ -274,7 +276,7 @@ define(function (require) {
             }
         }
 
-        var data = Array(number);
+        var data = new Array(number);
         var len = matrix.length - 1;
         for (var j = matrix.length - 2; j >= 0; j--) {
             var temp = 0;

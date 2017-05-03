@@ -1,7 +1,5 @@
 define(function (require) {
 
-    var array = require('../util/array');
-    var isArray = array.isArray;
     var number = require('../util/number');
     var isNumber = number.isNumber;
 
@@ -13,16 +11,13 @@ define(function (require) {
      */
     function sum(data) {
 
-        if (!isArray(data)) {
-            throw new Error('Invalid data type, you should input an array');
-        }
+        var len = data.length;
 
-        if (data.length === 0) {
+        if (!len) {
             return 0;
         }
-
         var sumData = 0;
-        for (var i = 0; i < data.length; i++) {
+        for (var i = 0; i < len; i++) {
             if (isNumber(data[i])) {
                 sumData += data[i];
             }

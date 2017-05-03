@@ -1,7 +1,5 @@
 define(function (require) {
 
-    var array = require('../util/array');
-    var isArray = array.isArray;
     var sum = require('./sum');
 
     /**
@@ -12,16 +10,14 @@ define(function (require) {
      */
     function mean(data) {
 
-        if (isArray(data) && data.length > 0) {
+        var len = data.length;
 
-            return sum(data) / data.length;
-
+        if (!len) {
+            return 0;
         }
-        else {
 
-            throw new Error('mean operation requires at least one data point array');
+        return sum(data) / data.length;
 
-        }
     }
 
     return mean;

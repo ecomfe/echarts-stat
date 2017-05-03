@@ -42,7 +42,9 @@ define(function (require) {
     }
 
     /**
-     * Sums each element in the array
+     * Sums each element in the array.
+     * Internal use, for performance considerations, to avoid
+     * unnecessary judgments and calculations.
      * @param  {Array} vector
      * @return {number}
      */
@@ -75,6 +77,39 @@ define(function (require) {
 
     }
 
+    /**
+     * Binary search algorithm --- this bisector is specidfied to histogram, which every bin like that [a, b),
+     * so the return value use to add 1.
+     * @param  {Array.<number>} array
+     * @param  {number} value
+     * @param  {number} start
+     * @param  {number} end
+     * @return {number}
+     */
+    function bisect(array, value, start, end) { //移出去
+
+        if (start == null) {
+            start = 0;
+        }
+        if (end == null) {
+            end = array.length;
+        }
+        while (start < end) {
+            var mid = Math.floor((start + end) / 2);
+            var compare = ascending(array[mid], value);
+            if (compare > 0) {
+                end = mid;
+            }
+            else if (compare < 0) {
+                start = mid + 1;
+            }
+            else {
+                return mid + 1;
+            }
+        }
+        return start;
+    }
+
 
     return {
         size: size,
@@ -82,7 +117,8 @@ define(function (require) {
         zeros: zeros,
         sum: sum,
         sumOfColumn: sumOfColumn,
-        ascending: ascending
+        ascending: ascending,
+        bisect: bisect
     };
 
 });

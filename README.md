@@ -27,7 +27,7 @@ var result = ecStat.clustering.hierarchicalKMeans(data, clusterNumber, false);
 
 * [Clustering](#clustering)
 * [Regression](#regression)
-* [Statistic](#statistic)
+* [Statistics](#statistic)
 
 ### Clustering
 

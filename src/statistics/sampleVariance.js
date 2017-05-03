@@ -1,7 +1,5 @@
 define(function (require) {
 
-    var array = require('../util/array');
-    var isArray = array.isArray;
     var number = require('../util/number');
     var isNumber = number.isNumber;
     var mean = require('./mean');
@@ -9,11 +7,15 @@ define(function (require) {
     /**
      * Computing the variance of list of sample
      * @param  {Array.<number>} data
-     * @return {bunber}      [description]
+     * @return {number}
      */
-    function sampleVariance (data) {
+    function sampleVariance(data) {
 
-        if (isArray(data) && data.length >= 2) {
+        var len = data.length;
+        if (!len || len < 2) {
+            return 0;
+        }
+        if (data.length >= 2) {
 
             var meanValue = mean(data);
             var sum = 0;
@@ -26,10 +28,6 @@ define(function (require) {
                 }
             }
             return sum / data.length - 1;
-        }
-        else {
-
-            throw new Error('sampleVariance operation requires at least two data points array');
         }
     }
 

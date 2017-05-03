@@ -1,7 +1,5 @@
 define(function (require) {
 
-    var array = require('../util/array');
-    var isArray = array.isArray;
     var number = require('../util/number');
     var isNumber = number.isNumber;
 
@@ -12,10 +10,6 @@ define(function (require) {
      * @return {number}
      */
     function min(data) {
-
-        if (!isArray(data)) {
-            throw new Error('Invalid data type, you should input an array');
-        }
 
         var minData = Infinity;
         for (var i = 0; i < data.length; i++) {
