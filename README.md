@@ -25,9 +25,18 @@ var result = ecStat.clustering.hierarchicalKMeans(data, clusterNumber, false);
 
 ## API Reference
 
+* [Histogram](#histogram)
 * [Clustering](#clustering)
 * [Regression](#regression)
 * [Statistics](#statistic)
+
+### Histogram
+
+
+
+
+
+
 
 ### Clustering
 

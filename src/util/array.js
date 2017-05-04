@@ -1,6 +1,8 @@
 define(function (require) {
 
     var objToString = Object.prototype.toString;
+    var arrayProto = Array.prototype;
+    var nativeMap = arrayProto.map;
 
     /**
      * Get the size of a array
@@ -110,6 +112,30 @@ define(function (require) {
         return start;
     }
 
+    /**
+     * 数组映射
+     * @memberOf module:zrender/core/util
+     * @param {Array} obj
+     * @param {Function} cb
+     * @param {*} [context]
+     * @return {Array}
+     */
+    function map(obj, cb, context) {
+        if (!(obj && cb)) {
+            return;
+        }
+        if (obj.map && obj.map === nativeMap) {
+            return obj.map(cb, context);
+        }
+        else {
+            var result = [];
+            for (var i = 0, len = obj.length; i < len; i++) {
+                result.push(cb.call(context, obj[i], i, obj));
+            }
+            return result;
+        }
+    }
+
 
     return {
         size: size,
@@ -118,7 +144,8 @@ define(function (require) {
         sum: sum,
         sumOfColumn: sumOfColumn,
         ascending: ascending,
-        bisect: bisect
+        bisect: bisect,
+        map: map
     };
 
 });

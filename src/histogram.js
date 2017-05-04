@@ -7,7 +7,7 @@ define(function (require) {
     var dataPreprocess = require('./util/dataPreprocess');
     var array = require('./util/array');
     var ascending = array.ascending;
-    var zrUtil = require('zrender/core/util');
+    var map = array.map;
     var range = require('./util/range');
     var bisect = array.bisect;
     var tickStep = require('./util/tickStep');
@@ -66,7 +66,7 @@ define(function (require) {
             }
         }
 
-        var data = zrUtil.map(bins, function (bin) {
+        var data = map(bins, function (bin) {
             return [(bin.x0 + bin.x1) / 2, bin.sample.length];
         });
 
