@@ -24,6 +24,6 @@ define(function (require) {
         }
         return stop >= start ? step1 : -step1;
 
-    }
+    };
 
 });

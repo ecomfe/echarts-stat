@@ -42,13 +42,13 @@ var bins = ecStat.histogram(data, binMethod);
 
 ##### Parameter
 
-* `data` - `one-dimensional array of data samples`. Compute bins for the given array of data samples.
+* `data` - `Array<number>`. Data samples of numbers.
 
 	```js
 	var data = [8.6, 8.8, 10.5, 10.7, 10.8, 11.0, ... ];
 	```
 
-* `binMethod` - `string`. There are four methods to compute the number of bins, which are 'squareRoot', 'scott', 'freedmanDiaconis', 'sturges'. Of course, there is no "best" number of bins, and different bin sizes can reveal different features of the data.
+* `binMethod` - `string`. There are four methods to calculate the number of bins, which are `squareRoot`, `scott`, `freedmanDiaconis`, and `sturges`. Of course, there is no "best" number of bins, and different bin sizes can reveal different features of the data.
 
 	 * `squareRoot` - This is the default method, which is also used by Excel histograms. Returns the number of bins according to [Square-root choice](https://en.wikipedia.org/wiki/Histogram#Mathematical_definition):
 	 	```js
@@ -73,15 +73,15 @@ var bins = ecStat.histogram(data, binMethod);
 ##### Return Value
 
 * `bins` - `Object`. Contain detail messages of each bin and data used for [ECharts](https://github.com/ecomfe/echarts) to draw the bar chart. 
-	* `bins.bins` - `Array.<Object>`. An array of bins, where each bin is an object containing three attributes:
+	* `bins.bins` - `Array.<Object>`. An array of bins, where each bin is an object, containing three attributes:
 		* `x0` - `number`. The lower bound of the bin (inclusive).
 		* `x1` - `number`. The upper bound of the bin (exclusive).
 		* `sample` - `Array.<number>`. Containing the associated elements from the input data.
-	* `bins.data` - `Array.<Array.<number>>`. An array of bins data, where each bins data is an array not only containing the mean value of `x0` and `x1`, but also the length of `sample`, which is the number of sample values in that bin.
+	* `bins.data` - `Array.<Array.<number>>`. An array of bins data, each bins data is an array not only containing the mean value of `x0` and `x1`, but also the length of `sample`, which is the number of sample values in that bin.
 
 #### Examples
 
- When using ECharts bar chart to draw the histogram, we must notice that setting the xAxis scale is true.
+ When using ECharts bar chart to draw the histogram, we must notice that, setting the xAxis scale is true.
 
 ```html
 <script src='https://cdn.bootcss.com/echarts/3.4.0/echarts.js'></script>
@@ -324,7 +324,7 @@ This interface provides basic summary statistical services.
 
 ##### Syntax
 ```
-var maxValue = ecStat.statistics.deviation(dataList);
+var sampleDeviation = ecStat.statistics.deviation(dataList);
 ```
 ##### Parameter
 
@@ -332,14 +332,14 @@ var maxValue = ecStat.statistics.deviation(dataList);
 
 ##### Return Value
 
-* `maxValue`: `number`. Return the deviation of the numeric array *dataList*. If the *dataList* is empty or the length less than 2, returns 0.
+* `sampleDeviation`: `number`. Return the deviation of the numeric array *dataList*. If the *dataList* is empty or the length less than 2, return 0.
 
 
 #### ecStat.statistics.sampleVariance()
 
 ##### Syntax
 ```
-var maxValue = ecStat.statistics.sampleVariance(dataList);
+var varianceValue = ecStat.statistics.sampleVariance(dataList);
 ```
 ##### Parameter
 
@@ -347,23 +347,23 @@ var maxValue = ecStat.statistics.sampleVariance(dataList);
 
 ##### Return Value
 
-* `maxValue`: `number`. Return the variance of the numeric array *dataList*. If the *dataList* is empty or the length less than 2, returns 0. 
+* `varianceValue`: `number`. Return the variance of the numeric array *dataList*. If the *dataList* is empty or the length less than 2, return 0. 
 
 
 #### ecStat.statistics.quantile()
 
 ##### Syntax
 ```
-var maxValue = ecStat.statistics.quantile(dataList, p);
+var quantileValue = ecStat.statistics.quantile(dataList, p);
 ```
 ##### Parameter
 
 * `dataList` : `Array.<number>`. Sorted array of numbers.
-* `p`: `number`.  where 0 =< *p* <= 1.For example, the first quartile at p = 0.25, the seconed quartile at p = 0.5(same as the median), and the third quartile at p = 0.75.
+* `p`: `number`.  where 0 =< *p* <= 1. For example, the first quartile at p = 0.25, the seconed quartile at p = 0.5(same as the median), and the third quartile at p = 0.75.
 
 ##### Return Value
 
-* `maxValue`: `number`. Return the *p*-quantile of the sorted array of numbers. If p <= 0 or the length of *dataList* less than 2, return the first element of the sorted array; if p >= 1, return the last element of the sorted array; If *dataList* is empty, return 0.
+* `quantileValue`: `number`. Return the *p*-quantile of the sorted array of numbers. If p <= 0 or the length of *dataList* less than 2, return the first element of the sorted array; if p >= 1, return the last element of the sorted array; If *dataList* is empty, return 0.
 
 
 #### ecStat.statistics.max()

@@ -14,10 +14,10 @@ define(function (require) {
         if (len < 2) {
             stop = start;
             start = 0;
-            step = 1
+            step = 1;
         }
         else if (len < 3) {
-            step = 1
+            step = 1;
         }
         else {
             step = +step;
@@ -30,6 +30,6 @@ define(function (require) {
             range[i] = start + i * step;
         }
         return range;
-    }
+    };
 
 });
