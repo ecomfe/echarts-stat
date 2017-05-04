@@ -83,26 +83,25 @@ var bins = ecStat.histogram(data, binMethod);
 
  When using ECharts bar chart to draw the histogram, we must notice that setting the xAxis scale is true.
 
-	```html
-	<script src='https://cdn.bootcss.com/echarts/3.4.0/echarts.js'></script>
-	<script src='./dist/ecStat.js'></script>
-	<script>
+```html
+<script src='https://cdn.bootcss.com/echarts/3.4.0/echarts.js'></script>
+<script src='./dist/ecStat.js'></script>
+<script>
 
-	var bins = ecStat.histogram(data);
-		...
-	var option = {
-		...
-		xAxis: [{
-			type: 'value',
-			//this must be set, otherwise barWidth and bins width
-			//can not corresponding on
-			scale: true 
-		}],
-		...
-	}
+var bins = ecStat.histogram(data);
+var option = {
+	...
+	xAxis: [{
+		type: 'value',
+		// this must be set, otherwise barWidth and bins width
+		// can not corresponding on
+		scale: true 
+	}],
+	...
+}
 
-	</script>
-	```
+</script>
+```
 ![histogram](img/histogram.png)
 
 [Run](http://gallery.echartsjs.com/editor.html?c=xBk5VZddJW)
