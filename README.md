@@ -32,10 +32,80 @@ var result = ecStat.clustering.hierarchicalKMeans(data, clusterNumber, false);
 
 ### Histogram
 
+A histogram is a graphical representation of the distribution of numerical data. It is an estimate of the probability distribution of a quantitative variable. It is a kind of bar graph. To construct a histogram, the first step is to "bin" the range of values - that is, divide the entire range of values into a series of intervals - and then count how many values fall into each interval. The bins are usually specified as consecutive, non-overlapping intervals of a variable. Here the bins(intervals) must be adjacent, and are of equal size.
 
+#### Syntax
 
+	```js
+	var bins = ecStat.histogram(data, binMethod);
+	```
 
+##### Parameter
 
+* `data` - `one-dimensional array of data samples`. Compute bins for the given array of data samples.
+
+	```js
+	var data = [8.6, 8.8, 10.5, 10.7, 10.8, 11.0, ... ];
+	```
+
+* `binMethod` - `string`. There are four methods to compute the number of bins, which are 'squareRoot', 'scott', 'freedmanDiaconis', 'sturges'. Of course, there is no "best" number of bins, and different bin sizes can reveal different features of the data.
+
+	 * `squareRoot` - This is the default method, which is also used by Excel histograms. Returns the number of bins according to [Square-root choice](https://en.wikipedia.org/wiki/Histogram#Mathematical_definition):
+	 	```js
+		var bins = ecStat.histogram(data);
+		```
+
+	* `scott` - Returns the number of bins according to [Scott's normal reference Rule](https://en.wikipedia.org/wiki/Histogram#Mathematical_definition):
+		```js
+		var bins = ecStat.histogram(data, 'scott');
+		```
+
+	* `freedmanDiaconis` - Returns the number of bins according to [The Freedman-Diaconis rule](https://en.wikipedia.org/wiki/Histogram#Mathematical_definition):
+		```js
+		var bins = ecStat.histogram(data, 'freedmanDiaconis');
+		```
+
+	* `sturges` - Returns the number of bins according to [Sturges' formula](https://en.wikipedia.org/wiki/Histogram#Mathematical_definition):
+		```js
+		var bins = ecStat.histogram(data, 'sturges');
+		```
+
+##### Return Value
+
+* `bins` - `Object`. Contain detail messages of each bin and data used for [ECharts](https://github.com/ecomfe/echarts) to draw the bar chart. 
+	* `bins.bins` - `Array.<Object>`. An array of bins, where each bin is an object containing three attributes:
+		* `x0` - `number`. The lower bound of the bin (inclusive).
+		* `x1` - `number`. The upper bound of the bin (exclusive).
+		* `sample` - `Array.<number>`. Containing the associated elements from the input data.
+	* `bins.data` - `Array.<Array.<number>>`. An array of bins data, where each bins data is an array not only containing the mean value of `x0` and `x1`, but also the length of `sample`, which is the number of sample values in that bin.
+
+#### Examples
+
+ When using ECharts bar chart to draw the histogram, we must notice that setting the xAxis scale is true.
+
+	```html
+	<script src='https://cdn.bootcss.com/echarts/3.4.0/echarts.js'></script>
+	<script src='./dist/ecStat.js'></script>
+	<script>
+
+	var bins = ecStat.histogram(data);
+		...
+	var option = {
+		...
+		xAxis: [{
+			type: 'value',
+			//this must be set, otherwise barWidth and bins width
+			//can not corresponding on
+			scale: true 
+		}],
+		...
+	}
+
+	</script>
+	```
+![histogram](img/histogram.png)
+
+[Run]()
 
 
 ### Clustering
@@ -48,7 +118,7 @@ var result = ecStat.clustering.hierarchicalKMeans(data, clusterNumber, stepBySte
 ```
 ##### Parameter
 
-* data － `Two-dimensional Numeric Array`,  each data point can have more than two numeric attributes in the original data set. In the following example, `data[0]` is called `data point` and `data[0][1]` is one of the numeric attributes of `data[0]`.
+* `data` － `two-dimensional Numeric Array`. Each data point can have more than two numeric attributes in the original data set. In the following example, `data[0]` is called `data point` and `data[0][1]` is one of the numeric attributes of `data[0]`.
 
   ```js
   var data = [
@@ -58,12 +128,12 @@ var result = ecStat.clustering.hierarchicalKMeans(data, clusterNumber, stepBySte
 		...
 	    ];
   ```
-* clusterNumer － `number`, the number of clusters generated
-* stepByStep － `Boolean`, control whether doing the clustering step by step
+* `clusterNumer` － `number`. The number of clusters generated
+* `stepByStep` － `boolean`. Control whether doing the clustering step by step
 
 ##### Return Value
 
-* result － `Object`, including the centroids, clusterAssment, and pointsInCluster. For Example:
+* `result` － `Object`. Including the centroids, clusterAssment, and pointsInCluster. For Example:
 
 	```js
 	result.centroids = [
@@ -144,8 +214,8 @@ var myRegression = ecStat.regression(regressionType, data, order);
 ```
 ##### Parameters
 
-* regressionType - `String`, there are four types of regression, whice are `linear`, `exponential`, `logarithmic`, `polynomial`
-* data - `Two-dimensional Numeric Array`, each data object should have two numeric attributes in the original data set. For Example:
+* `regressionType` - `string`. There are four types of regression, whice are `linear`, `exponential`, `logarithmic`, `polynomial`
+* `data` - `two-dimensional Numeric Array`. Each data object should have two numeric attributes in the original data set. For Example:
 
 	```js
 	var data = [
@@ -155,11 +225,11 @@ var myRegression = ecStat.regression(regressionType, data, order);
 		...
 	];
 	```
-* order - `number`, the order of polynomial. If you choose other types of regression, you can ignore it
+* `order` - `number`. The order of polynomial. If you choose other types of regression, you can ignore it
 
 ##### Return Value
 
-* myRegression - `Object`, Including points, parameter, and expression. For Example:
+* `myRegression` - `Object`. Including points, parameter, and expression. For Example:
 
 	```js
 	myRegression.points = [
@@ -247,83 +317,129 @@ var myRegression = ecStat.regression('polynomial', data, 3);
 
 
 
-### Statistic
+### Statistics
 
-This interface provides general statistical services such as maximum, minimum, average, median, sum, etc.
+This interface provides basic summary statistical services.
 
-#### ecStat.statistic.max()
-
-##### Syntax
-```
-var maxValue = ecStat.statistic.max(dataList);
-```
-##### Parameter
-
-* dataList : `Array.<number>`
-
-##### Return Value
-
-* maxValue: `number`, the maximum value of the data list
-
-
-#### ecStat.statistic.min()
+#### ecStat.statistics.deviation()
 
 ##### Syntax
 ```
-var minValue = ecStat.statistic.min(dataList);
+var maxValue = ecStat.statistics.deviation(dataList);
 ```
 ##### Parameter
 
-* dataList : `Array.<number>`
+* `dataList` : `Array.<number>`
 
 ##### Return Value
 
-* minValue: `number`, the minimum value of the data list
+* `maxValue`: `number`. Return the deviation of the numeric array *dataList*. If the *dataList* is empty or the length less than 2, returns 0.
 
 
-#### ecStat.statistic.mean()
+#### ecStat.statistics.sampleVariance()
 
 ##### Syntax
 ```
-var meanValue = ecStat.statistic.mean(dataList);
+var maxValue = ecStat.statistics.sampleVariance(dataList);
 ```
 ##### Parameter
 
-* dataList : `Array.<number>`
+* `dataList` : `Array.<number>`
 
 ##### Return Value
 
-* meanValue: `number`, the average of the data list
+* `maxValue`: `number`. Return the variance of the numeric array *dataList*. If the *dataList* is empty or the length less than 2, returns 0. 
 
 
-#### ecStat.statistic.median()
+#### ecStat.statistics.quantile()
 
 ##### Syntax
 ```
-var medianValue = ecStat.statistic.median(dataList);
+var maxValue = ecStat.statistics.quantile(dataList, p);
 ```
 ##### Parameter
 
-* dataList : `Array.<number>`
+* `dataList` : `Array.<number>`. Sorted array of numbers.
+* `p`: `number`.  where 0 =< *p* <= 1.For example, the first quartile at p = 0.25, the seconed quartile at p = 0.5(same as the median), and the third quartile at p = 0.75.
 
 ##### Return Value
 
-* medianValue: `number`, the median of the data list
+* `maxValue`: `number`. Return the *p*-quantile of the sorted array of numbers. If p <= 0 or the length of *dataList* less than 2, return the first element of the sorted array; if p >= 1, return the last element of the sorted array; If *dataList* is empty, return 0.
 
 
-#### ecStat.statistic.sum()
+#### ecStat.statistics.max()
 
 ##### Syntax
 ```
-var sumValue = ecStat.statistic.sum(dataList);
+var maxValue = ecStat.statistics.max(dataList);
 ```
 ##### Parameter
 
-* dataList : `Array.<number>`
+* `dataList` : `Array.<number>`
 
 ##### Return Value
 
-* sumValue: `number`, the sum of the data list
+* `maxValue`: `number`. The maximum value of the *dataList*.
+
+
+#### ecStat.statistics.min()
+
+##### Syntax
+```
+var minValue = ecStat.statistics.min(dataList);
+```
+##### Parameter
+
+* `dataList` : `Array.<number>`
+
+##### Return Value
+
+* `minValue`: `number`. The minimum value of the *dataList*.
+
+
+#### ecStat.statistics.mean()
+
+##### Syntax
+```
+var meanValue = ecStat.statistics.mean(dataList);
+```
+##### Parameter
+
+* `dataList` : `Array.<number>`
+
+##### Return Value
+
+* `meanValue`: `number`. The average of the *dataList*.
+
+
+#### ecStat.statistics.median()
+
+##### Syntax
+```
+var medianValue = ecStat.statistics.median(dataList);
+```
+##### Parameter
+
+* `dataList` : `Array.<number>`. Sorted array of numbers
+
+##### Return Value
+
+* `medianValue`: `number`. The median of the *dataList*.
+
+
+#### ecStat.statistics.sum()
+
+##### Syntax
+```
+var sumValue = ecStat.statistics.sum(dataList);
+```
+##### Parameter
+
+* `dataList` : `Array.<number>`
+
+##### Return Value
+
+* `sumValue`: `number`. The sum of the *dataList*.
 
 
 
