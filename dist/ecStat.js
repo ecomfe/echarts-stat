@@ -1312,10 +1312,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	        if (len < 2) {
 	            stop = start;
 	            start = 0;
-	            step = 1
+	            step = 1;
 	        }
 	        else if (len < 3) {
-	            step = 1
+	            step = 1;
 	        }
 	        else {
 	            step = +step;
@@ -1328,7 +1328,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            range[i] = start + i * step;
 	        }
 	        return range;
-	    }
+	    };
 
 	}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
 
@@ -1362,7 +1362,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	        return stop >= start ? step1 : -step1;
 
-	    }
+	    };
 
 	}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
 
