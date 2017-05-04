@@ -36,9 +36,9 @@ A histogram is a graphical representation of the distribution of numerical data.
 
 #### Syntax
 
-	```js
-	var bins = ecStat.histogram(data, binMethod);
-	```
+```js
+var bins = ecStat.histogram(data, binMethod);
+```
 
 ##### Parameter
 
@@ -105,7 +105,7 @@ A histogram is a graphical representation of the distribution of numerical data.
 	```
 ![histogram](img/histogram.png)
 
-[Run]()
+[Run](http://gallery.echartsjs.com/editor.html?c=xBk5VZddJW)
 
 
 ### Clustering
