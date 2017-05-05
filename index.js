@@ -1,1 +1,1 @@
-module.exports = require('./src/ecStat');
+module.exports = require('./dist/ecStat.js');

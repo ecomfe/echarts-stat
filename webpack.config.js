@@ -3,7 +3,7 @@ var webpack = require('webpack');
 
 module.exports = {
     entry: {
-        'ecStat': __dirname + '/index.js'
+        'ecStat': __dirname + '/src/ecStat.js'
     },
     output: {
         libraryTarget: 'umd',

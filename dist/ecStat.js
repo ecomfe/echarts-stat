@@ -54,8 +54,18 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 0 */
 /***/ (function(module, exports, __webpack_require__) {
 
-	module.exports = __webpack_require__(1);
+	var __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_RESULT__ = function (require) {
 
+	    return {
+
+	        clustering: __webpack_require__(1),
+	        regression: __webpack_require__(5),
+	        statistics: __webpack_require__(6),
+	        histogram: __webpack_require__(15)
+
+	    };
+
+	}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
 
 /***/ }),
 /* 1 */
@@ -63,25 +73,8 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_RESULT__ = function (require) {
 
-	    return {
-
-	        clustering: __webpack_require__(2),
-	        regression: __webpack_require__(6),
-	        statistics: __webpack_require__(7),
-	        histogram: __webpack_require__(16)
-
-	    };
-
-	}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
-
-/***/ }),
-/* 2 */
-/***/ (function(module, exports, __webpack_require__) {
-
-	var __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_RESULT__ = function (require) {
-
-	    var dataPreprocess = __webpack_require__(3);
-	    var array = __webpack_require__(4);
+	    var dataPreprocess = __webpack_require__(2);
+	    var array = __webpack_require__(3);
 	    var arraySize = array.size;
 	    var sumOfColumn = array.sumOfColumn;
 	    var arraySum = array.sum;
@@ -349,15 +342,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
 
 /***/ }),
-/* 3 */
+/* 2 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_RESULT__ = function (require) {
 
-	    var array = __webpack_require__(4);
+	    var array = __webpack_require__(3);
 	    var isArray = array.isArray;
 	    var size = array.size;
-	    var number = __webpack_require__(5);
+	    var number = __webpack_require__(4);
 	    var isNumber = number.isNumber;
 
 	    /**
@@ -408,7 +401,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
 
 /***/ }),
-/* 4 */
+/* 3 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_RESULT__ = function (require) {
@@ -564,7 +557,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
 
 /***/ }),
-/* 5 */
+/* 4 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_RESULT__ = function (require) {
@@ -597,12 +590,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
 
 /***/ }),
-/* 6 */
+/* 5 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_RESULT__ = function (require) {
 
-	    var dataPreprocess = __webpack_require__(3);
+	    var dataPreprocess = __webpack_require__(2);
 
 	    var regreMethods = {
 
@@ -903,33 +896,33 @@ return /******/ (function(modules) { // webpackBootstrap
 	}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
 
 /***/ }),
-/* 7 */
+/* 6 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_RESULT__ = function (require) {
 
 	    var statistics = {};
 
-	    statistics.max = __webpack_require__(8);
-	    statistics.deviation = __webpack_require__(9);
-	    statistics.mean = __webpack_require__(11);
-	    statistics.median = __webpack_require__(13);
-	    statistics.min = __webpack_require__(15);
-	    statistics.max = __webpack_require__(14);
-	    statistics.max = __webpack_require__(10);
-	    statistics.sum = __webpack_require__(12);
+	    statistics.max = __webpack_require__(7);
+	    statistics.deviation = __webpack_require__(8);
+	    statistics.mean = __webpack_require__(10);
+	    statistics.median = __webpack_require__(12);
+	    statistics.min = __webpack_require__(14);
+	    statistics.max = __webpack_require__(13);
+	    statistics.max = __webpack_require__(9);
+	    statistics.sum = __webpack_require__(11);
 
 	    return statistics;
 
 	}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
 
 /***/ }),
-/* 8 */
+/* 7 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_RESULT__ = function (require) {
 
-	    var number = __webpack_require__(5);
+	    var number = __webpack_require__(4);
 	    var isNumber = number.isNumber;
 
 	    /**
@@ -954,12 +947,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
 
 /***/ }),
-/* 9 */
+/* 8 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_RESULT__ = function (require) {
 
-	    var variance = __webpack_require__(10);
+	    var variance = __webpack_require__(9);
 
 	    /**
 	     * Computing the deviation
@@ -975,14 +968,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
 
 /***/ }),
-/* 10 */
+/* 9 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_RESULT__ = function (require) {
 
-	    var number = __webpack_require__(5);
+	    var number = __webpack_require__(4);
 	    var isNumber = number.isNumber;
-	    var mean = __webpack_require__(11);
+	    var mean = __webpack_require__(10);
 
 	    /**
 	     * Computing the variance of list of sample
@@ -1016,12 +1009,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
 
 /***/ }),
-/* 11 */
+/* 10 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_RESULT__ = function (require) {
 
-	    var sum = __webpack_require__(12);
+	    var sum = __webpack_require__(11);
 
 	    /**
 	     * Is a method for computing the mean value of a list of numbers,
@@ -1047,12 +1040,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
 
 /***/ }),
-/* 12 */
+/* 11 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_RESULT__ = function (require) {
 
-	    var number = __webpack_require__(5);
+	    var number = __webpack_require__(4);
 	    var isNumber = number.isNumber;
 
 	    /**
@@ -1082,12 +1075,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
 
 /***/ }),
-/* 13 */
+/* 12 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_RESULT__ = function (require) {
 
-	    var quantile = __webpack_require__(14);
+	    var quantile = __webpack_require__(13);
 
 	    /**
 	     * Is a method for computing the median value of a sorted array of numbers
@@ -1104,7 +1097,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
 
 /***/ }),
-/* 14 */
+/* 13 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_RESULT__ = function (require) {
@@ -1140,12 +1133,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
 
 /***/ }),
-/* 15 */
+/* 14 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_RESULT__ = function (require) {
 
-	    var number = __webpack_require__(5);
+	    var number = __webpack_require__(4);
 	    var isNumber = number.isNumber;
 
 	    /**
@@ -1170,22 +1163,22 @@ return /******/ (function(modules) { // webpackBootstrap
 	}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
 
 /***/ }),
-/* 16 */
+/* 15 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_RESULT__ = function (require) {
 
-	    var max = __webpack_require__(8);
-	    var min = __webpack_require__(15);
-	    var quantile = __webpack_require__(14);
-	    var deviation = __webpack_require__(9);
-	    var dataPreprocess = __webpack_require__(3);
-	    var array = __webpack_require__(4);
+	    var max = __webpack_require__(7);
+	    var min = __webpack_require__(14);
+	    var quantile = __webpack_require__(13);
+	    var deviation = __webpack_require__(8);
+	    var dataPreprocess = __webpack_require__(2);
+	    var array = __webpack_require__(3);
 	    var ascending = array.ascending;
 	    var map = array.map;
-	    var range = __webpack_require__(17);
+	    var range = __webpack_require__(16);
 	    var bisect = array.bisect;
-	    var tickStep = __webpack_require__(18);
+	    var tickStep = __webpack_require__(17);
 
 	    /**
 	     * Compute bins for histogram
@@ -1293,7 +1286,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
 
 /***/ }),
-/* 17 */
+/* 16 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_RESULT__ = function (require) {
@@ -1333,7 +1326,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
 
 /***/ }),
-/* 18 */
+/* 17 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_RESULT__ = function (require) {
