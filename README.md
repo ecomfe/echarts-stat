@@ -72,7 +72,7 @@ var bins = ecStat.histogram(data, binMethod);
 
 ##### Return Value
 
-* `bins` - `Object`. Contain detail messages of each bin and data used for [ECharts](https://github.com/ecomfe/echarts) to draw the bar chart. 
+* `bins` - `Object`. Contain detailed messages of each bin and data used for [ECharts](https://github.com/ecomfe/echarts) to draw the bar chart. 
 	* `bins.bins` - `Array.<Object>`. An array of bins, where each bin is an object, containing three attributes:
 		* `x0` - `number`. The lower bound of the bin (inclusive).
 		* `x1` - `number`. The upper bound of the bin (exclusive).
@@ -81,7 +81,7 @@ var bins = ecStat.histogram(data, binMethod);
 
 #### Examples
 
- When using ECharts bar chart to draw the histogram, we must notice that, setting the xAxis scale is true.
+ When using ECharts bar chart to draw the histogram, we must notice that, setting the `xAxis.scale` as `true`.
 
 ```html
 <script src='https://cdn.bootcss.com/echarts/3.4.0/echarts.js'></script>
@@ -93,8 +93,7 @@ var option = {
 	...
 	xAxis: [{
 		type: 'value',
-		// this must be set, otherwise barWidth and bins width
-		// can not corresponding on
+		// this must be set as true, otherwise barWidth and bins width can not corresponding on
 		scale: true 
 	}],
 	...
