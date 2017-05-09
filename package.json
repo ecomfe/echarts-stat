@@ -3,6 +3,7 @@
   "version": "1.1.0",
   "description": "a statistical tool for ECharts",
   "main": "index.js",
+  "types": "src/ecStat.d.ts",
   "author": {
     "name": "Deqing",
     "email": "annong035@gmail.com"
