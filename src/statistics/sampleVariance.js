@@ -27,7 +27,7 @@ define(function (require) {
                     sum += temple * temple;
                 }
             }
-            return sum / data.length - 1;
+            return sum / (data.length - 1);
         }
     }
 
