@@ -10,12 +10,12 @@ require.config({
         },
         {
             main: 'echarts',
-            location: '../../echarts/src',
+            location: '../../echarts/dist',
             name: 'echarts'
         },
         {
             main: 'zrender',
-            location: '../../zrender/src',
+            location: '../../zrender/dist',
             name: 'zrender'
         }
     ]

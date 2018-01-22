@@ -5,7 +5,7 @@
   "main": "index.js",
   "types": "src/ecStat.d.ts",
   "author": {
-    "name": "Deqing",
+    "name": "Deqing Li",
     "email": "annong035@gmail.com"
   },
   "license": "BSD",
