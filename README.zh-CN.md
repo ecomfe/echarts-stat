@@ -77,7 +77,7 @@ var bins = ecStat.histogram(data, binMethod);
 		* `x0` - `number`. 区间间隔的下界 (包含)。
 		* `x1` - `number`. 区间间隔的上界 (不包含)。
 		* `sample` - `Array.<number>`. 落入该区间间隔的输入样本数据。
-	* `bins.data` - `Array.<Array.<number>>`. An array of bins data, each bins data is an array not only containing the mean value of `x0` and `x1`, but also the length of `sample`, which is the number of sample values in that bin.
+	* `bins.data` - `Array.<Array.<number>>`. An array of bins data, each bin data is an array not only containing the mean value of `x0` and `x1`, but also the length of `sample`, which is the number of sample values in that bin.
 
 #### 实例
 

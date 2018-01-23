@@ -77,7 +77,7 @@ var bins = ecStat.histogram(data, binMethod);
 		* `x0` - `number`. The lower bound of the bin (inclusive).
 		* `x1` - `number`. The upper bound of the bin (exclusive).
 		* `sample` - `Array.<number>`. Containing the associated elements from the input data.
-	* `bins.data` - `Array.<Array.<number>>`. An array of bins data, each bins data is an array not only containing the mean value of `x0` and `x1`, but also the length of `sample`, which is the number of sample values in that bin.
+	* `bins.data` - `Array.<Array.<number>>`. An array of bins data, each bin data is an array not only containing the mean value of `x0` and `x1`, but also the length of `sample`, which is the number of sample values in that bin.
 
 #### Examples
 
