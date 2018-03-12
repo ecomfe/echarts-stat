@@ -50,5 +50,20 @@ define(function (require) {
         return predata;
     }
 
-    return dataPreprocess;
+    /**
+     * @param {string|number} val
+     * @return {number}
+     */
+    function getPrecision(val) {
+        var str = val.toString();
+        // scientific notation is not considered
+        var dotIndex = str.indexOf('.');
+        return dotIndex < 0 ? 0 : str.length - 1 - dotIndex;
+    }
+
+    return {
+        dataPreprocess: dataPreprocess,
+        getPrecision: getPrecision
+    };
+
 });

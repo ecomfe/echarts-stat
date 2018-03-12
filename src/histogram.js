@@ -4,7 +4,8 @@ define(function (require) {
     var min = require('./statistics/min');
     var quantile = require('./statistics/quantile');
     var deviation = require('./statistics/deviation');
-    var dataPreprocess = require('./util/dataPreprocess');
+    var dataProcess = require('./util/dataProcess');
+    var dataPreprocess = dataProcess.dataPreprocess;
     var array = require('./util/array');
     var ascending = array.ascending;
     var map = array.map;

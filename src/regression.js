@@ -1,6 +1,7 @@
 define(function (require) {
 
-    var dataPreprocess = require('./util/dataPreprocess');
+    var dataProcess = require('./util/dataProcess');
+    var dataPreprocess = dataProcess.dataPreprocess;
 
     var regreMethods = {
 
