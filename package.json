@@ -8,13 +8,23 @@
     "name": "Deqing Li",
     "email": "annong035@gmail.com"
   },
+  "scripts": {
+    "test": "jest",
+    "dev": "webpack --watch",
+    "build": "webpack -p"
+  },
   "license": "BSD",
   "repository": {
     "type": "git",
     "url": "https://github.com/ecomfe/echarts-stat"
   },
   "devDependencies": {
+    "jest": "^22.4.2",
     "webpack": "^1.13.3",
     "webpack-link": "^0.2.0"
+  },
+  "jest": {
+    "collectCoverage": true,
+    "setupFiles": []
   }
 }
