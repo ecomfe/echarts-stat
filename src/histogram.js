@@ -6,6 +6,7 @@ define(function (require) {
     var deviation = require('./statistics/deviation');
     var dataProcess = require('./util/dataProcess');
     var dataPreprocess = dataProcess.dataPreprocess;
+    var getPrecision = dataProcess.getPrecision;
     var array = require('./util/array');
     var ascending = array.ascending;
     var map = array.map;
@@ -22,25 +23,25 @@ define(function (require) {
     function computeBins(data, threshold) {
 
         if (threshold == null) {
-
             threshold = thresholdMethod.squareRoot;
-
         }
         else {
-
             threshold = thresholdMethod[threshold];
-
         }
         var values = dataPreprocess(data);
         var maxValue = max(values);
         var minValue = min(values);
-
         var binsNumber = threshold(values, minValue, maxValue);
-
         var step = tickStep(minValue, maxValue, binsNumber);
-
+        var precision = -Math.floor(Math.log(Math.abs(maxValue - minValue) / binsNumber) / Math.LN10);
+        
         // return the xAxis coordinate for each bins, except the end point of the value
-        var rangeArray = range(Math.ceil(minValue / step) * step, Math.floor(maxValue / step) * step, step);
+        var rangeArray = range(
+                +((Math.ceil(minValue / step) * step).toFixed(precision)),
+                +((Math.floor(maxValue / step) * step).toFixed(precision)),
+                step,
+                precision
+            );
 
         var len = rangeArray.length;
 
@@ -68,15 +69,19 @@ define(function (require) {
         }
 
         var data = map(bins, function (bin) {
-            return [(bin.x0 + bin.x1) / 2, bin.sample.length];
+            return [+((bin.x0 + bin.x1) / 2).toFixed(precision), bin.sample.length];
+        });
+
+        var customData = map(bins, function (bin) {
+            return [bin.x0, bin.x1, bin.sample.length];
         });
 
         return {
             bins: bins,
-            data: data
+            data: data,
+            customData: customData
         };
     }
-
 
     /**
      * Four kinds of threshold methods used to

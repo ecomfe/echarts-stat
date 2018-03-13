@@ -10,7 +10,8 @@ define(function (require) {
     return function (start, stop, count) {
 
         var step0 = Math.abs(stop - start) / count;
-        var step1 = Math.pow(10, Math.floor(Math.log(step0) / Math.LN10));
+        var precision = Math.floor(Math.log(step0) / Math.LN10);
+        var step1 = Math.pow(10, precision);
         var error = step0 / step1;
 
         if (error >= Math.sqrt(50)) {
@@ -22,7 +23,7 @@ define(function (require) {
         else if(error >= Math.sqrt(2)) {
             step1 *= 2;
         }
-        return stop >= start ? step1 : -step1;
+        return +((stop >= start ? step1 : -step1).toFixed(-precision));
 
     };
 

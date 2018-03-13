@@ -35,43 +35,51 @@
 
                 var bins = ecStat.histogram(testdata);
 
-console.log(bins);
-console.log(bins.data);
-
                 var option = {
                     title: {
                         text: 'Girths of Black Cherry Trees',
                         left: 'center',
                         top: 20
                     },
-                    color: ['rgb(25, 183, 207)'],
-                    grid: {
-                        left: '3%',
-                        right: '3%',
-                        bottom: '3%',
-                        containLabel: true
-                    },
+                    tooltip: {},
                     xAxis: [{
-                        type: 'value',
                         scale: true, //这个一定要设，不然barWidth和bins对应不上
                     }],
-                    yAxis: [{
-                        type: 'value',
-                    }],
+                    yAxis: {
+                    },
                     series: [{
-                        name: 'height',
-                        type: 'bar',
-                        barWidth: '99.3%',
+                        type: 'custom',
+                        renderItem: function (params, api) {
+                            var yValue = api.value(2);
+                            var start = api.coord([api.value(0), yValue]);
+                            var size = api.size([api.value(1) - api.value(0), yValue]);
+                            return {
+                                type: 'rect',
+                                shape: {
+                                    x: start[0],
+                                    y: start[1],
+                                    width: size[0] * 0.99,
+                                    height: size[1]
+                                },
+                                style: api.style()
+                            };
+                        },
+                        itemStyle: {
+                            color: 'rgb(25, 183, 207)'
+                        },
                         label: {
                             normal: {
                                 show: true,
-                                position: 'insideTop',
-                                formatter: function (params) {
-                                    return params.value[1];
-                                }
+                                position: 'insideTop'
                             }
                         },
-                        data: bins.data
+                        dimension: ['x0', 'x1', 'sampleNum'],
+                        encode: {
+                            x: [0, 1],
+                            y: 2,
+                            tooltip: [0, 1, 2]
+                        },
+                        data: bins.customData
                     }]
                 };
 

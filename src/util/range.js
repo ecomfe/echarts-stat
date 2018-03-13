@@ -10,7 +10,7 @@ define(function (require) {
      * @param  {number} step
      * @return {Array.<number>}
      */
-    return function (start, end, step) {
+    return function (start, end, step, precision) {
 
         var len = arguments.length;
 
@@ -22,18 +22,18 @@ define(function (require) {
         else if (len < 3) {
             step = 1;
         }
-        else {
+        else if (len < 4) {
             step = +step;
+            precision = getPrecision(step);
         }
-        
-        var n = Math.ceil((end - start) / step);
-        var range = new Array(n + 1);
-        var startPre = getPrecision(start);
-        var stepPre = getPrecision(step);
-        var precision = Math.max(startPre, stepPre);
+        else {
+            precision = +precision;
+        }
 
+        var n = Math.ceil(((end - start) / step).toFixed(precision));
+        var range = new Array(n + 1);
         for (var i = 0; i < n + 1; i++) {
-            range[i] = +((start + i * step).toFixed(precision));
+            range[i] = +(start + i * step).toFixed(precision);
         }
         return range;
     };
