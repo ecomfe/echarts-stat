@@ -32,7 +32,7 @@ var result = ecStat.clustering.hierarchicalKMeans(data, clusterNumber, false);
 
 ### Histogram
 
-A histogram is a graphical representation of the distribution of numerical data. It is an estimate of the probability distribution of a quantitative variable. It is a kind of bar graph. To construct a histogram, the first step is to "bin" the range of values - that is, divide the entire range of values into a series of intervals - and then count how many values fall into each interval. The bins are usually specified as consecutive, non-overlapping intervals of a variable. Here the bins(intervals) must be adjacent, and are of equal size.
+A histogram is a graphical representation of the distribution of numerical data. It is an estimate of the probability distribution of a quantitative variable. It is a kind of bar graph. To construct a histogram, the first step is to "bin" the range of values - that is, divide the entire range of values into a series of intervals - and then count how many original sample values fall into each interval. The bins are usually specified as consecutive, non-overlapping intervals of a variable. Here the bins(intervals) must be adjacent, and are of equal size.
 
 #### Syntax
 
@@ -72,16 +72,17 @@ var bins = ecStat.histogram(data, binMethod);
 
 ##### Return Value
 
-* `bins` - `Object`. Contain detailed messages of each bin and data used for [ECharts](https://github.com/ecomfe/echarts) to draw the bar chart. 
+* `bins` - `Object`. Contain detailed messages of each bin and data used for [ECharts](https://github.com/ecomfe/echarts) to draw the histogram.
 	* `bins.bins` - `Array.<Object>`. An array of bins, where each bin is an object, containing three attributes:
 		* `x0` - `number`. The lower bound of the bin (inclusive).
 		* `x1` - `number`. The upper bound of the bin (exclusive).
 		* `sample` - `Array.<number>`. Containing the associated elements from the input data.
-	* `bins.data` - `Array.<Array.<number>>`. An array of bins data, each bin data is an array not only containing the mean value of `x0` and `x1`, but also the length of `sample`, which is the number of sample values in that bin.
+	* `bins.data` - `Array.<Array.<number>>`. Used for bar chart to draw the histogram, each bin data is an array not only containing the mean value of `x0` and `x1`, but also the length of `sample`, which is the number of sample values in this bin.
+	* `bins.customData` - `Array.<Array<number>>`. Used for custom chart to draw the histogram, each custom data is an array not only containing the `x0` and `x1`, but also the length of `sample`, which is the number of sample values in this bin.  
 
 #### Examples
 
- When using ECharts bar chart to draw the histogram, we must notice that, setting the `xAxis.scale` as `true`.
+ This example using ECharts custom chart to draw the histogram, which is the best type of chart we recommend.
 
 ```html
 <script src='https://cdn.bootcss.com/echarts/3.4.0/echarts.js'></script>
@@ -91,10 +92,9 @@ var bins = ecStat.histogram(data, binMethod);
 var bins = ecStat.histogram(data);
 var option = {
 	...
-	xAxis: [{
-		type: 'value',
-		// this must be set as true, otherwise barWidth and bins width can not corresponding on
-		scale: true 
+	series: [{
+		type: 'custom',
+		...
 	}],
 	...
 }
@@ -141,7 +141,7 @@ var result = ecStat.clustering.hierarchicalKMeans(data, clusterNumber, stepBySte
 	    	...
 	];
 
-	// indicate which cluster each data point belonging to, and the distance to cluster centroids
+	// Indicate which cluster each data point belonging to, and the distance to cluster centroids
 	result.clusterAssment = [
 
 		[1, 0.145],
@@ -150,7 +150,7 @@ var result = ecStat.clustering.hierarchicalKMeans(data, clusterNumber, stepBySte
 		...
 	];
 
-	// concrete data point in each cluster
+	// Concrete data point in each cluster
 	result.pointsInCluster = [
 		[
 			[0.335, -3.376],
@@ -236,7 +236,7 @@ var myRegression = ecStat.regression(regressionType, data, order);
 		...
 	];
 
-	// this is the parameter of linear regression, for other types, it shoule be a little different
+	// This is the parameter of linear regression, for other types, it shoule be a little different
 	myRegression.parameter = {
 		gradient: 1.695,
 		intercept: 3.008
