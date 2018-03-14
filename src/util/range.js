@@ -4,10 +4,12 @@ define(function (require) {
     var getPrecision = dataProcess.getPrecision;
 
     /**
-     * Computing range array
+     * Computing range array.
+     * Adding param precision to fix range value, avoiding range[i] = 0.7000000001.
      * @param  {number} start
      * @param  {number} end
      * @param  {number} step
+     * @param  {number} precision
      * @return {Array.<number>}
      */
     return function (start, end, step, precision) {

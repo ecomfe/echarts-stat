@@ -37,6 +37,7 @@ define(function (require) {
         
         // return the xAxis coordinate for each bins, except the end point of the value
         var rangeArray = range(
+                // use function toFixed() to avoid data like '0.700000001'
                 +((Math.ceil(minValue / step) * step).toFixed(precision)),
                 +((Math.floor(maxValue / step) * step).toFixed(precision)),
                 step,
@@ -50,7 +51,7 @@ define(function (require) {
         for (var i = 0; i <= len; i++) {
             bins[i] = {};
             bins[i].sample = [];
-            bins[i].x0 = i > 0 // 不要数组直接挂属性，改成Object
+            bins[i].x0 = i > 0 
                 ? rangeArray[i - 1]
                 : (rangeArray[i] - minValue) === step
                 ? minValue
@@ -69,6 +70,7 @@ define(function (require) {
         }
 
         var data = map(bins, function (bin) {
+            // use function toFixed() to avoid data like '6.5666638489'
             return [+((bin.x0 + bin.x1) / 2).toFixed(precision), bin.sample.length];
         });
 
