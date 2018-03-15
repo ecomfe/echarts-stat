@@ -7,8 +7,8 @@ define(function (require) {
     statistics.mean = require('./statistics/mean');
     statistics.median = require('./statistics/median');
     statistics.min = require('./statistics/min');
-    statistics.max = require('./statistics/quantile');
-    statistics.max = require('./statistics/sampleVariance');
+    statistics.quantile = require('./statistics/quantile');
+    statistics.sampleVariance = require('./statistics/sampleVariance');
     statistics.sum = require('./statistics/sum');
 
     return statistics;
