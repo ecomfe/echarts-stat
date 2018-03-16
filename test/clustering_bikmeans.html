@@ -23,11 +23,18 @@
 
                 var chart = echarts.init(document.getElementById('main'));
 
+                window.onresize = function () {
+                        chart.resize();
+                };
+
                 $.getJSON('./data/clustering_dataset2.json')
                 .done(function (data) {
 
-                    var clusterNumber = 3;
-                    var result = ecStat.clustering.hierarchicalKMeans(data, clusterNumber, false);
+                    var clusterNumber = 2;
+                    
+                    // var result = ecStat.clustering.hierarchicalKMeans(data, clusterNumber, false);
+                    var result = ecStat.clustering.kMeans(data, clusterNumber);
+
                     var centroids = result.centroids;
 
                     var ptsInCluster = result.pointsInCluster;

@@ -92,12 +92,14 @@ define(function (require) {
     /**
      * The combine of hierarchical clustering and k-means.
      * @param  {Array} data   two-dimension array.
-     * @param  {[type]} k   the number of clusters in a dataset
+     * @param  {[type]} k   the number of clusters in a dataset. It has to be greater than 1.
      * @param  {boolean}  stepByStep
      * @return {}
      */
     function hierarchicalKMeans(data, k, stepByStep) {
-
+        if (k < 2 ) {
+            return;
+        }
         var dataSet = dataPreprocess(data);
         var size = arraySize(dataSet);
         var clusterAssment = zeros(size[0], 2);
