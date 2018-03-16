@@ -126,7 +126,7 @@ var result = ecStat.clustering.hierarchicalKMeans(data, clusterNumber, stepBySte
 		...
 	    ];
   ```
-* `clusterNumer` － `number`. The number of clusters generated
+* `clusterNumer` － `number`. The number of clusters generated. **Note that it has to be greater than 1.**
 * `stepByStep` － `boolean`. Control whether doing the clustering step by step
 
 ##### Return Value
