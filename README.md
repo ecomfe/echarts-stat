@@ -116,7 +116,7 @@ var result = ecStat.clustering.hierarchicalKMeans(data, clusterNumber, stepBySte
 ```
 ##### Parameter
 
-* `data` － `two-dimensional Numeric Array`. Each data point can have more than two numeric attributes in the original data set. In the following example, `data[0]` is called `data point` and `data[0][1]` is one of the numeric attributes of `data[0]`.
+* `data` － `Array.<Array.<number>>`. Two-dimensional numeric array, each data point can have more than two numeric attributes in the original data set. In the following example, `data[0]` is called `data point` and `data[0][1]` is one of the numeric attributes of `data[0]`.
 
   ```js
   var data = [

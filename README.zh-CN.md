@@ -10,7 +10,7 @@ ecStat 是 [ECharts](https://github.com/ecomfe/echarts) 的统计和数据挖掘
 
 ```sh
  npm install echarts-stat
- ```
+```
 
 或者， 从 [dist](https://github.com/ecomfe/echarts-stat/tree/master/dist) 目录直接下载引用:
 
@@ -72,16 +72,30 @@ var bins = ecStat.histogram(data, binMethod);
 
 ##### 返回值说明
 
-* `bins` - `Object`. 返回值包含了每一个 bin 的详细信息，以及用于绘制 [ECharts](https://github.com/ecomfe/echarts) 柱状图的数据。 
+* `bins` - `Object`. 返回值包含了每一个 bin 的详细信息，以及用 [ECharts](https://github.com/ecomfe/echarts) 绘制直方图所需要的数据信息。 
 	* `bins.bins` - `Array.<Object>`. 包含所有小区间间隔的数组，其中每个区间间隔是一个对象，包含如下三个属性：
 		* `x0` - `number`. 区间间隔的下界 (包含)。
 		* `x1` - `number`. 区间间隔的上界 (不包含)。
-		* `sample` - `Array.<number>`. 落入该区间间隔的输入样本数据。
-	* `bins.data` - `Array.<Array.<number>>`. An array of bins data, each bin data is an array not only containing the mean value of `x0` and `x1`, but also the length of `sample`, which is the number of sample values in that bin.
+		* `sample` - `Array.<number>`. 落入该区间间隔的原始输入样本数据。
+	* `bins.data` - `Array.<Array.<number>>`. 用 ECharts 柱状图绘制直方图所需要的数据信息。这是一个二维数据，其中每个数据项是一个一维数组。该一维数组包含了 x0 和 x1 的均值，以及上述 sample 数组的长度，示例如下：
+		```js
+		var bins.data = [
+			[mean1, len1],
+			[mean2, len2],
+				...
+		];
+		```
+	* `bins.customData` - `Array.<Array<number>>`. 用 ECharts 自定义图表绘制直方图所需要的数据信息。这是一个二维数据，其中每个数据项是一个一维数组。该一维数组包含了 x0 和 x1，以及上述 sample 数组的长度，示例如下：
+		```js
+		var bins.customData = [
+			[x0, x1, len1],
+				...
+		];
+		```
 
 #### 实例
 
- When using ECharts bar chart to draw the histogram, we must notice that, setting the `xAxis.scale` as `true`.
+这个示例使用 ECharts 自定义图表绘制直方图，相较于柱状图我们更推荐使用自定义图表绘制直方图。
 
 ```html
 <script src='https://cdn.bootcss.com/echarts/3.4.0/echarts.js'></script>
@@ -91,10 +105,9 @@ var bins = ecStat.histogram(data, binMethod);
 var bins = ecStat.histogram(data);
 var option = {
 	...
-	xAxis: [{
-		type: 'value',
-		// this must be set as true, otherwise barWidth and bins width can not corresponding on
-		scale: true 
+	series: [{
+		type: 'custom',
+		...
 	}],
 	...
 }
@@ -108,7 +121,7 @@ var option = {
 
 ### 聚类
 
-Clustering can divide the original data set into multiple data clusters with different characteristics. And through [ECharts](https://github.com/ecomfe/echarts), you can visualize the results of clustering, or visualize the process of clustering.
+聚类可以将原始输入数据分割成多个具有不同特征的数据簇。并且通过 [ECharts](https://github.com/ecomfe/echarts) 既可以可视化聚类的结果，也可以可视化聚类的分割过程。
 
 #### 调用方式
 ```
@@ -116,7 +129,7 @@ var result = ecStat.clustering.hierarchicalKMeans(data, clusterNumber, stepBySte
 ```
 ##### 参数说明
 
-* `data` － `two-dimensional Numeric Array`. Each data point can have more than two numeric attributes in the original data set. In the following example, `data[0]` is called `data point` and `data[0][1]` is one of the numeric attributes of `data[0]`.
+* `data` － `Array.<Array.<number>>`. 这是一个二维数组，two-dimensional Numeric Array, Each data point can have more than two numeric attributes in the original data set. In the following example, `data[0]` is called `data point` and `data[0][1]` is one of the numeric attributes of `data[0]`.
 
   ```js
   var data = [
@@ -126,7 +139,8 @@ var result = ecStat.clustering.hierarchicalKMeans(data, clusterNumber, stepBySte
 		...
 	    ];
   ```
-* `clusterNumer` － `number`. The number of clusters generated
+* `clusterNumer` － `number`. The number of clusters generated. **Note that it has to be greater than 1.**
+* `clusterNumer` － `number`. The number of clusters generated. 
 * `stepByStep` － `boolean`. Control whether doing the clustering step by step
 
 ##### 返回值说明
