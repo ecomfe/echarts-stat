@@ -213,7 +213,7 @@ var myRegression = ecStat.regression(regressionType, data, order);
 ##### Parameters
 
 * `regressionType` - `string`. There are four types of regression, whice are `linear`, `exponential`, `logarithmic`, `polynomial`
-* `data` - `two-dimensional Numeric Array`. Each data object should have two numeric attributes in the original data set. For Example:
+* `data` - `Array.<Array.<number>>`. Two-dimensional numeric array, Each data object should have two numeric attributes in the original data set. For Example:
 
 	```js
 	var data = [
