@@ -139,8 +139,8 @@ var result = ecStat.clustering.hierarchicalKMeans(data, clusterNumber, stepBySte
 		...
 	    ];
   ```
-* `clusterNumer` － `number`. 要生成的数据簇的个数. **注意，该数值必须大于 1。** 
-* `stepByStep` － `boolean`. 该参数主要用于可视化聚类算法每一步的分割过程，即动态地展示数据簇如从 2 个到 3 个，4 个， .... 。
+* `clusterNumer` － `number`. 要生成的数据簇的个数。 **注意，该数值必须大于 1。** 
+* `stepByStep` － `boolean`. 该参数主要用于可视化聚类算法每一步的分割过程，即动态地展示数据簇如何从 2 个到 3 个，4 个， .... 。
 
 ##### 返回值说明
 
@@ -176,7 +176,7 @@ var result = ecStat.clustering.hierarchicalKMeans(data, clusterNumber, stepBySte
 
 #### 实例
 
-调用该接口不仅可以做聚类分析，还可以将聚类的结果用 [ECharts](https://github.com/ecomfe/echarts) 展现出来。
+调用该接口不仅可以做聚类分析，还可以将聚类的结果用 [ECharts](https://github.com/ecomfe/echarts) 展现出来。
 
 **注意：聚类算法可以处理具有多个数值属性的一组数据对象，这里为了可视化的方便，我们以具有两个数值属性的数据对象为例。**
 
