@@ -167,7 +167,7 @@ You can not only do cluster analysis through this interface, but also use [EChar
 
 Note: the clustering algorithm can handle multiple numeric attributes, but for the convenience of visualization, two numeric attributes are chosen here as an example.
 
-##### Directly visualize the results of clustering
+##### Directly visualize the final results of clustering
 
 ```html
 <script src='https://cdn.bootcss.com/echarts/3.4.0/echarts.js'></script>

@@ -129,7 +129,7 @@ var result = ecStat.clustering.hierarchicalKMeans(data, clusterNumber, stepBySte
 ```
 ##### 参数说明
 
-* `data` － `Array.<Array.<number>>`. 这是一个二维数组，two-dimensional Numeric Array, Each data point can have more than two numeric attributes in the original data set. In the following example, `data[0]` is called `data point` and `data[0][1]` is one of the numeric attributes of `data[0]`.
+* `data` － `Array.<Array.<number>>`. 这是一个二维数组，其中每个数据对象是具有多个数值属性的一维数组。如下，`data[0]` 就是一个数据对象，`data[0][1]` 是该数据对象的一个数值属性.
 
   ```js
   var data = [
@@ -139,13 +139,12 @@ var result = ecStat.clustering.hierarchicalKMeans(data, clusterNumber, stepBySte
 		...
 	    ];
   ```
-* `clusterNumer` － `number`. The number of clusters generated. **Note that it has to be greater than 1.**
-* `clusterNumer` － `number`. The number of clusters generated. 
-* `stepByStep` － `boolean`. Control whether doing the clustering step by step
+* `clusterNumer` － `number`. 要生成的数据簇的个数. **注意，该数值必须大于 1。** 
+* `stepByStep` － `boolean`. 该参数主要用于可视化聚类算法每一步的分割过程，即动态地展示数据簇如从 2 个到 3 个，4 个， .... 。
 
 ##### 返回值说明
 
-* `result` － `Object`. Including the centroids, clusterAssment, and pointsInCluster. For Example:
+* `result` － `Object`. 包含每个数据簇的中心点 centroids，聚类的评估结果 clusterAssment，以及每个数据簇所包含的原始数据对象 pointsInCluster。如下:
 
 	```js
 	result.centroids = [
@@ -177,11 +176,11 @@ var result = ecStat.clustering.hierarchicalKMeans(data, clusterNumber, stepBySte
 
 #### 实例
 
-You can not only do cluster analysis through this interface, but also use [ECharts](https://github.com/ecomfe/echarts) to visualize the results.
+调用该接口不仅可以做聚类分析，还可以将聚类的结果用 [ECharts](https://github.com/ecomfe/echarts) 展现出来。
 
-Note: the clustering algorithm can handle multiple numeric attributes, but for the convenience of visualization, two numeric attributes are chosen here as an example.
+**注意：聚类算法可以处理具有多个数值属性的一组数据对象，这里为了可视化的方便，我们以具有两个数值属性的数据对象为例。**
 
-##### Directly visualize the results of clustering
+##### 直接可视化聚类算法的最终结果
 
 ```html
 <script src='https://cdn.bootcss.com/echarts/3.4.0/echarts.js'></script>
@@ -198,7 +197,7 @@ var result = ecStat.clustering.hierarchicalKMeans(data, clusterNumber, false);
 
 [Run](http://gallery.echartsjs.com/editor.html?c=xSkBOEaGtx)
 
-##### Visualize the process of clustering
+##### 可视化聚类的过程
 
 ```html
 <script src='https://cdn.bootcss.com/echarts/3.4.0/echarts.js'></script>
