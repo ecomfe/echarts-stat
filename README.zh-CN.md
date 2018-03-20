@@ -1,6 +1,6 @@
 # ecStat
 
-ecStat 是 [ECharts](https://github.com/ecomfe/echarts) 的统计和数据挖掘工具。你可以把它当作一个工具库直接用来处理分析数据；你也可以将其与 ECharts 结合使用，用 ECharts 可视化数据分析或处理的结果。
+ecStat 是 [ECharts](https://github.com/ecomfe/echarts) 的统计和数据挖掘工具。你可以把它当作一个工具库直接用来分析数据；你也可以将其与 ECharts 结合使用，用 ECharts 可视化数据分析的结果。
 
 同时支持 Node 和浏览器中使用。
 
@@ -129,7 +129,7 @@ var result = ecStat.clustering.hierarchicalKMeans(data, clusterNumber, stepBySte
 ```
 ##### 参数说明
 
-* `data` － `Array.<Array.<number>>`. 这是一个二维数组，其中每个数据对象是具有多个数值属性的一维数组。如下，`data[0]` 就是一个数据对象，`data[0][1]` 是该数据对象的一个数值属性.
+* `data` － `Array.<Array.<number>>`. 这是一个二维数组，其中每个数据对象是具有多个数值属性的一维数组。如下，`data[0]` 就是一个数据对象，`data[0][1]` 是该数据对象的一个数值属性。
 
   ```js
   var data = [
@@ -178,7 +178,7 @@ var result = ecStat.clustering.hierarchicalKMeans(data, clusterNumber, stepBySte
 
 调用该接口不仅可以做聚类分析，还可以将聚类的结果用 [ECharts](https://github.com/ecomfe/echarts) 展现出来。
 
-**注意：聚类算法可以处理具有多个数值属性的一组数据对象，这里为了可视化的方便，我们以具有两个数值属性的数据对象为例。**
+**注意：聚类算法可以处理具有多个数值属性的一组数据对象，这里为了可视化的方便，我们以具有两个数值属性的数据对象为例。**
 
 ##### 直接可视化聚类算法的最终结果
 
