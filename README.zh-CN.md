@@ -217,7 +217,7 @@ var result = ecStat.clustering.hierarchicalKMeans(data, clusterNumber, true);
 
 ### 回归
 
-Regression algorithm can according to the value of the dependent and independent variables of the data set, fitting out a curve to reflect their trends. The regression algorithm here only supports two numeric attributes.
+回归算法将根据原始输入数据集中自变量和因变量的值拟合出一条曲线，以反映它们的变化趋势，目前只支持单个自变量的回归算法。
 
 #### 调用方式
 ```
@@ -225,9 +225,8 @@ var myRegression = ecStat.regression(regressionType, data, order);
 ```
 ##### 参数说明
 
-* `regressionType` - `string`. There are four types of regression, whice are `linear`, `exponential`, `logarithmic`, `polynomial`
-* `data` - `two-dimensional Numeric Array`. Each data object should have two numeric attributes in the original data set. For Example:
-
+* `regressionType` - `string`. 回归类型，提供了四种类型的回归算法，分别是 `'linear'`, `'exponential'`, `'logarithmic'`, `'polynomial'`。
+* `data` - `Array.<Array.<number>>`. 原始的输入数据是一个二维的数值数组，其中每个数据对象是包含两个数值属性的一维数组，分别表示自变量和因变量的值。如下：
 	```js
 	var data = [
 
@@ -236,11 +235,11 @@ var myRegression = ecStat.regression(regressionType, data, order);
 		...
 	];
 	```
-* `order` - `number`. The order of polynomial. If you choose other types of regression, you can ignore it
+* `order` - `number`. 多项式的阶数。对于非多项式回归，可以忽略该参数。
 
 ##### 返回值说明
 
-* `myRegression` - `Object`. Including points, parameter, and expression. For Example:
+* `myRegression` - `Object`. 包括用于绘制折线图的拟合数据点 `points`，回归曲线的参数 `parameter`，以及拟合出的曲线表达式 `expression`。如下：
 
 	```js
 	myRegression.points = [
@@ -262,7 +261,7 @@ var myRegression = ecStat.regression(regressionType, data, order);
 
 You can not only do regression analysis through this interface, you can also use [ECharts](https://github.com/ecomfe/echarts) to visualize the results.
 
-##### Linear Regression
+##### 线性回归
 
 ```html
 <script src='https://cdn.bootcss.com/echarts/3.4.0/echarts.js'></script>
@@ -278,7 +277,7 @@ var myRegression = ecStat.regression('linear', data);
 
 [Run](http://gallery.echartsjs.com/editor.html?c=xS1bQ2AMKe)
 
-##### Exponential Regression
+##### 指数回归
 
 ```html
 <script src='https://cdn.bootcss.com/echarts/3.4.0/echarts.js'></script>
@@ -294,7 +293,7 @@ var myRegression = ecStat.regression('exponential', data);
 
 [Run](http://gallery.echartsjs.com/editor.html?c=xHyaNv0fFe&v=5)
 
-##### Logarithmic Regression
+##### 对数回归
 
 ```html
 <script src='https://cdn.bootcss.com/echarts/3.4.0/echarts.js'></script>
@@ -310,7 +309,7 @@ var myRegression = ecStat.regression('logarithmic', data);
 
 [Run](http://gallery.echartsjs.com/editor.html?c=xry3aWkmYe)
 
-##### Polynomial Regression
+##### 多项式回归
 
 ```html
 <script src='https://cdn.bootcss.com/echarts/3.4.0/echarts.js'></script>
