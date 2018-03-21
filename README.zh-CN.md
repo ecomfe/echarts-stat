@@ -217,7 +217,7 @@ var result = ecStat.clustering.hierarchicalKMeans(data, clusterNumber, true);
 
 ### 回归
 
-回归算法将根据原始输入数据集中自变量和因变量的值拟合出一条曲线，以反映它们的变化趋势，目前只支持单个自变量的回归算法。
+回归算法根据原始输入数据集中自变量和因变量的值拟合出一条曲线，以反映它们的变化趋势。目前只支持单个自变量的回归算法。
 
 #### 调用方式
 ```
@@ -226,7 +226,7 @@ var myRegression = ecStat.regression(regressionType, data, order);
 ##### 参数说明
 
 * `regressionType` - `string`. 回归类型，提供了四种类型的回归算法，分别是 `'linear'`, `'exponential'`, `'logarithmic'`, `'polynomial'`。
-* `data` - `Array.<Array.<number>>`. 原始的输入数据是一个二维的数值数组，其中每个数据对象是包含两个数值属性的一维数组，分别表示自变量和因变量的值。如下：
+* `data` - `Array.<Array.<number>>`. 原始的输入数据是一个二维的数值数组，其中每个数据对象是包含两个数值属性的一维数组，分别表示自变量和因变量的值。如下：
 	```js
 	var data = [
 
@@ -259,7 +259,7 @@ var myRegression = ecStat.regression(regressionType, data, order);
 
 #### 实例
 
-You can not only do regression analysis through this interface, you can also use [ECharts](https://github.com/ecomfe/echarts) to visualize the results.
+不仅可以调用该接口做回归分析，还可以将分析的结果用 [ECharts](https://github.com/ecomfe/echarts) 展现出来。
 
 ##### 线性回归
 
@@ -309,7 +309,7 @@ var myRegression = ecStat.regression('logarithmic', data);
 
 [Run](http://gallery.echartsjs.com/editor.html?c=xry3aWkmYe)
 
-##### 多项式回归
+##### 多项式回归
 
 ```html
 <script src='https://cdn.bootcss.com/echarts/3.4.0/echarts.js'></script>
