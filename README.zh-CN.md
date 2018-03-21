@@ -329,7 +329,7 @@ var myRegression = ecStat.regression('polynomial', data, 3);
 
 ### 基本统计方法
 
-This interface provides basic summary statistical services.
+这些接口提供了基本汇总统计功能。
 
 #### ecStat.statistics.deviation()
 
