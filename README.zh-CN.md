@@ -225,8 +225,8 @@ var myRegression = ecStat.regression(regressionType, data, order);
 ```
 ##### 参数说明
 
-* `regressionType` - `string`. 回归类型，提供了四种类型的回归算法，分别是 `'linear'`, `'exponential'`, `'logarithmic'`, `'polynomial'`。
-* `data` - `Array.<Array.<number>>`. 原始的输入数据是一个二维的数值数组，其中每个数据对象是包含两个数值属性的一维数组，分别表示自变量和因变量的值。如下：
+* `regressionType` - `string`. 回归类型，提供了四种类型的回归算法，分别是 `'linear'`, `'exponential'`, `'logarithmic'`, `'polynomial'`。
+* `data` - `Array.<Array.<number>>`. 原始的输入数据是一个二维的数值数组，其中每个数据对象是包含两个数值属性的一维数组，分别表示自变量和因变量的值。如下：
 	```js
 	var data = [
 
