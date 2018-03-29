@@ -387,11 +387,11 @@ var maxValue = ecStat.statistics.max(dataList);
 ```
 ##### 参数说明
 
-* `dataList` : `Array.<number>`
+* `dataList` : `Array.<number>`. 输入的数值样本集。
 
 ##### 返回值说明
 
-* `maxValue`: `number`. The maximum value of the *dataList*.
+* `maxValue`: `number`. 返回输入数组 *dataList* 的最大值。
 
 
 #### ecStat.statistics.min()
@@ -402,11 +402,11 @@ var minValue = ecStat.statistics.min(dataList);
 ```
 ##### 参数说明
 
-* `dataList` : `Array.<number>`
+* `dataList` : `Array.<number>`. 输入的数值样本集。
 
 ##### 返回值说明
 
-* `minValue`: `number`. The minimum value of the *dataList*.
+* `minValue`: `number`. 返回输入数组 *dataList* 的最小值。
 
 
 #### ecStat.statistics.mean()
@@ -417,11 +417,11 @@ var meanValue = ecStat.statistics.mean(dataList);
 ```
 ##### 参数说明
 
-* `dataList` : `Array.<number>`
+* `dataList` : `Array.<number>`. 输入的数值样本集。
 
 ##### 返回值说明
 
-* `meanValue`: `number`. The average of the *dataList*.
+* `meanValue`: `number`. 返回输入数组 *dataList* 的平均值。
 
 
 #### ecStat.statistics.median()
@@ -436,7 +436,7 @@ var medianValue = ecStat.statistics.median(dataList);
 
 ##### 返回值说明
 
-* `medianValue`: `number`. The median of the *dataList*.
+* `medianValue`: `number`. 返回输入数组 *dataList* 的中位数。
 
 
 #### ecStat.statistics.sum()
@@ -447,11 +447,11 @@ var sumValue = ecStat.statistics.sum(dataList);
 ```
 ##### 参数说明
 
-* `dataList` : `Array.<number>`
+* `dataList` : `Array.<number>`. 输入的数值样本集。
 
 ##### 返回值说明
 
-* `sumValue`: `number`. The sum of the *dataList*.
+* `sumValue`: `number`. 返回输入数组 *dataList* 的求和结果。
 
 
 
