@@ -341,11 +341,11 @@ var sampleDeviation = ecStat.statistics.deviation(dataList);
 ```
 ##### 参数说明
 
-* `dataList` : `Array.<number>`
+* `dataList` : `Array.<number>`. 输入的数值样本集。
 
 ##### 返回值说明
 
-* `sampleDeviation`: `number`. Return the deviation of the numeric array *dataList*. If the *dataList* is empty or the length less than 2, return 0.
+* `sampleDeviation`: `number`. 返回输入数组 *dataList* 的标准差。如果 *dataList* 为空或者长度小于 2，返回 0.
 
 
 #### ecStat.statistics.sampleVariance()
@@ -356,11 +356,11 @@ var varianceValue = ecStat.statistics.sampleVariance(dataList);
 ```
 ##### 参数说明
 
-* `dataList` : `Array.<number>`
+* `dataList` : `Array.<number>`. 输入的数值样本集。
 
 ##### 返回值说明
 
-* `varianceValue`: `number`. Return the variance of the numeric array *dataList*. If the *dataList* is empty or the length less than 2, return 0. 
+* `varianceValue`: `number`. 返回输入数组 *dataList* 的样本方差。如果 *dataList* 为空或者长度小于 2，返回 0. 
 
 
 #### ecStat.statistics.quantile()
