@@ -73,7 +73,8 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_RESULT__ = function (require) {
 
-	    var dataPreprocess = __webpack_require__(2);
+	    var dataProcess = __webpack_require__(2);
+	    var dataPreprocess = dataProcess.dataPreprocess;
 	    var array = __webpack_require__(3);
 	    var arraySize = array.size;
 	    var sumOfColumn = array.sumOfColumn;
@@ -164,12 +165,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	    /**
 	     * The combine of hierarchical clustering and k-means.
 	     * @param  {Array} data   two-dimension array.
-	     * @param  {[type]} k   the number of clusters in a dataset
+	     * @param  {[type]} k   the number of clusters in a dataset. It has to be greater than 1.
 	     * @param  {boolean}  stepByStep
 	     * @return {}
 	     */
 	    function hierarchicalKMeans(data, k, stepByStep) {
-
+	        if (k < 2 ) {
+	            return;
+	        }
 	        var dataSet = dataPreprocess(data);
 	        var size = arraySize(dataSet);
 	        var clusterAssment = zeros(size[0], 2);
@@ -397,7 +400,22 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return predata;
 	    }
 
-	    return dataPreprocess;
+	    /**
+	     * @param {string|number} val
+	     * @return {number}
+	     */
+	    function getPrecision(val) {
+	        var str = val.toString();
+	        // scientific notation is not considered
+	        var dotIndex = str.indexOf('.');
+	        return dotIndex < 0 ? 0 : str.length - 1 - dotIndex;
+	    }
+
+	    return {
+	        dataPreprocess: dataPreprocess,
+	        getPrecision: getPrecision
+	    };
+
 	}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
 
 /***/ }),
@@ -569,7 +587,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	     */
 	    function isNumber(value) {
 
-	        value = (value === null ? NaN : +value);
+	        value = value === null ? NaN : +value;
 	        return typeof value === 'number' && !isNaN(value);
 	    }
 
@@ -595,7 +613,8 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_RESULT__ = function (require) {
 
-	    var dataPreprocess = __webpack_require__(2);
+	    var dataProcess = __webpack_require__(2);
+	    var dataPreprocess = dataProcess.dataPreprocess;
 
 	    var regreMethods = {
 
@@ -908,8 +927,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    statistics.mean = __webpack_require__(10);
 	    statistics.median = __webpack_require__(12);
 	    statistics.min = __webpack_require__(14);
-	    statistics.max = __webpack_require__(13);
-	    statistics.max = __webpack_require__(9);
+	    statistics.quantile = __webpack_require__(13);
+	    statistics.sampleVariance = __webpack_require__(9);
 	    statistics.sum = __webpack_require__(11);
 
 	    return statistics;
@@ -1000,13 +1019,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	                    sum += temple * temple;
 	                }
 	            }
-	            return sum / data.length - 1;
+	            return sum / (data.length - 1);
 	        }
 	    }
 
 	    return sampleVariance;
 
 	}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
+
 
 /***/ }),
 /* 10 */
@@ -1172,7 +1192,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var min = __webpack_require__(14);
 	    var quantile = __webpack_require__(13);
 	    var deviation = __webpack_require__(8);
-	    var dataPreprocess = __webpack_require__(2);
+	    var dataProcess = __webpack_require__(2);
+	    var dataPreprocess = dataProcess.dataPreprocess;
+	    var getPrecision = dataProcess.getPrecision;
 	    var array = __webpack_require__(3);
 	    var ascending = array.ascending;
 	    var map = array.map;
@@ -1189,25 +1211,26 @@ return /******/ (function(modules) { // webpackBootstrap
 	    function computeBins(data, threshold) {
 
 	        if (threshold == null) {
-
 	            threshold = thresholdMethod.squareRoot;
-
 	        }
 	        else {
-
 	            threshold = thresholdMethod[threshold];
-
 	        }
 	        var values = dataPreprocess(data);
 	        var maxValue = max(values);
 	        var minValue = min(values);
-
 	        var binsNumber = threshold(values, minValue, maxValue);
-
 	        var step = tickStep(minValue, maxValue, binsNumber);
-
+	        var precision = -Math.floor(Math.log(Math.abs(maxValue - minValue) / binsNumber) / Math.LN10);
+	        
 	        // return the xAxis coordinate for each bins, except the end point of the value
-	        var rangeArray = range(Math.ceil(minValue / step) * step, Math.floor(maxValue / step) * step, step);
+	        var rangeArray = range(
+	                // use function toFixed() to avoid data like '0.700000001'
+	                +((Math.ceil(minValue / step) * step).toFixed(precision)),
+	                +((Math.floor(maxValue / step) * step).toFixed(precision)),
+	                step,
+	                precision
+	            );
 
 	        var len = rangeArray.length;
 
@@ -1216,7 +1239,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        for (var i = 0; i <= len; i++) {
 	            bins[i] = {};
 	            bins[i].sample = [];
-	            bins[i].x0 = i > 0 // 不要数组直接挂属性，改成Object
+	            bins[i].x0 = i > 0 
 	                ? rangeArray[i - 1]
 	                : (rangeArray[i] - minValue) === step
 	                ? minValue
@@ -1235,15 +1258,20 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 
 	        var data = map(bins, function (bin) {
-	            return [(bin.x0 + bin.x1) / 2, bin.sample.length];
+	            // use function toFixed() to avoid data like '6.5666638489'
+	            return [+((bin.x0 + bin.x1) / 2).toFixed(precision), bin.sample.length];
+	        });
+
+	        var customData = map(bins, function (bin) {
+	            return [bin.x0, bin.x1, bin.sample.length];
 	        });
 
 	        return {
 	            bins: bins,
-	            data: data
+	            data: data,
+	            customData: customData
 	        };
 	    }
-
 
 	    /**
 	     * Four kinds of threshold methods used to
@@ -1291,34 +1319,42 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_RESULT__ = function (require) {
 
+	    var dataProcess = __webpack_require__(2);
+	    var getPrecision = dataProcess.getPrecision;
+
 	    /**
-	     * Computing range array
+	     * Computing range array.
+	     * Adding param precision to fix range value, avoiding range[i] = 0.7000000001.
 	     * @param  {number} start
-	     * @param  {number} stop
+	     * @param  {number} end
 	     * @param  {number} step
+	     * @param  {number} precision
 	     * @return {Array.<number>}
 	     */
-	    return function (start, stop, step) {
+	    return function (start, end, step, precision) {
 
 	        var len = arguments.length;
 
 	        if (len < 2) {
-	            stop = start;
+	            end = start;
 	            start = 0;
 	            step = 1;
 	        }
 	        else if (len < 3) {
 	            step = 1;
 	        }
-	        else {
+	        else if (len < 4) {
 	            step = +step;
+	            precision = getPrecision(step);
+	        }
+	        else {
+	            precision = +precision;
 	        }
 
-	        var n = Math.ceil((stop - start) / step);
+	        var n = Math.ceil(((end - start) / step).toFixed(precision));
 	        var range = new Array(n + 1);
-
 	        for (var i = 0; i < n + 1; i++) {
-	            range[i] = start + i * step;
+	            range[i] = +(start + i * step).toFixed(precision);
 	        }
 	        return range;
 	    };
@@ -1341,7 +1377,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return function (start, stop, count) {
 
 	        var step0 = Math.abs(stop - start) / count;
-	        var step1 = Math.pow(10, Math.floor(Math.log(step0) / Math.LN10));
+	        var precision = Math.floor(Math.log(step0) / Math.LN10);
+	        var step1 = Math.pow(10, precision);
 	        var error = step0 / step1;
 
 	        if (error >= Math.sqrt(50)) {
@@ -1353,7 +1390,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        else if(error >= Math.sqrt(2)) {
 	            step1 *= 2;
 	        }
-	        return stop >= start ? step1 : -step1;
+	        return +((stop >= start ? step1 : -step1).toFixed(-precision));
 
 	    };
 
