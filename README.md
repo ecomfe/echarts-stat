@@ -4,6 +4,8 @@ A statistical and data mining tool for [ECharts](https://github.com/ecomfe/echar
 
 It works both in node.js and in the browser.
 
+*Read this in other languages: [English](README.md), [简体中文](README.zh-CN.md).*
+
 ## Installing
 
 If you use npm, you can install it with:
