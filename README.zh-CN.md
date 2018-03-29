@@ -4,6 +4,8 @@ ecStat 是 [ECharts](https://github.com/ecomfe/echarts) 的统计和数据挖掘
 
 同时支持 Node 和浏览器中使用。
 
+*其他语言版本: [English](README.md), [简体中文](README.zh-CN.md).*
+
 ## 安装
 
 如果你使用 npm ，直接运行下面的命令:
