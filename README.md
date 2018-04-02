@@ -364,7 +364,7 @@ var quantileValue = ecStat.statistics.quantile(dataList, p);
 
 ##### Return Value
 
-* `quantileValue`: `number`. Return the *p*-quantile of the sorted array of numbers. If p <= 0 or the length of *dataList* less than 2, return the first element of the sorted array; if p >= 1, return the last element of the sorted array; If *dataList* is empty, return 0.
+* `quantileValue`: `number`. Return the quantile of the sorted array of numbers. If p <= 0 or the length of *dataList* less than 2, return the first element of the sorted array *dataList*; if p >= 1, return the last element of the sorted array *dataList*; If *dataList* is empty, return 0.
 
 
 #### ecStat.statistics.max()

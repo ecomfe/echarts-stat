@@ -371,12 +371,12 @@ var quantileValue = ecStat.statistics.quantile(dataList, p);
 ```
 ##### 参数说明
 
-* `dataList` : `Array.<number>`. Sorted array of numbers.
-* `p`: `number`.  where 0 =< *p* <= 1. For example, the first quartile at p = 0.25, the seconed quartile at p = 0.5(same as the median), and the third quartile at p = 0.75.
+* `dataList` : `Array.<number>`. 输入的数值数组，该数组必须是按从小到大有序排列的.
+* `p`: `number`. 分位数，取值在 [0, 1] 之间. 例如, 第一四分位数对应的 p 值是 0.25；第二四分位数，也就是中位数，对应的 p 值是 0.5；第三四分位数对应的 p 值是 0.75.
 
 ##### 返回值说明
 
-* `quantileValue`: `number`. Return the *p*-quantile of the sorted array of numbers. If p <= 0 or the length of *dataList* less than 2, return the first element of the sorted array; if p >= 1, return the last element of the sorted array; If *dataList* is empty, return 0.
+* `quantileValue`: `number`. 计算得到的分位数值。如果输入的 *p* 值小于等于 0 或者 *dataList* 的长度小于2，则返回有序数组 *dataList* 的第一个值；如果输入的 *p* 值大于等于1，则返回有序数组 *dataList* 的最后一个值；如果输入的有序数组 *dataList* 为空，则返回 0.
 
 
 #### ecStat.statistics.max()
@@ -432,7 +432,7 @@ var medianValue = ecStat.statistics.median(dataList);
 ```
 ##### 参数说明
 
-* `dataList` : `Array.<number>`. Sorted array of numbers
+* `dataList` : `Array.<number>`. 输入的数值数组，该数组必须是按从小到大有序排列的.
 
 ##### 返回值说明
 
