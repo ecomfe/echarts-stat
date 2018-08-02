@@ -23,7 +23,7 @@ define(function (require) {
         else if(error >= Math.sqrt(2)) {
             step1 *= 2;
         }
-        return +((stop >= start ? step1 : -step1).toFixed(-precision));
+        return +((stop >= start ? step1 : -step1).toFixed(precision));
 
     };
 
