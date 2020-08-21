@@ -1,6 +1,6 @@
 # ecStat
 
-ecStat 是 [ECharts](https://github.com/ecomfe/echarts) 的统计和数据挖掘工具。你可以把它当作一个工具库直接用来分析数据；你也可以将其与 ECharts 结合使用，用 ECharts 可视化数据分析的结果。
+ecStat 是 [Apache ECharts (incubating)](https://github.com/apache/incubator-echarts) 的统计和数据挖掘工具。你可以把它当作一个工具库直接用来分析数据；你也可以将其与 ECharts 结合使用，用 ECharts 可视化数据分析的结果。
 
 同时支持 Node 和浏览器中使用。
 
