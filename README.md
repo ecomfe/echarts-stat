@@ -1,6 +1,6 @@
 # ecStat
 
-A statistical and data mining tool for [ECharts](https://github.com/ecomfe/echarts). You can use it to analyze data and then visualize the results with ECharts, or just use it to process data.
+A statistical and data mining tool for [Apache ECharts (incubating)](https://github.com/apache/incubator-echarts). You can use it to analyze data and then visualize the results with ECharts, or just use it to process data.
 
 It works both in node.js and in the browser.
 
