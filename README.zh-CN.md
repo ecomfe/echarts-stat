@@ -46,54 +46,54 @@ var bins = ecStat.histogram(data, binMethod);
 
 * `data` - `Array<number>`. 数值样本.
 
-	```js
-	var data = [8.6, 8.8, 10.5, 10.7, 10.8, 11.0, ... ];
-	```
+    ```js
+    var data = [8.6, 8.8, 10.5, 10.7, 10.8, 11.0, ... ];
+    ```
 
 * `binMethod` - `string`. 直方图提供了四种计算小区间间隔个数的方法，分别是 `squareRoot`, `scott`, `freedmanDiaconis` 和 `sturges`。这里的每个小区间间隔又称为 `bin`，所有的小区间间隔组成的数组称为 `bins`。当然，对于一个直方图来说，没有所谓的最佳区间间隔个数，不同的区间间隔大小会揭示数据样本不同的数值特性。
 
-	 * `squareRoot` - 默认方法，Excel 的直方图中也是使用这个方法计算 `bins`。依照 [Square-root choice](https://en.wikipedia.org/wiki/Histogram#Mathematical_definition) 返回 bin 的个数:
-	 	```js
-		var bins = ecStat.histogram(data);
-		```
+    * `squareRoot` - 默认方法，Excel 的直方图中也是使用这个方法计算 `bins`。依照 [Square-root choice](https://en.wikipedia.org/wiki/Histogram#Mathematical_definition) 返回 bin 的个数:
+        ```js
+        var bins = ecStat.histogram(data);
+        ```
 
-	* `scott` - 依照 [Scott's normal reference Rule](https://en.wikipedia.org/wiki/Histogram#Mathematical_definition) 返回 bin 的个数:
-		```js
-		var bins = ecStat.histogram(data, 'scott');
-		```
+    * `scott` - 依照 [Scott's normal reference Rule](https://en.wikipedia.org/wiki/Histogram#Mathematical_definition) 返回 bin 的个数:
+        ```js
+        var bins = ecStat.histogram(data, 'scott');
+        ```
 
-	* `freedmanDiaconis` - 依照 [The Freedman-Diaconis rule](https://en.wikipedia.org/wiki/Histogram#Mathematical_definition) 返回 bin 的个数:
-		```js
-		var bins = ecStat.histogram(data, 'freedmanDiaconis');
-		```
+    * `freedmanDiaconis` - 依照 [The Freedman-Diaconis rule](https://en.wikipedia.org/wiki/Histogram#Mathematical_definition) 返回 bin 的个数:
+        ```js
+        var bins = ecStat.histogram(data, 'freedmanDiaconis');
+        ```
 
-	* `sturges` - 依照 [Sturges' formula](https://en.wikipedia.org/wiki/Histogram#Mathematical_definition) 返回 bin 的个数:
-		```js
-		var bins = ecStat.histogram(data, 'sturges');
-		```
+    * `sturges` - 依照 [Sturges' formula](https://en.wikipedia.org/wiki/Histogram#Mathematical_definition) 返回 bin 的个数:
+        ```js
+        var bins = ecStat.histogram(data, 'sturges');
+        ```
 
 ##### 返回值说明
 
-* `bins` - `Object`. 返回值包含了每一个 bin 的详细信息，以及用 [ECharts](https://github.com/ecomfe/echarts) 绘制直方图所需要的数据信息。 
-	* `bins.bins` - `Array.<Object>`. 包含所有小区间间隔的数组，其中每个区间间隔是一个对象，包含如下三个属性：
-		* `x0` - `number`. 区间间隔的下界 (包含)。
-		* `x1` - `number`. 区间间隔的上界 (不包含)。
-		* `sample` - `Array.<number>`. 落入该区间间隔的原始输入样本数据。
-	* `bins.data` - `Array.<Array.<number>>`. 用 ECharts 柱状图绘制直方图所需要的数据信息。这是一个二维数据，其中每个数据项是一个一维数组。该一维数组包含了 x0 和 x1 的均值，以及上述 sample 数组的长度，示例如下：
-		```js
-		var bins.data = [
-			[mean1, len1],
-			[mean2, len2],
-				...
-		];
-		```
-	* `bins.customData` - `Array.<Array<number>>`. 用 ECharts 自定义图表绘制直方图所需要的数据信息。这是一个二维数据，其中每个数据项是一个一维数组。该一维数组包含了 x0 和 x1，以及上述 sample 数组的长度，示例如下：
-		```js
-		var bins.customData = [
-			[x0, x1, len1],
-				...
-		];
-		```
+* `bins` - `Object`. 返回值包含了每一个 bin 的详细信息，以及用 [ECharts](https://github.com/ecomfe/echarts) 绘制直方图所需要的数据信息。
+    * `bins.bins` - `Array.<Object>`. 包含所有小区间间隔的数组，其中每个区间间隔是一个对象，包含如下三个属性：
+        * `x0` - `number`. 区间间隔的下界 (包含)。
+        * `x1` - `number`. 区间间隔的上界 (不包含)。
+        * `sample` - `Array.<number>`. 落入该区间间隔的原始输入样本数据。
+    * `bins.data` - `Array.<Array.<number>>`. 用 ECharts 柱状图绘制直方图所需要的数据信息。这是一个二维数据，其中每个数据项是一个一维数组。该一维数组包含了 x0 和 x1 的均值，以及上述 sample 数组的长度，示例如下：
+        ```js
+        var bins.data = [
+            [mean1, len1],
+            [mean2, len2],
+                ...
+        ];
+        ```
+    * `bins.customData` - `Array.<Array<number>>`. 用 ECharts 自定义图表绘制直方图所需要的数据信息。这是一个二维数据，其中每个数据项是一个一维数组。该一维数组包含了 x0 和 x1，以及上述 sample 数组的长度，示例如下：
+        ```js
+        var bins.customData = [
+            [x0, x1, len1],
+                ...
+        ];
+        ```
 
 #### 实例
 
@@ -106,12 +106,12 @@ var bins = ecStat.histogram(data, binMethod);
 
 var bins = ecStat.histogram(data);
 var option = {
-	...
-	series: [{
-		type: 'custom',
-		...
-	}],
-	...
+    ...
+    series: [{
+        type: 'custom',
+        ...
+    }],
+    ...
 }
 
 </script>
@@ -126,55 +126,56 @@ var option = {
 聚类可以将原始输入数据分割成多个具有不同特征的数据簇。并且通过 [ECharts](https://github.com/ecomfe/echarts) 既可以可视化聚类的结果，也可以可视化聚类的分割过程。
 
 #### 调用方式
-```
+```js
 var result = ecStat.clustering.hierarchicalKMeans(data, clusterNumber, stepByStep);
 ```
 ##### 参数说明
 
 * `data` － `Array.<Array.<number>>`. 这是一个二维数组，其中每个数据对象是具有多个数值属性的一维数组。如下，`data[0]` 就是一个数据对象，`data[0][1]` 是该数据对象的一个数值属性。
 
-  ```js
-  var data = [
-		[1, 2, 3, 4, 5],
-		[6, 7, 8, 9, 10],
-		[11, 12, 13, 14, 15],
-		...
-	    ];
-  ```
-* `clusterNumer` － `number`. 要生成的数据簇的个数。 **注意，该数值必须大于 1。** 
+    ```js
+    var data = [
+        [1, 2, 3, 4, 5],
+        [6, 7, 8, 9, 10],
+        [11, 12, 13, 14, 15],
+        ...
+        ];
+    ```
+* `clusterNumer` － `number`. 要生成的数据簇的个数。 **注意，该数值必须大于 1。**
 * `stepByStep` － `boolean`. 该参数主要用于可视化聚类算法每一步的分割过程，即动态地展示数据簇如何从 2 个到 3 个，4 个， .... 。
 
 ##### 返回值说明
 
 * `result` － `Object`. 包含每个数据簇的中心点 centroids，聚类的评估结果 clusterAssment，以及每个数据簇所包含的原始数据对象 pointsInCluster。如下:
 
-	```js
-	result.centroids = [
+    ```js
+    result.centroids = [
 
-		[-0.460, -2.778],
-		[2.934, 3.128],
-	    	...
-	];
+        [-0.460, -2.778],
+        [2.934, 3.128],
+        ...
+    ];
 
-	// indicate which cluster each data point belonging to, and the distance to cluster centroids
-	result.clusterAssment = [
+    // indicate which cluster each data point belonging to,
+    // and the distance to cluster centroids
+    result.clusterAssment = [
 
-		[1, 0.145],
-		[2, 0.680],
-		[0, 1.022],
-		...
-	];
+        [1, 0.145],
+        [2, 0.680],
+        [0, 1.022],
+        ...
+    ];
 
-	// concrete data point in each cluster
-	result.pointsInCluster = [
-		[
-			[0.335, -3.376],
-			[-0.994, -0.884],
-			...
-		],
-		...
-	];
-	```
+    // concrete data point in each cluster
+    result.pointsInCluster = [
+        [
+            [0.335, -3.376],
+            [-0.994, -0.884],
+            ...
+        ],
+        ...
+    ];
+    ```
 
 #### 实例
 
@@ -222,42 +223,42 @@ var result = ecStat.clustering.hierarchicalKMeans(data, clusterNumber, true);
 回归算法根据原始输入数据集中自变量和因变量的值拟合出一条曲线，以反映它们的变化趋势。目前只支持单个自变量的回归算法。
 
 #### 调用方式
-```
+```js
 var myRegression = ecStat.regression(regressionType, data, order);
 ```
 ##### 参数说明
 
 * `regressionType` - `string`. 回归类型，提供了四种类型的回归算法，分别是 `'linear'`, `'exponential'`, `'logarithmic'`, `'polynomial'`。
 * `data` - `Array.<Array.<number>>`. 原始的输入数据是一个二维的数值数组，其中每个数据对象是包含两个数值属性的一维数组，分别表示自变量和因变量的值。如下：
-	```js
-	var data = [
-
-		[1, 2],
-		[3, 5],
-		...
-	];
-	```
+    ```js
+    var data = [
+        [1, 2],
+        [3, 5],
+        ...
+    ];
+    ```
 * `order` - `number`. 多项式的阶数。对于非多项式回归，可以忽略该参数。
 
 ##### 返回值说明
 
 * `myRegression` - `Object`. 包括用于绘制折线图的拟合数据点 `points`，回归曲线的参数 `parameter`，以及拟合出的曲线表达式 `expression`。如下：
 
-	```js
-	myRegression.points = [
-		[1, 2],
-		[3, 4],
-		...
-	];
+    ```js
+    myRegression.points = [
+        [1, 2],
+        [3, 4],
+        ...
+    ];
 
-	// this is the parameter of linear regression, for other types, it shoule be a little different
-	myRegression.parameter = {
-		gradient: 1.695,
-		intercept: 3.008
-	};
+    // this is the parameter of linear regression,
+    // for other types, it shoule be a little different
+    myRegression.parameter = {
+        gradient: 1.695,
+        intercept: 3.008
+    };
 
-	myRegression.expression = 'y = 1.7x + 3.01';
-	```
+    myRegression.expression = 'y = 1.7x + 3.01';
+    ```
 
 #### 实例
 
@@ -336,7 +337,7 @@ var myRegression = ecStat.regression('polynomial', data, 3);
 #### ecStat.statistics.deviation()
 
 ##### 调用方式
-```
+```js
 var sampleDeviation = ecStat.statistics.deviation(dataList);
 ```
 ##### 参数说明
@@ -351,7 +352,7 @@ var sampleDeviation = ecStat.statistics.deviation(dataList);
 #### ecStat.statistics.sampleVariance()
 
 ##### 调用方式
-```
+```js
 var varianceValue = ecStat.statistics.sampleVariance(dataList);
 ```
 ##### 参数说明
@@ -360,13 +361,13 @@ var varianceValue = ecStat.statistics.sampleVariance(dataList);
 
 ##### 返回值说明
 
-* `varianceValue`: `number`. 返回输入数组 *dataList* 的样本方差。如果 *dataList* 为空或者长度小于 2，返回 0. 
+* `varianceValue`: `number`. 返回输入数组 *dataList* 的样本方差。如果 *dataList* 为空或者长度小于 2，返回 0.
 
 
 #### ecStat.statistics.quantile()
 
 ##### 调用方式
-```
+```js
 var quantileValue = ecStat.statistics.quantile(dataList, p);
 ```
 ##### 参数说明
@@ -382,7 +383,7 @@ var quantileValue = ecStat.statistics.quantile(dataList, p);
 #### ecStat.statistics.max()
 
 ##### 调用方式
-```
+```js
 var maxValue = ecStat.statistics.max(dataList);
 ```
 ##### 参数说明
@@ -397,7 +398,7 @@ var maxValue = ecStat.statistics.max(dataList);
 #### ecStat.statistics.min()
 
 ##### 调用方式
-```
+```js
 var minValue = ecStat.statistics.min(dataList);
 ```
 ##### 参数说明
@@ -412,7 +413,7 @@ var minValue = ecStat.statistics.min(dataList);
 #### ecStat.statistics.mean()
 
 ##### 调用方式
-```
+```js
 var meanValue = ecStat.statistics.mean(dataList);
 ```
 ##### 参数说明
@@ -427,7 +428,7 @@ var meanValue = ecStat.statistics.mean(dataList);
 #### ecStat.statistics.median()
 
 ##### 调用方式
-```
+```js
 var medianValue = ecStat.statistics.median(dataList);
 ```
 ##### 参数说明
@@ -442,7 +443,7 @@ var medianValue = ecStat.statistics.median(dataList);
 #### ecStat.statistics.sum()
 
 ##### 调用方式
-```
+```js
 var sumValue = ecStat.statistics.sum(dataList);
 ```
 ##### 参数说明
