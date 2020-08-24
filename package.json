@@ -8,6 +8,10 @@
     "name": "Deqing Li",
     "email": "annong035@gmail.com"
   },
+  "scripts": {
+    "build": "./node_modules/.bin/webpack",
+    "release": "./node_modules/.bin/webpack && ./node_modules/.bin/webpack -p"
+  },
   "license": "BSD",
   "repository": {
     "type": "git",
