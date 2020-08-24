@@ -1,7 +1,8 @@
-<!DOCTYPE>
+<!DOCTYPE html>
 <html>
     <head>
         <meta charset='utf-8'>
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
         <script src="esl.js"></script>
         <script src="config.js"></script>
         <script src="lib/jquery.min.js"></script>
@@ -11,6 +12,8 @@
             html, body, #main {
                 width: 100%;
                 height: 100%;
+                margin: 0;
+                padding: 0;
             }
         </style>
         <div id="main"></div>
@@ -59,10 +62,8 @@
                     };
 
                     for (var i = 0; !(result = step.next()).isEnd; i++) {
-
                         option.options.push(getOption(result, clusterNumber));
                         option.timeline.data.push(i + '');
-
                     }
 
                     chart.setOption(option);
