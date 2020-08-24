@@ -3,9 +3,9 @@
     <head>
         <meta charset='utf-8'>
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <script src="esl.js"></script>
-        <script src="config.js"></script>
-        <script src="lib/jquery.min.js"></script>
+        <script src="../lib/esl.js"></script>
+        <script src="../lib/config.js"></script>
+        <script src="../lib/jquery.min.js"></script>
     </head>
     <body>
         <style>
@@ -30,7 +30,7 @@
                         chart.resize();
                 };
 
-                $.getJSON('./data/clustering_dataset2.json')
+                $.getJSON('../data/clustering_dataset2.json')
                 .done(function (data) {
 
                     var clusterNumber = 2;

@@ -3,9 +3,9 @@
     <head>
         <meta charset='utf-8'>
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <script src="esl.js"></script>
-        <script src="config.js"></script>
-        <script src="lib/jquery.min.js"></script>
+        <script src="../lib/esl.js"></script>
+        <script src="../lib/config.js"></script>
+        <script src="../lib/jquery.min.js"></script>
     </head>
     <body>
         <style>
@@ -26,45 +26,44 @@
 
                 var chart = echarts.init(document.getElementById('main'));
 
-                var data = [
-                    [96.24, 11.35],
-                    [33.09, 85.11],
-                    [57.60, 36.61],
-                    [36.77, 27.26],
-                    [20.10, 6.72],
-                    [45.53, 36.37],
-                    [110.07, 80.13],
-                    [72.05, 20.88],
-                    [39.82, 37.15],
-                    [48.05, 70.50],
-                    [0.85, 2.57],
-                    [51.66, 63.70],
-                    [61.07, 127.13],
-                    [64.54, 33.59],
-                    [35.50, 25.01],
-                    [226.55, 664.02],
-                    [188.60, 175.31],
-                    [81.31, 108.68]
+                var dataSH = [
+                    [1, 4862.4],
+                    [2, 5294.7],
+                    [3, 5934.5],
+                    [4, 7171.0],
+                    [5, 8964.4],
+                    [6, 10202.2],
+                    [7, 11962.5],
+                    [8, 14928.3],
+                    [9, 16909.2],
+                    [10, 18547.9],
+                    [11, 21617.8],
+                    [12, 26638.1],
+                    [13, 34634.4],
+                    [14, 46759.4],
+                    [15, 58478.1],
+                    [16, 67884.6],
+                    [17, 74462.6],
+                    [18, 79395.7]
                 ];
 
-                var myRegression = ecStat.regression('polynomial', data, 3);
+                var myRegression = ecStat.regression('exponential', dataSH);
 
                 myRegression.points.sort(function (a, b) {
                     return a[0] - b[0];
                 });
 
                 chart.setOption({
-
+                    title: {
+                        text: '1981至1998年国内生产总值GDP（万亿元）',
+                        left: 'center',
+                        top: 21
+                    },
                     tooltip: {
                         trigger: 'axis',
                         axisPointer: {
                             type: 'cross'
                         }
-                    },
-                    title: {
-                        text: '18 家公司的净利润和主营业务收入（百万元）',
-                        left: 'center',
-                        top: 16
                     },
                     xAxis: {
                         type: 'value',
@@ -77,7 +76,6 @@
                     },
                     yAxis: {
                         type: 'value',
-                        min: -40,
                         splitLine: {
                             lineStyle: {
                                 type: 'dashed'
@@ -92,12 +90,12 @@
                                 show: true
                             }
                         },
-                        data: data
+                        data: dataSH
                      },{
                         name: 'line',
                         type: 'line',
-                        smooth: true,
                         showSymbol: false,
+                        smooth: true,
                         data: myRegression.points,
                         markPoint: {
                             itemStyle: {
@@ -108,7 +106,6 @@
                             label: {
                                 normal: {
                                     show: true,
-                                    position: 'left',
                                     formatter: myRegression.expression,
                                     textStyle: {
                                         color: '#333',
