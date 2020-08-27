@@ -28,46 +28,31 @@
 
                 var chart = echarts.init(document.getElementById('main'));
 
-                var option = {
+                chart.setOption({
                     dataset: [{
                         source: [
-                            [1, 4862.4],
-                            [2, 5294.7],
-                            [3, 5934.5],
-                            [4, 7171.0],
-                            [5, 8964.4],
-                            [6, 10202.2],
-                            [7, 11962.5],
-                            [8, 14928.3],
-                            [9, 16909.2],
-                            [10, 18547.9],
-                            [11, 21617.8],
-                            [12, 26638.1],
-                            [13, 34634.4],
-                            [14, 46759.4],
-                            [15, 58478.1],
-                            [16, 67884.6],
-                            [17, 74462.6],
-                            [18, 79395.7]
+                            [0, 0],
+                            [1, 2],
+                            [2, 3],
+                            [3, 4],
+                            [4, 5],
+                            [5, 8],
+                            [6, 7],
+                            [7, 7],
+                            [8, 10],
+                            [9, 14],
+                            [10, 10],
+                            [11, 11],
+                            ['12', '12'],
+                            [13, 15]
                         ]
                     }, {
-                        transform: [{
-                            type: 'sort',
-                            print: true,
-                            config: { dimension: 0, order: 'asc' }
-                        }, {
+                        transform: {
                             type: 'ecStat:regression',
-                            config: {
-                                method: 'exponential',
-                                // 'end' by default
-                                // formulaOn: 'start'
-                            }
-                        }]
+                            config: { method: 'linearThroughOrigin' }
+                        }
                     }],
-                    title: {
-                        text: '1981至1998年国内生产总值GDP（万亿元）',
-                        left: 'center',
-                        top: 21
+                    legend: {
                     },
                     tooltip: {
                         trigger: 'axis',
@@ -77,26 +62,21 @@
                     },
                     xAxis: {
                         splitLine: {
-                            lineStyle: {
-                                type: 'dashed'
-                            }
-                        }
+                            show: false
+                        },
+                        splitNumber: 20
                     },
                     yAxis: {
                         splitLine: {
-                            lineStyle: {
-                                type: 'dashed'
-                            }
+                            show: false
                         }
                     },
                     series: [{
                         name: 'scatter',
-                        type: 'scatter',
-                        datasetIndex: 0
-                    },{
+                        type: 'scatter'
+                     },{
                         name: 'line',
                         type: 'line',
-                        smooth: true,
                         datasetIndex: 1,
                         symbolSize: 0.1,
                         symbol: 'circle',
@@ -104,9 +84,7 @@
                         labelLayout: { dx: -20 },
                         encode: { label: 2, tooltip: 1 }
                     }]
-                };
-
-                chart.setOption(option);
+                });
             });
         </script>
     </body>

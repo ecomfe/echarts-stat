@@ -223,9 +223,30 @@ var result = ecStat.clustering.hierarchicalKMeans(data, clusterNumber, true);
 回归算法根据原始输入数据集中自变量和因变量的值拟合出一条曲线，以反映它们的变化趋势。目前只支持单个自变量的回归算法。
 
 #### 调用方式
-```js
-var myRegression = ecStat.regression(regressionType, data, order);
-```
+
+* 独立使用
+    ```js
+    var myRegression = ecStat.regression(regressionType, data, opt);
+    ```
+* 作为 echarts transform 使用（echarts 5.0 开始支持）
+    ```js
+    echarts.registerTransform(ecStat.transform.regression);
+    ```
+    ```js
+    chart.setOption({
+        dataset: [{
+            source: data
+        }, {
+            type: 'ecStat:regression',
+            config: {
+                method: regressionType,
+                ...opt
+            }
+        }],
+        ...
+    });
+    ```
+
 ##### 参数说明
 
 * `regressionType` - `string`. 回归类型，提供了四种类型的回归算法，分别是 `'linear'`, `'exponential'`, `'logarithmic'`, `'polynomial'`。
@@ -237,7 +258,9 @@ var myRegression = ecStat.regression(regressionType, data, order);
         ...
     ];
     ```
-* `order` - `number`. 多项式的阶数。对于非多项式回归，可以忽略该参数。
+* `opt` - `Object`. 可选的配置项：
+    * `opt.dimensions` - `Array.<number>`. 指定数据的哪些维度会被用于回归计算。默认为 `[0, 1]`。
+    * `order` - `number`. 多项式的阶数（只在 `'polynomial'` 中生效）。对于非多项式回归，可以忽略该参数。
 
 ##### 返回值说明
 
@@ -266,15 +289,8 @@ var myRegression = ecStat.regression(regressionType, data, order);
 
 ##### 线性回归
 
-```html
-<script src='https://cdn.bootcss.com/echarts/3.4.0/echarts.js'></script>
-<script src='./dist/ecStat.js'></script>
-<script>
-
-var myRegression = ecStat.regression('linear', data);
-
-</script>
-```
+[test/standalone/regression_linear.html](https://github.com/ecomfe/echarts-stat/blob/master/test/standalone/regression_linear.html)
+[test/transform/regression_linear.html](https://github.com/ecomfe/echarts-stat/blob/master/test/transform/regression_linear.html)
 
 ![linear regression](img/linear.png)
 
@@ -282,15 +298,8 @@ var myRegression = ecStat.regression('linear', data);
 
 ##### 指数回归
 
-```html
-<script src='https://cdn.bootcss.com/echarts/3.4.0/echarts.js'></script>
-<script src='./dist/ecStat.js'></script>
-<script>
-
-var myRegression = ecStat.regression('exponential', data);
-
-</script>
-```
+[test/standalone/regression_exponential.html](https://github.com/ecomfe/echarts-stat/blob/master/test/standalone/regression_exponential.html)
+[test/transform/regression_exponential.html](https://github.com/ecomfe/echarts-stat/blob/master/test/transform/regression_exponential.html)
 
 ![exponential regression](img/exponential.png)
 
@@ -298,15 +307,8 @@ var myRegression = ecStat.regression('exponential', data);
 
 ##### 对数回归
 
-```html
-<script src='https://cdn.bootcss.com/echarts/3.4.0/echarts.js'></script>
-<script src='./dist/ecStat.js'></script>
-<script>
-
-var myRegression = ecStat.regression('logarithmic', data);
-
-</script>
-```
+[test/standalone/regression_logarithmic.html](https://github.com/ecomfe/echarts-stat/blob/master/test/standalone/regression_logarithmic.html)
+[test/transform/regression_logarithmic.html](https://github.com/ecomfe/echarts-stat/blob/master/test/transform/regression_logarithmic.html)
 
 ![logarithmic regression](img/logarithmic.png)
 
@@ -314,15 +316,8 @@ var myRegression = ecStat.regression('logarithmic', data);
 
 ##### 多项式回归
 
-```html
-<script src='https://cdn.bootcss.com/echarts/3.4.0/echarts.js'></script>
-<script src='./dist/ecStat.js'></script>
-<script>
-
-var myRegression = ecStat.regression('polynomial', data, 3);
-
-</script>
-```
+[test/standalone/regression_polynomial.html](https://github.com/ecomfe/echarts-stat/blob/master/test/standalone/regression_polynomial.html)
+[test/transform/regression_polynomial.html](https://github.com/ecomfe/echarts-stat/blob/master/test/transform/regression_polynomial.html)
 
 ![polynomial regression](img/polynomial.png)
 

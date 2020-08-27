@@ -7,12 +7,11 @@ define(function (require) {
 
         /**
          * Common linear regression algorithm
-         * @param  {Array.<Array.<number>>} data two-dimensional array
-         * @return {Object}
          */
-        linear: function (data) {
+        linear: function (predata, opt) {
 
-            var predata = dataPreprocess(data);
+            var xDimIdx = opt.dimensions[0];
+            var yDimIdx = opt.dimensions[1];
             var sumX = 0;
             var sumY = 0;
             var sumXY = 0;
@@ -20,10 +19,11 @@ define(function (require) {
             var len = predata.length;
 
             for (var i = 0; i < len; i++) {
-                sumX += predata[i][0];
-                sumY += predata[i][1];
-                sumXY += predata[i][0] * predata[i][1];
-                sumXX += predata[i][0] * predata[i][0];
+                var rawItem = predata[i];
+                sumX += rawItem[xDimIdx];
+                sumY += rawItem[yDimIdx];
+                sumXY += rawItem[xDimIdx] * rawItem[yDimIdx];
+                sumXX += rawItem[xDimIdx] * rawItem[xDimIdx];
             }
 
             var gradient = ((len * sumXY) - (sumX * sumY)) / ((len * sumXX) - (sumX * sumX));
@@ -31,11 +31,14 @@ define(function (require) {
 
             var result = [];
             for (var j = 0; j < predata.length; j++) {
-                var coordinate = [predata[j][0], gradient * predata[j][0] + intercept];
-                result.push(coordinate);
+                var rawItem = predata[j];
+                var resultItem = rawItem.slice();
+                resultItem[xDimIdx] = rawItem[xDimIdx];
+                resultItem[yDimIdx] = gradient * rawItem[xDimIdx] + intercept;
+                result.push(resultItem);
             }
 
-            var string = 'y = ' + Math.round(gradient * 100) / 100 + 'x + ' + Math.round(intercept * 100) / 100;
+            var expression = 'y = ' + Math.round(gradient * 100) / 100 + 'x + ' + Math.round(intercept * 100) / 100;
 
             return {
                 points: result,
@@ -43,54 +46,56 @@ define(function (require) {
                     gradient: gradient,
                     intercept: intercept
                 },
-                expression: string
+                expression: expression
             };
         },
 
         /**
          * If the raw data include [0,0] point, we should choose linearThroughOrigin
          *   instead of linear.
-         * @param  {Array.<Array>} data  two-dimensional number array
-         * @return {Object}
          */
-        linearThroughOrigin: function (data) {
+        linearThroughOrigin: function (predata, opt) {
 
-            var predata = dataPreprocess(data);
+            var xDimIdx = opt.dimensions[0];
+            var yDimIdx = opt.dimensions[1];
             var sumXX = 0;
             var sumXY = 0;
 
             for (var i = 0; i < predata.length; i++) {
-                sumXX += predata[i][0] * predata[i][0];
-                sumXY += predata[i][0] * predata[i][1];
+                var rawItem = predata[i];
+                sumXX += rawItem[xDimIdx] * rawItem[xDimIdx];
+                sumXY += rawItem[xDimIdx] * rawItem[yDimIdx];
             }
 
             var gradient = sumXY / sumXX;
             var result = [];
 
             for (var j = 0; j < predata.length; j++) {
-                var coordinate = [predata[j][0], predata[j][0] * gradient];
-                result.push(coordinate);
+                var rawItem = predata[j];
+                var resultItem = rawItem.slice();
+                resultItem[xDimIdx] = rawItem[xDimIdx];
+                resultItem[yDimIdx] = rawItem[xDimIdx] * gradient;
+                result.push(resultItem);
             }
 
-            var string = 'y = ' + Math.round(gradient * 100) / 100 + 'x';
+            var expression = 'y = ' + Math.round(gradient * 100) / 100 + 'x';
 
             return {
                 points: result,
                 parameter: {
                     gradient: gradient
                 },
-                expression: string
+                expression: expression
             };
         },
 
         /**
          * Exponential regression
-         * @param  {Array.<Array.<number>>} data  two-dimensional number array
-         * @return {Object}
          */
-        exponential: function (data) {
+        exponential: function (predata, opt) {
 
-            var predata = dataPreprocess(data);
+            var xDimIdx = opt.dimensions[0];
+            var yDimIdx = opt.dimensions[1];
             var sumX = 0;
             var sumY = 0;
             var sumXXY = 0;
@@ -99,12 +104,13 @@ define(function (require) {
             var sumXY = 0;
 
             for (var i = 0; i < predata.length; i++) {
-                sumX += predata[i][0];
-                sumY += predata[i][1];
-                sumXY += predata[i][0] * predata[i][1];
-                sumXXY += predata[i][0] * predata[i][0] * predata[i][1];
-                sumYlny += predata[i][1] * Math.log(predata[i][1]);
-                sumXYlny += predata[i][0] * predata[i][1] * Math.log(predata[i][1]);
+                var rawItem = predata[i];
+                sumX += rawItem[xDimIdx];
+                sumY += rawItem[yDimIdx];
+                sumXY += rawItem[xDimIdx] * rawItem[yDimIdx];
+                sumXXY += rawItem[xDimIdx] * rawItem[xDimIdx] * rawItem[yDimIdx];
+                sumYlny += rawItem[yDimIdx] * Math.log(rawItem[yDimIdx]);
+                sumXYlny += rawItem[xDimIdx] * rawItem[yDimIdx] * Math.log(rawItem[yDimIdx]);
             }
 
             var denominator = (sumY * sumXXY) - (sumXY * sumXY);
@@ -113,11 +119,14 @@ define(function (require) {
             var result = [];
 
             for (var j = 0; j < predata.length; j++) {
-                var coordinate = [predata[j][0], coefficient * Math.pow(Math.E, index * predata[j][0])];
-                result.push(coordinate);
+                var rawItem = predata[j];
+                var resultItem = rawItem.slice();
+                resultItem[xDimIdx] = rawItem[xDimIdx];
+                resultItem[yDimIdx] = coefficient * Math.pow(Math.E, index * rawItem[xDimIdx]);
+                result.push(resultItem);
             }
 
-            var string = 'y = ' + Math.round(coefficient * 100) / 100 + 'e^(' + Math.round(index * 100) / 100 + 'x)';
+            var expression = 'y = ' + Math.round(coefficient * 100) / 100 + 'e^(' + Math.round(index * 100) / 100 + 'x)';
 
             return {
                 points: result,
@@ -125,29 +134,29 @@ define(function (require) {
                     coefficient: coefficient,
                     index: index
                 },
-                expression: string
+                expression: expression
             };
 
         },
 
         /**
          * Logarithmic regression
-         * @param  {Array.<Array.<number>>} data  two-dimensional number array
-         * @return {Object}
          */
-        logarithmic: function (data) {
+        logarithmic: function (predata, opt) {
 
-            var predata = dataPreprocess(data);
+            var xDimIdx = opt.dimensions[0];
+            var yDimIdx = opt.dimensions[1];
             var sumlnx = 0;
             var sumYlnx = 0;
             var sumY = 0;
             var sumlnxlnx = 0;
 
             for (var i = 0; i < predata.length; i++) {
-                sumlnx += Math.log(predata[i][0]);
-                sumYlnx += predata[i][1] * Math.log(predata[i][0]);
-                sumY += predata[i][1];
-                sumlnxlnx += Math.pow(Math.log(predata[i][0]), 2);
+                var rawItem = predata[i];
+                sumlnx += Math.log(rawItem[xDimIdx]);
+                sumYlnx += rawItem[yDimIdx] * Math.log(rawItem[xDimIdx]);
+                sumY += rawItem[yDimIdx];
+                sumlnxlnx += Math.pow(Math.log(rawItem[xDimIdx]), 2);
             }
 
             var gradient = (i * sumYlnx - sumY * sumlnx) / (i * sumlnxlnx - sumlnx * sumlnx);
@@ -155,11 +164,14 @@ define(function (require) {
             var result = [];
 
             for (var j = 0; j < predata.length; j++) {
-                var coordinate = [predata[j][0], gradient * Math.log(predata[j][0]) + intercept];
-                result.push(coordinate);
+                var rawItem = predata[j];
+                var resultItem = rawItem.slice();
+                resultItem[xDimIdx] = rawItem[xDimIdx];
+                resultItem[yDimIdx] = gradient * Math.log(rawItem[xDimIdx]) + intercept;
+                result.push(resultItem);
             }
 
-            var string =
+            var expression =
                 'y = '
                 + Math.round(intercept * 100) / 100
                 + ' + '
@@ -171,21 +183,21 @@ define(function (require) {
                     gradient: gradient,
                     intercept: intercept
                 },
-                expression: string
+                expression: expression
             };
 
         },
 
         /**
          * Polynomial regression
-         * @param  {Array.<Array.<number>>} data  two-dimensional number array
-         * @param  {number} order  order of polynomials
-         * @return {Object}
          */
-        polynomial: function (data, order) {
+        polynomial: function (predata, opt) {
 
-            var predata = dataPreprocess(data);
-            if (typeof order === 'undefined') {
+            var xDimIdx = opt.dimensions[0];
+            var yDimIdx = opt.dimensions[1];
+            var order = opt.order;
+
+            if (order == null) {
                 order = 2;
             }
             //coefficient matrix
@@ -196,7 +208,8 @@ define(function (require) {
             for (var i = 0; i < k; i++) {
                 var sumA = 0;
                 for (var n = 0; n < predata.length; n++) {
-                    sumA += predata[n][1] * Math.pow(predata[n][0], i);
+                    var rawItem = predata[n];
+                    sumA += rawItem[yDimIdx] * Math.pow(rawItem[xDimIdx], i);
                 }
                 lhs.push(sumA);
 
@@ -204,7 +217,7 @@ define(function (require) {
                 for (var j = 0; j < k; j++) {
                     var sumB = 0;
                     for (var m = 0; m < predata.length; m++) {
-                        sumB += Math.pow(predata[m][0], i + j);
+                        sumB += Math.pow(predata[m][xDimIdx], i + j);
                     }
                     temp.push(sumB);
                 }
@@ -218,29 +231,33 @@ define(function (require) {
 
             for (var i = 0; i < predata.length; i++) {
                 var value = 0;
+                var rawItem = predata[i];
                 for (var n = 0; n < coeArray.length; n++) {
-                    value += coeArray[n] * Math.pow(predata[i][0], n);
+                    value += coeArray[n] * Math.pow(rawItem[xDimIdx], n);
                 }
-                result.push([predata[i][0], value]);
+                var resultItem = rawItem.slice();
+                resultItem[xDimIdx] = rawItem[xDimIdx];
+                resultItem[yDimIdx] = value;
+                result.push(resultItem);
             }
 
-            var string = 'y = ';
+            var expression = 'y = ';
             for (var i = coeArray.length - 1; i >= 0; i--) {
                 if (i > 1) {
-                    string += Math.round(coeArray[i] * Math.pow(10, i + 1)) / Math.pow(10, i + 1) + 'x^' + i + ' + ';
+                    expression += Math.round(coeArray[i] * Math.pow(10, i + 1)) / Math.pow(10, i + 1) + 'x^' + i + ' + ';
                 }
                 else if (i === 1) {
-                    string += Math.round(coeArray[i] * 100) / 100 + 'x' + ' + ';
+                    expression += Math.round(coeArray[i] * 100) / 100 + 'x' + ' + ';
                 }
                 else {
-                    string += Math.round(coeArray[i] * 100) / 100;
+                    expression += Math.round(coeArray[i] * 100) / 100;
                 }
             }
 
             return {
                 points: result,
                 parameter: coeArray,
-                expression: string
+                expression: expression
             };
 
         }
@@ -291,9 +308,26 @@ define(function (require) {
         return data;
     }
 
-    var regression = function (regreMethod, data, order) {
+    /**
+     * @param  {string} regreMethod
+     * @param  {Array.<Array.<number>>} data   two-dimensional number array
+     * @param  {Object|number} [optOrOrder]  opt or order
+     * @param  {number} [optOrOrder.order]  order of polynomials
+     * @param  {Array.<number>} [optOrOrder.dimensions=[0, 1]]  Target dimensions to calculate the regression.
+     *         By defualt: use [0, 1] as [x, y].
+     * @return {Array}
+     */
+    var regression = function (regreMethod, data, optOrOrder) {
+        var opt = typeof optOrOrder === 'number'
+            ? { order: optOrOrder }
+            : (optOrOrder || {});
 
-        return regreMethods[regreMethod](data, order);
+        if (opt.dimensions == null) {
+            opt.dimensions = [0, 1];
+        }
+
+        var predata = dataPreprocess(data, { numberDimensions: opt.dimensions });
+        return regreMethods[regreMethod](predata, opt);
 
     };
 

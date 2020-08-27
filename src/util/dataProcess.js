@@ -13,9 +13,25 @@ define(function (require) {
      *              [12, b] --- incorrect y value
      *              ['a', 12] --- incorrect x value
      * @param  {Array.<Array>} data
+     * @param  {Object?} [opt]
+     * @param  {Array.<number>?} [opt.numberDimensions] Optional. Like [2, 4],
+     *         means that dimension index 2 and dimension index 4 need to be number.
+     *         By default all dimensions need to be number.
      * @return {Array.<Array.<number>>}
      */
-    function dataPreprocess(data) {
+    function dataPreprocess(data, opt) {
+        opt = opt || {};
+        var numberDimensions = opt.numberDimensions;
+        var numberDimensionMap = {};
+        if (numberDimensions) {
+            for (var i = 0; i < numberDimensions.length; i++) {
+                numberDimensionMap[numberDimensions[i]] = true;
+            }
+        }
+
+        function shouldBeNumberDimension(dimIdx) {
+            return !numberDimensions || numberDimensionMap.hasOwnProperty(dimIdx);
+        }
 
         if (!isArray(data)) {
             throw new Error('Invalid data type, you should input an array');
@@ -24,21 +40,17 @@ define(function (require) {
         var arraySize = size(data);
 
         if (arraySize.length === 1) {
-
             for (var i = 0; i < arraySize[0]; i++) {
-
                 if (isNumber(data[i])) {
                     predata.push(data[i]);
                 }
             }
         }
         else if (arraySize.length === 2) {
-
             for (var i = 0; i < arraySize[0]; i++) {
-
                 var isCorrect = true;
                 for (var j = 0; j < arraySize[1]; j++) {
-                    if (!isNumber(data[i][j])) {
+                    if (shouldBeNumberDimension(j) && !isNumber(data[i][j])) {
                         isCorrect = false;
                     }
                 }

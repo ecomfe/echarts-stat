@@ -212,15 +212,33 @@ Regression algorithm can according to the value of the dependent and independent
 
 #### Syntax
 
-```js
-var myRegression = ecStat.regression(regressionType, data, order);
-```
+* Standalone
+    ```js
+    var myRegression = ecStat.regression(regressionType, data, opt);
+    ```
+* Used as echarts transform (since echarts 5.0)
+    ```js
+    echarts.registerTransform(ecStat.transform.regression);
+    ```
+    ```js
+    chart.setOption({
+        dataset: [{
+            source: data
+        }, {
+            type: 'ecStat:regression',
+            config: {
+                method: regressionType,
+                ...opt
+            }
+        }],
+        ...
+    });
+    ```
 
 ##### Parameters
 
-* `regressionType` - `string`. There are four types of regression, whice are `'linear'`, `'exponential'`, `'logarithmic'`, `'polynomial'`.
+* `regressionType` - `string`. There are four types of regression, which are `'linear'`, `'exponential'`, `'logarithmic'`, `'polynomial'`.
 * `data` - `Array.<Array.<number>>`. Two-dimensional numeric array, Each data object should have two numeric attributes in the original data set. For Example:
-
     ```js
     var data = [
         [1, 2],
@@ -228,9 +246,11 @@ var myRegression = ecStat.regression(regressionType, data, order);
         ...
     ];
     ```
-* `order` - `number`. The order of polynomial. If you choose other types of regression, you can ignore it.
+* `opt` - `Object`. optional settings:
+    * `opt.dimensions` - `Array.<number>`. Specify the dimensions of data that are used to regression calculation. By default `[0, 1]`, which means the column 0 and 1 is used in the regression calculation.
+    * `opt.order` - `number`. The order of polynomial. If you choose other types of regression, you can ignore it.
 
-##### Return Value
+##### Return Value (only for standalone usage)
 
 * `myRegression` - `Object`. Including points, parameter, and expression. For Example:
 
@@ -242,7 +262,7 @@ var myRegression = ecStat.regression(regressionType, data, order);
     ];
 
     // This is the parameter of linear regression,
-    // for other types, it shoule be a little different
+    // for other types, it should be a little different
     myRegression.parameter = {
         gradient: 1.695,
         intercept: 3.008
@@ -257,15 +277,8 @@ You can not only do regression analysis through this interface, you can also use
 
 ##### Linear Regression
 
-```html
-<script src='https://cdn.bootcss.com/echarts/3.4.0/echarts.js'></script>
-<script src='./dist/ecStat.js'></script>
-<script>
-
-var myRegression = ecStat.regression('linear', data);
-
-</script>
-```
+[test/standalone/regression_linear.html](https://github.com/ecomfe/echarts-stat/blob/master/test/standalone/regression_linear.html)
+[test/transform/regression_linear.html](https://github.com/ecomfe/echarts-stat/blob/master/test/transform/regression_linear.html)
 
 ![linear regression](img/linear.png)
 
@@ -273,15 +286,8 @@ var myRegression = ecStat.regression('linear', data);
 
 ##### Exponential Regression
 
-```html
-<script src='https://cdn.bootcss.com/echarts/3.4.0/echarts.js'></script>
-<script src='./dist/ecStat.js'></script>
-<script>
-
-var myRegression = ecStat.regression('exponential', data);
-
-</script>
-```
+[test/standalone/regression_exponential.html](https://github.com/ecomfe/echarts-stat/blob/master/test/standalone/regression_exponential.html)
+[test/transform/regression_exponential.html](https://github.com/ecomfe/echarts-stat/blob/master/test/transform/regression_exponential.html)
 
 ![exponential regression](img/exponential.png)
 
@@ -289,15 +295,8 @@ var myRegression = ecStat.regression('exponential', data);
 
 ##### Logarithmic Regression
 
-```html
-<script src='https://cdn.bootcss.com/echarts/3.4.0/echarts.js'></script>
-<script src='./dist/ecStat.js'></script>
-<script>
-
-var myRegression = ecStat.regression('logarithmic', data);
-
-</script>
-```
+[test/standalone/regression_logarithmic.html](https://github.com/ecomfe/echarts-stat/blob/master/test/standalone/regression_logarithmic.html)
+[test/transform/regression_logarithmic.html](https://github.com/ecomfe/echarts-stat/blob/master/test/transform/regression_logarithmic.html)
 
 ![logarithmic regression](img/logarithmic.png)
 
@@ -305,15 +304,8 @@ var myRegression = ecStat.regression('logarithmic', data);
 
 ##### Polynomial Regression
 
-```html
-<script src='https://cdn.bootcss.com/echarts/3.4.0/echarts.js'></script>
-<script src='./dist/ecStat.js'></script>
-<script>
-
-var myRegression = ecStat.regression('polynomial', data, 3);
-
-</script>
-```
+[test/standalone/regression_polynomial.html](https://github.com/ecomfe/echarts-stat/blob/master/test/standalone/regression_polynomial.html)
+[test/transform/regression_polynomial.html](https://github.com/ecomfe/echarts-stat/blob/master/test/transform/regression_polynomial.html)
 
 ![polynomial regression](img/polynomial.png)
 
