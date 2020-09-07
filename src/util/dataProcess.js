@@ -14,20 +14,28 @@ define(function (require) {
      *              ['a', 12] --- incorrect x value
      * @param  {Array.<Array>} data
      * @param  {Object?} [opt]
-     * @param  {Array.<number>?} [opt.numberDimensions] Optional. Like [2, 4],
+     * @param  {Array.<number>|number} [opt.numberDimensions] Optional. Like [2, 4],
      *         means that dimension index 2 and dimension index 4 need to be number.
-     *         By default all dimensions need to be number.
+     *         If null/undefined (by default), all dimensions need to be number.
+     * @param  {boolean} [opt.toOneDimensionArray] Convert to one dimension array.
+     *         Each value is from `opt.numberDimensions[0]` or dimension 0.
      * @return {Array.<Array.<number>>}
      */
     function dataPreprocess(data, opt) {
         opt = opt || {};
         var numberDimensions = opt.numberDimensions;
         var numberDimensionMap = {};
-        if (numberDimensions) {
+        if (typeof numberDimensions === 'number') {
+            numberDimensions = [numberDimensions];
+        }
+        if (numberDimensions != null) {
             for (var i = 0; i < numberDimensions.length; i++) {
                 numberDimensionMap[numberDimensions[i]] = true;
             }
         }
+        var targetOneDim = opt.toOneDimensionArray
+            ? (numberDimensions ? numberDimensions[0] : 0)
+            : null;
 
         function shouldBeNumberDimension(dimIdx) {
             return !numberDimensions || numberDimensionMap.hasOwnProperty(dimIdx);
@@ -41,21 +49,27 @@ define(function (require) {
 
         if (arraySize.length === 1) {
             for (var i = 0; i < arraySize[0]; i++) {
-                if (isNumber(data[i])) {
-                    predata.push(data[i]);
+                var item = data[i];
+                if (isNumber(item)) {
+                    predata.push(item);
                 }
             }
         }
         else if (arraySize.length === 2) {
             for (var i = 0; i < arraySize[0]; i++) {
                 var isCorrect = true;
+                var item = data[i];
                 for (var j = 0; j < arraySize[1]; j++) {
-                    if (shouldBeNumberDimension(j) && !isNumber(data[i][j])) {
+                    if (shouldBeNumberDimension(j) && !isNumber(item[j])) {
                         isCorrect = false;
                     }
                 }
                 if (isCorrect) {
-                    predata.push(data[i]);
+                    predata.push(
+                        targetOneDim != null
+                            ? item[targetOneDim]
+                            : item
+                    );
                 }
             }
         }

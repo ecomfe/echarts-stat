@@ -38,71 +38,82 @@ A histogram is a graphical representation of the distribution of numerical data.
 
 #### Syntax
 
-```js
-var bins = ecStat.histogram(data, binMethod);
-```
+* Used as echarts transform (since echarts 5.0)
+    ```js
+    echarts.registerTransform(ecStat.transform.histogram);
+    ```
+    ```js
+    chart.setOption({
+        dataset: [{
+            source: data
+        }, {
+            type: 'ecStat:histogram',
+            config: config
+        }],
+        ...
+    });
+    ```
+* Standalone
+    ```js
+    var bins = ecStat.histogram(data, config);
+    ```
+
 
 ##### Parameter
 
-* `data` - `Array<number>`. Data samples of numbers.
-
+* `data` - `number[] | number[][]`. Data samples of numbers.
     ```js
+    // One-dimension array
     var data = [8.6, 8.8, 10.5, 10.7, 10.8, 11.0, ... ];
     ```
+    or
+    ```js
+    // Two-dimension array
+    var data = [[8.3, 143], [8.6, 214], ...];
+    ```
 
-* `binMethod` - `string`. There are four methods to calculate the number of bin, which are `squareRoot`, `scott`, `freedmanDiaconis`, and `sturges`. Of course, there is no "best" number of bin, and different bin size can reveal different feature of data.
+* `config` - `object | config['method']`. optional settings:
+    * `config.method` - `'squareRoot' | 'scott' | 'freedmanDiaconis' | 'sturges'`. Methods to calculate the number of bin. There is no "best" number of bin, and different bin size can reveal different feature of data.
 
-    * `squareRoot` - This is the default method, which is also used by Excel histogram. Returns the number of bin according to [Square-root choice](https://en.wikipedia.org/wiki/Histogram#Mathematical_definition):
-        ```js
-        var bins = ecStat.histogram(data);
-        ```
+        * `squareRoot` - This is the default method, which is also used by Excel histogram. Returns the number of bin according to [Square-root choice](https://en.wikipedia.org/wiki/Histogram#Mathematical_definition):
+            ```js
+            var bins = ecStat.histogram(data);
+            ```
 
-    * `scott` - Returns the number of bin according to [Scott's normal reference Rule](https://en.wikipedia.org/wiki/Histogram#Mathematical_definition):
-        ```js
-        var bins = ecStat.histogram(data, 'scott');
-        ```
+        * `scott` - Returns the number of bin according to [Scott's normal reference Rule](https://en.wikipedia.org/wiki/Histogram#Mathematical_definition):
+            ```js
+            var bins = ecStat.histogram(data, 'scott');
+            ```
 
-    * `freedmanDiaconis` - Returns the number of bin according to [The Freedman-Diaconis rule](https://en.wikipedia.org/wiki/Histogram#Mathematical_definition):
-        ```js
-        var bins = ecStat.histogram(data, 'freedmanDiaconis');
-        ```
+        * `freedmanDiaconis` - Returns the number of bin according to [The Freedman-Diaconis rule](https://en.wikipedia.org/wiki/Histogram#Mathematical_definition):
+            ```js
+            var bins = ecStat.histogram(data, 'freedmanDiaconis');
+            ```
 
-    * `sturges` - Returns the number of bin according to [Sturges' formula](https://en.wikipedia.org/wiki/Histogram#Mathematical_definition):
-        ```js
-        var bins = ecStat.histogram(data, 'sturges');
-        ```
+        * `sturges` - Returns the number of bin according to [Sturges' formula](https://en.wikipedia.org/wiki/Histogram#Mathematical_definition):
+            ```js
+            var bins = ecStat.histogram(data, 'sturges');
+            ```
 
-##### Return Value
+    * `config.dimensions` - `number`. Specify the dimensions of data that are used to regression calculation. By default `0`, which means the column 0 and 1 is used in the regression calculation.
 
-* `bins` - `Object`. Contain detailed messages of each bin and data used for [ECharts](https://github.com/ecomfe/echarts) to draw the histogram.
-    * `bins.bins` - `Array.<Object>`. An array of bins, where each bin is an object, containing three attributes:
+
+##### Return Value (only for standalone usage)
+
+* `bins` - `object`. Contain detailed messages of each bin and data used for [ECharts](https://github.com/ecomfe/echarts) to draw the histogram.
+    * `bins.bins` - `BinItem[]`. An array of bins, where each bin is an object (`BinItem`), containing three attributes:
         * `x0` - `number`. The lower bound of the bin (inclusive).
         * `x1` - `number`. The upper bound of the bin (exclusive).
-        * `sample` - `Array.<number>`. Containing the associated elements from the input data.
-    * `bins.data` - `Array.<Array.<number>>`. Used for bar chart to draw the histogram, each bin data is an array not only containing the mean value of `x0` and `x1`, but also the length of `sample`, which is the number of sample values in this bin.
-    * `bins.customData` - `Array.<Array<number>>`. Used for custom chart to draw the histogram, each custom data is an array not only containing the `x0` and `x1`, but also the length of `sample`, which is the number of sample values in this bin.
+        * `sample` - `number[]`. Containing the associated elements from the input data.
+    * `bins.data` - `[MeanOfX0X1, SampleLength, X0, X1, DisplayableName][]`. Used for bar chart to draw the histogram, where the length of `sample` is the number of sample values in this bin.
+    * `bins.customData` - `[X0, X1, SampleLength][]`. Used for custom chart to draw the histogram, where the length of `sample` is the number of sample values in this bin.
 
 #### Examples
 
- This example using ECharts custom chart to draw the histogram, which is the best type of chart we recommend.
+[test/transform/histogram_bar.html](https://github.com/ecomfe/echarts-stat/blob/master/test/transform/histogram_bar.html)
+[test/standalone/histogram_bar.html](https://github.com/ecomfe/echarts-stat/blob/master/test/standalone/histogram_bar.html)
 
-```html
-<script src='https://cdn.bootcss.com/echarts/3.4.0/echarts.js'></script>
-<script src='./dist/ecStat.js'></script>
-<script>
 
-var bins = ecStat.histogram(data);
-var option = {
-    ...
-    series: [{
-        type: 'custom',
-        ...
-    }],
-    ...
-}
-
-</script>
-```
 ![histogram](img/histogram.png)
 
 [Run](http://gallery.echartsjs.com/editor.html?c=xBk5VZddJW)
@@ -118,7 +129,7 @@ var result = ecStat.clustering.hierarchicalKMeans(data, clusterNumber, stepBySte
 ```
 ##### Parameter
 
-* `data` － `Array.<Array.<number>>`. Two-dimensional numeric array, each data point can have more than two numeric attributes in the original data set. In the following example, `data[0]` is called `data point` and `data[0][1]` is one of the numeric attributes of `data[0]`.
+* `data` － `number[][]`. Two-dimensional numeric array, each data point can have more than two numeric attributes in the original data set. In the following example, `data[0]` is called `data point` and `data[0][1]` is one of the numeric attributes of `data[0]`.
 
     ```js
     var data = [
@@ -134,7 +145,7 @@ var result = ecStat.clustering.hierarchicalKMeans(data, clusterNumber, stepBySte
 
 ##### Return Value
 
-* `result` － `Object`. Including the centroids, clusterAssment, and pointsInCluster. For Example:
+* `result` － `object`. Including the centroids, clusterAssment, and pointsInCluster. For Example:
 
     ```js
     result.centroids = [
@@ -212,10 +223,6 @@ Regression algorithm can according to the value of the dependent and independent
 
 #### Syntax
 
-* Standalone
-    ```js
-    var myRegression = ecStat.regression(regressionType, data, opt);
-    ```
 * Used as echarts transform (since echarts 5.0)
     ```js
     echarts.registerTransform(ecStat.transform.regression);
@@ -234,11 +241,15 @@ Regression algorithm can according to the value of the dependent and independent
         ...
     });
     ```
+* Standalone
+    ```js
+    var myRegression = ecStat.regression(regressionType, data, opt);
+    ```
 
 ##### Parameters
 
 * `regressionType` - `string`. There are four types of regression, which are `'linear'`, `'exponential'`, `'logarithmic'`, `'polynomial'`.
-* `data` - `Array.<Array.<number>>`. Two-dimensional numeric array, Each data object should have two numeric attributes in the original data set. For Example:
+* `data` - `number[][]`. Two-dimensional numeric array, Each data object should have two numeric attributes in the original data set. For Example:
     ```js
     var data = [
         [1, 2],
@@ -246,13 +257,13 @@ Regression algorithm can according to the value of the dependent and independent
         ...
     ];
     ```
-* `opt` - `Object`. optional settings:
-    * `opt.dimensions` - `Array.<number>`. Specify the dimensions of data that are used to regression calculation. By default `[0, 1]`, which means the column 0 and 1 is used in the regression calculation.
+* `opt` - `object`. optional settings:
+    * `opt.dimensions` - `number[]|number`. Specify the dimensions of data that are used to regression calculation. By default `[0, 1]`, which means the column 0 and 1 is used in the regression calculation.
     * `opt.order` - `number`. The order of polynomial. If you choose other types of regression, you can ignore it.
 
 ##### Return Value (only for standalone usage)
 
-* `myRegression` - `Object`. Including points, parameter, and expression. For Example:
+* `myRegression` - `object`. Including points, parameter, and expression. For Example:
 
     ```js
     myRegression.points = [
@@ -277,8 +288,8 @@ You can not only do regression analysis through this interface, you can also use
 
 ##### Linear Regression
 
-[test/standalone/regression_linear.html](https://github.com/ecomfe/echarts-stat/blob/master/test/standalone/regression_linear.html)
 [test/transform/regression_linear.html](https://github.com/ecomfe/echarts-stat/blob/master/test/transform/regression_linear.html)
+[test/standalone/regression_linear.html](https://github.com/ecomfe/echarts-stat/blob/master/test/standalone/regression_linear.html)
 
 ![linear regression](img/linear.png)
 
@@ -286,8 +297,8 @@ You can not only do regression analysis through this interface, you can also use
 
 ##### Exponential Regression
 
-[test/standalone/regression_exponential.html](https://github.com/ecomfe/echarts-stat/blob/master/test/standalone/regression_exponential.html)
 [test/transform/regression_exponential.html](https://github.com/ecomfe/echarts-stat/blob/master/test/transform/regression_exponential.html)
+[test/standalone/regression_exponential.html](https://github.com/ecomfe/echarts-stat/blob/master/test/standalone/regression_exponential.html)
 
 ![exponential regression](img/exponential.png)
 
@@ -295,8 +306,8 @@ You can not only do regression analysis through this interface, you can also use
 
 ##### Logarithmic Regression
 
-[test/standalone/regression_logarithmic.html](https://github.com/ecomfe/echarts-stat/blob/master/test/standalone/regression_logarithmic.html)
 [test/transform/regression_logarithmic.html](https://github.com/ecomfe/echarts-stat/blob/master/test/transform/regression_logarithmic.html)
+[test/standalone/regression_logarithmic.html](https://github.com/ecomfe/echarts-stat/blob/master/test/standalone/regression_logarithmic.html)
 
 ![logarithmic regression](img/logarithmic.png)
 
@@ -304,8 +315,8 @@ You can not only do regression analysis through this interface, you can also use
 
 ##### Polynomial Regression
 
-[test/standalone/regression_polynomial.html](https://github.com/ecomfe/echarts-stat/blob/master/test/standalone/regression_polynomial.html)
 [test/transform/regression_polynomial.html](https://github.com/ecomfe/echarts-stat/blob/master/test/transform/regression_polynomial.html)
+[test/standalone/regression_polynomial.html](https://github.com/ecomfe/echarts-stat/blob/master/test/standalone/regression_polynomial.html)
 
 ![polynomial regression](img/polynomial.png)
 
@@ -325,7 +336,7 @@ var sampleDeviation = ecStat.statistics.deviation(dataList);
 ```
 ##### Parameter
 
-* `dataList` : `Array.<number>`
+* `dataList` : `number[]`
 
 ##### Return Value
 
@@ -340,7 +351,7 @@ var varianceValue = ecStat.statistics.sampleVariance(dataList);
 ```
 ##### Parameter
 
-* `dataList` : `Array.<number>`
+* `dataList` : `number[]`
 
 ##### Return Value
 
@@ -355,7 +366,7 @@ var quantileValue = ecStat.statistics.quantile(dataList, p);
 ```
 ##### Parameter
 
-* `dataList` : `Array.<number>`. Sorted array of numbers.
+* `dataList` : `number[]`. Sorted array of numbers.
 * `p`: `number`.  where 0 =< *p* <= 1. For example, the first quartile at p = 0.25, the seconed quartile at p = 0.5(same as the median), and the third quartile at p = 0.75.
 
 ##### Return Value
@@ -371,7 +382,7 @@ var maxValue = ecStat.statistics.max(dataList);
 ```
 ##### Parameter
 
-* `dataList` : `Array.<number>`
+* `dataList` : `number[]`
 
 ##### Return Value
 
@@ -386,7 +397,7 @@ var minValue = ecStat.statistics.min(dataList);
 ```
 ##### Parameter
 
-* `dataList` : `Array.<number>`
+* `dataList` : `number[]`
 
 ##### Return Value
 
@@ -401,7 +412,7 @@ var meanValue = ecStat.statistics.mean(dataList);
 ```
 ##### Parameter
 
-* `dataList` : `Array.<number>`
+* `dataList` : `number[]`
 
 ##### Return Value
 
@@ -416,7 +427,7 @@ var medianValue = ecStat.statistics.median(dataList);
 ```
 ##### Parameter
 
-* `dataList` : `Array.<number>`. Sorted array of numbers
+* `dataList` : `number[]`. Sorted array of numbers
 
 ##### Return Value
 
@@ -431,7 +442,7 @@ var sumValue = ecStat.statistics.sum(dataList);
 ```
 ##### Parameter
 
-* `dataList` : `Array.<number>`
+* `dataList` : `number[]`
 
 ##### Return Value
 

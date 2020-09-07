@@ -313,7 +313,7 @@ define(function (require) {
      * @param  {Array.<Array.<number>>} data   two-dimensional number array
      * @param  {Object|number} [optOrOrder]  opt or order
      * @param  {number} [optOrOrder.order]  order of polynomials
-     * @param  {Array.<number>} [optOrOrder.dimensions=[0, 1]]  Target dimensions to calculate the regression.
+     * @param  {Array.<number>|number} [optOrOrder.dimensions=[0, 1]]  Target dimensions to calculate the regression.
      *         By defualt: use [0, 1] as [x, y].
      * @return {Array}
      */

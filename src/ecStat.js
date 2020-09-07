@@ -8,7 +8,8 @@ define(function (require) {
         histogram: require('./histogram'),
 
         transform: {
-            regression: require('./transform/regression')
+            regression: require('./transform/regression'),
+            histogram: require('./transform/histogram')
         }
 
     };

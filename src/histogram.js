@@ -6,7 +6,6 @@ define(function (require) {
     var deviation = require('./statistics/deviation');
     var dataProcess = require('./util/dataProcess');
     var dataPreprocess = dataProcess.dataPreprocess;
-    var getPrecision = dataProcess.getPrecision;
     var array = require('./util/array');
     var ascending = array.ascending;
     var map = array.map;
@@ -17,32 +16,40 @@ define(function (require) {
     /**
      * Compute bins for histogram
      * @param  {Array.<number>} data
-     * @param  {string} threshold
+     * @param  {Object|string} optOrMethod Optional settings or `method`.
+     * @param  {Object|string} optOrMethod.method 'squareRoot' | 'scott' | 'freedmanDiaconis' | 'sturges'
+     * @param  {Array.<number>|number} optOrMethod.dimensions If data is a 2-d array,
+     *         which dimension will be used to calculate histogram.
      * @return {Object}
      */
-    function computeBins(data, threshold) {
+    function computeBins(data, optOrMethod) {
+        var opt = typeof optOrMethod === 'string'
+            ? { method: optOrMethod }
+            : (optOrMethod || {});
 
-        if (threshold == null) {
-            threshold = thresholdMethod.squareRoot;
-        }
-        else {
-            threshold = thresholdMethod[threshold];
-        }
-        var values = dataPreprocess(data);
+        var threshold = opt.method == null
+            ? thresholdMethod.squareRoot
+            : thresholdMethod[opt.method];
+
+        var values = dataPreprocess(data, {
+            numberDimensions: opt.dimensions,
+            toOneDimensionArray: true
+        });
         var maxValue = max(values);
         var minValue = min(values);
         var binsNumber = threshold(values, minValue, maxValue);
-        var step = tickStep(minValue, maxValue, binsNumber);
-        var precision = -Math.floor(Math.log(Math.abs(maxValue - minValue) / binsNumber) / Math.LN10);
-        
+        var tickStepResult = tickStep(minValue, maxValue, binsNumber);
+        var step = tickStepResult.step;
+        var toFixedPrecision = tickStepResult.toFixedPrecision;
+
         // return the xAxis coordinate for each bins, except the end point of the value
         var rangeArray = range(
-                // use function toFixed() to avoid data like '0.700000001'
-                +((Math.ceil(minValue / step) * step).toFixed(precision)),
-                +((Math.floor(maxValue / step) * step).toFixed(precision)),
-                step,
-                precision
-            );
+            // use function toFixed() to avoid data like '0.700000001'
+            +((Math.ceil(minValue / step) * step).toFixed(toFixedPrecision)),
+            +((Math.floor(maxValue / step) * step).toFixed(toFixedPrecision)),
+            step,
+            toFixedPrecision
+        );
 
         var len = rangeArray.length;
 
@@ -51,7 +58,7 @@ define(function (require) {
         for (var i = 0; i <= len; i++) {
             bins[i] = {};
             bins[i].sample = [];
-            bins[i].x0 = i > 0 
+            bins[i].x0 = i > 0
                 ? rangeArray[i - 1]
                 : (rangeArray[i] - minValue) === step
                 ? minValue
@@ -71,7 +78,13 @@ define(function (require) {
 
         var data = map(bins, function (bin) {
             // use function toFixed() to avoid data like '6.5666638489'
-            return [+((bin.x0 + bin.x1) / 2).toFixed(precision), bin.sample.length];
+            return [
+                +((bin.x0 + bin.x1) / 2).toFixed(toFixedPrecision),
+                bin.sample.length,
+                bin.x0,
+                bin.x1,
+                bin.x0 + ' - ' + bin.x1
+            ];
         });
 
         var customData = map(bins, function (bin) {

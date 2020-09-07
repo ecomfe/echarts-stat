@@ -10,7 +10,7 @@ define(function (require) {
         /**
          * @param {Paramter<typeof regression>[0]} [params.config.method='linear'] 'linear' by default
          * @param {Paramter<typeof regression>[2]} [params.config.order=2] Only work when method is `polynomial`.
-         * @param {numer[]} [params.config.dimensions=[0, 1]] dimensions that used to calculate regression.
+         * @param {numer[]|number} [params.config.dimensions=[0, 1]] dimensions that used to calculate regression.
          *        By default [0, 1].
          * @param {'start' | 'end' | 'all'} params.config.formulaOn Include formula on the last (third) dimension of the:
          *        'start': first data item.
