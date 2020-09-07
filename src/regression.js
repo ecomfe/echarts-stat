@@ -2,6 +2,7 @@ define(function (require) {
 
     var dataProcess = require('./util/dataProcess');
     var dataPreprocess = dataProcess.dataPreprocess;
+    var normalizeDimensions = dataProcess.normalizeDimensions;
 
     var regreMethods = {
 
@@ -322,13 +323,21 @@ define(function (require) {
             ? { order: optOrOrder }
             : (optOrOrder || {});
 
-        if (opt.dimensions == null) {
-            opt.dimensions = [0, 1];
-        }
+        var dimensions = normalizeDimensions(opt.dimensions, [0, 1]);
 
-        var predata = dataPreprocess(data, { numberDimensions: opt.dimensions });
-        return regreMethods[regreMethod](predata, opt);
+        var predata = dataPreprocess(data, { dimensions: dimensions });
+        var result = regreMethods[regreMethod](predata, {
+            order: opt.order,
+            dimensions: dimensions
+        });
 
+        // Sort for line chart.
+        var xDimIdx = dimensions[0];
+        result.points.sort(function (itemA, itemB) {
+            return itemA[xDimIdx] - itemB[xDimIdx];
+        });
+
+        return result;
     };
 
     return regression;

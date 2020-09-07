@@ -81,15 +81,12 @@
                             config: { dimension: 4, eq: 2015 }
                         }
                     }, {
-                        transform: [{
-                            type: 'sort',
-                            config: { dimension: 0, order: 'asc' }
-                        }, {
+                        transform: {
                             type: 'ecStat:regression',
                             config: {
                                 method: 'logarithmic'
                             }
-                        }]
+                        }
                     }],
                     legend: {
                         data: ['1990', '2015']

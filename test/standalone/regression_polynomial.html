@@ -49,10 +49,6 @@
 
                 var myRegression = ecStat.regression('polynomial', data, 3);
 
-                myRegression.points.sort(function (a, b) {
-                    return a[0] - b[0];
-                });
-
                 chart.setOption({
 
                     tooltip: {

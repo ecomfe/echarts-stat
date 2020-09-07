@@ -51,18 +51,14 @@
                             [18, 79395.7]
                         ]
                     }, {
-                        transform: [{
-                            type: 'sort',
-                            print: true,
-                            config: { dimension: 0, order: 'asc' }
-                        }, {
+                        transform: {
                             type: 'ecStat:regression',
                             config: {
                                 method: 'exponential',
                                 // 'end' by default
                                 // formulaOn: 'start'
                             }
-                        }]
+                        }
                     }],
                     title: {
                         text: '1981至1998年国内生产总值GDP（万亿元）',

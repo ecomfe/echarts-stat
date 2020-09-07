@@ -6,6 +6,7 @@ define(function (require) {
     var deviation = require('./statistics/deviation');
     var dataProcess = require('./util/dataProcess');
     var dataPreprocess = dataProcess.dataPreprocess;
+    var normalizeDimensions = dataProcess.normalizeDimensions;
     var array = require('./util/array');
     var ascending = array.ascending;
     var map = array.map;
@@ -30,9 +31,10 @@ define(function (require) {
         var threshold = opt.method == null
             ? thresholdMethod.squareRoot
             : thresholdMethod[opt.method];
+        var dimensions = normalizeDimensions(opt.dimensions);
 
         var values = dataPreprocess(data, {
-            numberDimensions: opt.dimensions,
+            dimensions: dimensions,
             toOneDimensionArray: true
         });
         var maxValue = max(values);

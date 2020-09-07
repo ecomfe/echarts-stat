@@ -35,15 +35,11 @@
                         dataset: [{
                             source: data
                         }, {
-                            transform: [{
-                                type: 'sort',
-                                // print: true,
-                                config: { dimension: 0, order: 'asc' }
-                            }, {
+                            transform: {
                                 type: 'ecStat:regression'
                                 // 'linear' by default.
                                 // config: { method: 'linear', formulaOn: 'end'}
-                            }]
+                            }
                         }],
                         legend: {},
                         tooltip: {

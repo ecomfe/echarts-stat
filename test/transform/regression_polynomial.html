@@ -72,13 +72,10 @@
                             [81.31, 108.68]
                         ]
                     }, {
-                        transform: [{
-                            type: 'sort',
-                            config: { dimension: 0, order: 'asc' }
-                        }, {
+                        transform: {
                             type: 'ecStat:regression',
                             config: { method: 'polynomial', order: 3 }
-                        }]
+                        }
                     }],
                     tooltip: {
                         trigger: 'axis',

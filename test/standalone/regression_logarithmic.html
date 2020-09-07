@@ -113,10 +113,6 @@
 
                 var myRegression = ecStat.regression('logarithmic', data);
 
-                myRegression.points.sort(function (a, b) {
-                    return a[0] - b[0];
-                });
-
                 chart.setOption({
                     legend: {
                         data: ['1990', '2015']

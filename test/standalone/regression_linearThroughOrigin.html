@@ -45,10 +45,6 @@
 
                 var myRegression = ecStat.regression('linearThroughOrigin', data);
 
-                myRegression.points.sort(function (a, b) {
-                    return a[0] - b[0];
-                });
-
                 chart.setOption({
                     legend: {
                         data: ['scatter', 'line']
