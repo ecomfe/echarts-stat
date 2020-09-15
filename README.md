@@ -139,6 +139,7 @@ A histogram is a graphical representation of the distribution of numerical data.
 #### Examples
 
 [test/transform/histogram_bar.html](https://github.com/ecomfe/echarts-stat/blob/master/test/transform/histogram_bar.html)
+
 [test/standalone/histogram_bar.html](https://github.com/ecomfe/echarts-stat/blob/master/test/standalone/histogram_bar.html)
 
 
@@ -321,6 +322,7 @@ You can not only do cluster analysis through this interface, but also use [EChar
 ##### Directly visualize the final results of clustering
 
 [test/transform/clustering_bikmeans.html](https://github.com/ecomfe/echarts-stat/blob/master/test/transform/clustering_bikmeans.html)
+
 [test/standalone/clustering_bikmeans.html](https://github.com/ecomfe/echarts-stat/blob/master/test/standalone/clustering_bikmeans.html)
 
 ![static clustering](img/static-clustering.png)
@@ -431,6 +433,7 @@ You can not only do regression analysis through this interface, you can also use
 ##### Linear Regression
 
 [test/transform/regression_linear.html](https://github.com/ecomfe/echarts-stat/blob/master/test/transform/regression_linear.html)
+
 [test/standalone/regression_linear.html](https://github.com/ecomfe/echarts-stat/blob/master/test/standalone/regression_linear.html)
 
 ![linear regression](img/linear.png)
@@ -440,6 +443,7 @@ You can not only do regression analysis through this interface, you can also use
 ##### Exponential Regression
 
 [test/transform/regression_exponential.html](https://github.com/ecomfe/echarts-stat/blob/master/test/transform/regression_exponential.html)
+
 [test/standalone/regression_exponential.html](https://github.com/ecomfe/echarts-stat/blob/master/test/standalone/regression_exponential.html)
 
 ![exponential regression](img/exponential.png)
@@ -449,6 +453,7 @@ You can not only do regression analysis through this interface, you can also use
 ##### Logarithmic Regression
 
 [test/transform/regression_logarithmic.html](https://github.com/ecomfe/echarts-stat/blob/master/test/transform/regression_logarithmic.html)
+
 [test/standalone/regression_logarithmic.html](https://github.com/ecomfe/echarts-stat/blob/master/test/standalone/regression_logarithmic.html)
 
 ![logarithmic regression](img/logarithmic.png)
@@ -458,6 +463,7 @@ You can not only do regression analysis through this interface, you can also use
 ##### Polynomial Regression
 
 [test/transform/regression_polynomial.html](https://github.com/ecomfe/echarts-stat/blob/master/test/transform/regression_polynomial.html)
+
 [test/standalone/regression_polynomial.html](https://github.com/ecomfe/echarts-stat/blob/master/test/standalone/regression_polynomial.html)
 
 ![polynomial regression](img/polynomial.png)
