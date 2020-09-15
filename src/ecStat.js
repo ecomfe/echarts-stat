@@ -9,7 +9,8 @@ define(function (require) {
 
         transform: {
             regression: require('./transform/regression'),
-            histogram: require('./transform/histogram')
+            histogram: require('./transform/histogram'),
+            clustering: require('./transform/clustering')
         }
 
     };

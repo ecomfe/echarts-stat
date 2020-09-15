@@ -56,6 +56,8 @@ A histogram is a graphical representation of the distribution of numerical data.
 * Standalone
     ```js
     var bins = ecStat.histogram(data, config);
+    // or
+    var bins = ecStat.histogram(data, method);
     ```
 
 
@@ -72,8 +74,8 @@ A histogram is a graphical representation of the distribution of numerical data.
     var data = [[8.3, 143], [8.6, 214], ...];
     ```
 
-* `config` - `object | config['method']`. optional settings:
-    * `config.method` - `'squareRoot' | 'scott' | 'freedmanDiaconis' | 'sturges'`. Methods to calculate the number of bin. There is no "best" number of bin, and different bin size can reveal different feature of data.
+* `config` - `object`.
+    * `config.method` - `'squareRoot' | 'scott' | 'freedmanDiaconis' | 'sturges'`. Optional. Methods to calculate the number of bin. There is no "best" number of bin, and different bin size can reveal different feature of data.
 
         * `squareRoot` - This is the default method, which is also used by Excel histogram. Returns the number of bin according to [Square-root choice](https://en.wikipedia.org/wiki/Histogram#Mathematical_definition):
             ```js
@@ -95,18 +97,44 @@ A histogram is a graphical representation of the distribution of numerical data.
             var bins = ecStat.histogram(data, 'sturges');
             ```
 
-    * `config.dimensions` - `number`. Specify the dimensions of data that are used to regression calculation. By default `0`, which means the column 0 and 1 is used in the regression calculation.
+    * `config.dimensions` - `number`. Optional. Specify the dimensions of data that are used to regression calculation. By default `0`, which means the column 0 and 1 is used in the regression calculation.
 
 
 ##### Return Value (only for standalone usage)
 
-* `bins` - `object`. Contain detailed messages of each bin and data used for [ECharts](https://github.com/ecomfe/echarts) to draw the histogram.
-    * `bins.bins` - `BinItem[]`. An array of bins, where each bin is an object (`BinItem`), containing three attributes:
-        * `x0` - `number`. The lower bound of the bin (inclusive).
-        * `x1` - `number`. The upper bound of the bin (exclusive).
-        * `sample` - `number[]`. Containing the associated elements from the input data.
-    * `bins.data` - `[MeanOfX0X1, SampleLength, X0, X1, DisplayableName][]`. Used for bar chart to draw the histogram, where the length of `sample` is the number of sample values in this bin.
-    * `bins.customData` - `[X0, X1, SampleLength][]`. Used for custom chart to draw the histogram, where the length of `sample` is the number of sample values in this bin.
+* Used as echarts transform (since echarts 5.0)
+    ```js
+    dataset: [{
+        source: [...]
+    }, {
+        transform: 'ecStat:histogram'
+        // // The result data of this dataset is like:
+        // [
+        //     // MeanOfX0X1, SampleLength, X0, X1, DisplayableName
+        //     [  11.3,       12,           8,  12, '8 - 12'],
+        //     ...
+        // ]
+        // // The rest of the input dimensions that other than
+        // // config.dimensions specified are kept in the output.
+    }]
+    ```
+* Standalone
+    * `result` - `object`. Contain detailed messages of each bin and data used for [ECharts](https://github.com/ecomfe/echarts) to draw the histogram.
+        * `result.bins` - `BinItem[]`. An array of bins, where each bin is an object (`BinItem`), containing three attributes:
+            * `x0` - `number`. The lower bound of the bin (inclusive).
+            * `x1` - `number`. The upper bound of the bin (exclusive).
+            * `sample` - `number[]`. Containing the associated elements from the input data.
+        * `result.data` - `[MeanOfX0X1, SampleLength, X0, X1, DisplayableName][]`. Used for bar chart to draw the histogram, where the length of `sample` is the number of sample values in this bin. For example:
+            ```js
+            var bins.data = [
+                // MeanOfX0X1, SampleLength, X0, X1, DisplayableName
+                [  11.3,       12,           8,  12, '8 - 12'],
+                ...
+            ];
+            // The rest of the input dimensions that other than
+            // config.dimensions specified are kept in the output.
+            ```
+        * `result.customData` - `[X0, X1, SampleLength][]`. Used for custom chart to draw the histogram, where the length of `sample` is the number of sample values in this bin.
 
 #### Examples
 
@@ -124,57 +152,165 @@ A histogram is a graphical representation of the distribution of numerical data.
 Clustering can divide the original data set into multiple data clusters with different characteristics. And through [ECharts](https://github.com/ecomfe/echarts), you can visualize the results of clustering, or visualize the process of clustering.
 
 #### Syntax
-```js
-var result = ecStat.clustering.hierarchicalKMeans(data, clusterNumber, stepByStep);
-```
+
+
+* Used as echarts transform (since echarts 5.0)
+    ```js
+    echarts.registerTransform(ecStat.transform.clustering);
+    ```
+    ```js
+    chart.setOption({
+        dataset: [{
+            source: data
+        }, {
+            type: 'ecStat:clustering',
+            config: config
+        }],
+        ...
+    });
+    ```
+* Standalone
+    ```js
+    var result = ecStat.clustering.hierarchicalKMeans(data, config);
+    // or
+    var result = ecStat.clustering.hierarchicalKMeans(data, clusterCount, stepByStep);
+    ```
+
 ##### Parameter
 
 * `data` － `number[][]`. Two-dimensional numeric array, each data point can have more than two numeric attributes in the original data set. In the following example, `data[0]` is called `data point` and `data[0][1]` is one of the numeric attributes of `data[0]`.
 
     ```js
     var data = [
-        [1, 2, 3, 4, 5],
-        [6, 7, 8, 9, 10],
-        [11, 12, 13, 14, 15],
+        [232, 4.21, 51, 0.323, 19],
+        [321, 1.62, 18, 0.139, 10],
+        [551, 11.21, 13, 0.641, 15],
         ...
-        ];
+    ];
     ```
 
-* `clusterNumer` － `number`. The number of clusters generated. **Note that it has to be greater than 1.**
-* `stepByStep` － `boolean`. Control whether doing the clustering step by step
+* `config` - `object`.
+    * `config.clusterCount` － `number`. Mandatory. The number of clusters generated. **Note that it must be greater than 1.**
+    * `config.dimensions` - `number[]`. Optional. Specify which dimensions (columns) of data will be used to clustering calculation. The other columns will also be kept in the output data. By default all of the columns of the data will be used as dimensions.
+    * `config.stepByStep` － `boolean`. Optional. Control whether doing the clustering step by step. By default `false`.
+    * `config.outputType` - `'single' | 'multiple'`. Optional. Specify the format of the output. In "standalone" usage, it is by default `'multiple'`. In "transform" usage, it can not be specified, always be `'single'`.
+    * `config.outputClusterIndexDimension` - `number`. Optional. By default next to the last dimension of input data. It only works in `config.outputType: 'single'`. In this mode, the cluster index will be written to that dimension of the output data.
+    * `config.outputDistanceDimension` - `number`. Optional. By default next to the last dimension of input data having `config.outputClusterIndexDimension` decided. It only works in `config.outputType: 'single'`. In this mode, the distance value (squared distance) to the centroid of the cluster will be written to the dimension of the output data.
 
 ##### Return Value
 
-* `result` － `object`. Including the centroids, clusterAssment, and pointsInCluster. For Example:
+For example, the input data is:
+```js
+var data = [
+    // dimensions:
+    // 0    1      2    3      4
+    [ 232,  4.21,  51,  0.323, 'xxx'],
+    [ 321,  1.62,  18,  0.139, 'xzx'],
+    [ 551,  11.21, 13,  0.641, 'yzy'],
+    ...
+];
+```
+And we specify the `config` as:
+```js
+config = {
+    dimensions: [2, 3],
+    outputClusterIndexDimension: 5
+}
+```
+The result will be:
 
+* Used as echarts transform (since echarts 5.0)
     ```js
-    result.centroids = [
-
-        [-0.460, -2.778],
-        [2.934, 3.128],
-            ...
-    ];
-
-    // Indicate which cluster each data point belonging to,
-    // and the distance to cluster centroids
-    result.clusterAssment = [
-
-        [1, 0.145],
-        [2, 0.680],
-        [0, 1.022],
-        ...
-    ];
-
-    // Concrete data point in each cluster
-    result.pointsInCluster = [
-        [
-            [0.335, -3.376],
-            [-0.994, -0.884],
-            ...
-        ],
-        ...
-    ];
+    dataset: [{
+        source: [ ... ],
+    }, {
+        transform: 'ecStat:clustering',
+        // The result data of this dataset will be:
+        // [
+        //    // dim2, dim3 are used in clustering.
+        //    // All of the input data are kept in the output.
+        //    // dim5 is the output cluster index.
+        //    // dim6 is the output squared distance.
+        //    // dimensions:
+        //    // 0    1      2    3       4       5   6
+        //    [ 232,  4.21,  51,  0.323,  'xxx',  0,  89 ],
+        //    [ 321,  1.62,  18,  0.139,  'xzx',  2,  23 ],
+        //    [ 551,  11.21, 13,  0.641,  'yzy',  0,  ?? ],
+        //    ...
+        // ]
+    }, {
+        fromDatasetIndex: 1,
+        fromTransformResult: 1
+        // The result data of this dataset will be:
+        // centroids: [
+        //     // center of cluster0
+        //     [14, 0.145],
+        //     // center of cluster1
+        //     [24, 0.321],
+        //     ...
+        // ]
+    }]
     ```
+* Standalone
+    * `outputType: 'single'`:
+        * `result` - `object`. For example:
+            ```js
+            result = {
+                data: [
+                    // dim2, dim3 are used in clustering.
+                    // All of the input data are kept in the output.
+                    // dim5 is the output cluster index.
+                    // dim6 is the output squared distance.
+                    // dimensions:
+                    // 0    1      2    3      4      5  6
+                    [ 232,  4.21,  51,  0.323, 'xxx', 0, 89 ],
+                    [ 321,  1.62,  18,  0.139, 'xzx', 2, 23 ],
+                    [ 551,  11.21, 13,  0.641, 'yzy', 0, ?? ],
+                    ...
+                ],
+                centroids: [
+                    // center of cluster0
+                    [14, 0.145],
+                    // center of cluster1
+                    [24, 0.321],
+                    ...
+                ]
+            }
+            ```
+    * `outputType: 'multiple'`:
+        * `result` － `object`. Including the centroids, clusterAssment, and pointsInCluster. For example:
+            ```js
+            result = {
+                pointsInCluster: [
+                    // points in cluster0
+                    [
+                        [ 232,  4.21,  51,  0.323, 'xxx' ],
+                        [ 551,  11.21, 13,  0.641, 'yzy' ],
+                        ...
+                    ],
+                    // points in cluster1
+                    [
+                        [ 321,  1.62,  18,  0.139, 'xzx' ],
+                        ...
+                    ],
+                    ...
+                ],
+                centroids: [
+                    // center of cluster0
+                    [14, 0.145],
+                    // center of cluster1
+                    [24, 0.321],
+                    ...
+                ],
+                clusterAssment: [
+                    // cluster index,   squared distance
+                    [  1,               0.145            ],
+                    [  2,               0.680            ],
+                    [  0,               1.022            ],
+                    ...
+                ]
+            };
+            ```
 
 #### Examples
 
@@ -184,16 +320,8 @@ You can not only do cluster analysis through this interface, but also use [EChar
 
 ##### Directly visualize the final results of clustering
 
-```html
-<script src='https://cdn.bootcss.com/echarts/3.4.0/echarts.js'></script>
-<script src='./dist/ecStat.js'></script>
-<script>
-
-var clusterNumber = 3;
-var result = ecStat.clustering.hierarchicalKMeans(data, clusterNumber, false);
-
-</script>
-```
+[test/transform/clustering_bikmeans.html](https://github.com/ecomfe/echarts-stat/blob/master/test/transform/clustering_bikmeans.html)
+[test/standalone/clustering_bikmeans.html](https://github.com/ecomfe/echarts-stat/blob/master/test/standalone/clustering_bikmeans.html)
 
 ![static clustering](img/static-clustering.png)
 
@@ -201,16 +329,7 @@ var result = ecStat.clustering.hierarchicalKMeans(data, clusterNumber, false);
 
 ##### Visualize the process of clustering
 
-```html
-<script src='https://cdn.bootcss.com/echarts/3.4.0/echarts.js'></script>
-<script src='./dist/ecStat.js'></script>
-<script>
-
-var clusterNumber = 6;
-var result = ecStat.clustering.hierarchicalKMeans(data, clusterNumber, true);
-
-</script>
-```
+[test/standalone/clustering_animation.html](https://github.com/ecomfe/echarts-stat/blob/master/test/standalone/clustering_animation.html)
 
 ![dynamic clustering](http://g.recordit.co/DTTS8d0D4O.gif)
 
@@ -244,11 +363,13 @@ Regression algorithm can according to the value of the dependent and independent
 * Standalone
     ```js
     var myRegression = ecStat.regression(regressionType, data, opt);
+    // or
+    var myRegression = ecStat.regression('polynomial', data, order);
     ```
 
 ##### Parameters
 
-* `regressionType` - `string`. There are four types of regression, which are `'linear'`, `'exponential'`, `'logarithmic'`, `'polynomial'`.
+* `regressionType` - `string`. Mandatory. There are four types of regression, which are `'linear'`, `'exponential'`, `'logarithmic'`, `'polynomial'`.
 * `data` - `number[][]`. Two-dimensional numeric array, Each data object should have two numeric attributes in the original data set. For Example:
     ```js
     var data = [
@@ -257,30 +378,51 @@ Regression algorithm can according to the value of the dependent and independent
         ...
     ];
     ```
-* `opt` - `object`. optional settings:
-    * `opt.dimensions` - `number[]|number`. Specify the dimensions of data that are used to regression calculation. By default `[0, 1]`, which means the column 0 and 1 is used in the regression calculation.
-    * `opt.order` - `number`. The order of polynomial. If you choose other types of regression, you can ignore it.
+* `opt` - `object`.
+    * `opt.dimensions` - `number[]|number`. Optional. Specify the dimensions of data that are used to regression calculation. By default `[0, 1]`, which means the column 0 and 1 is used in the regression calculation.
+    * `opt.order` - `number`. Optional. By default `2`. The order of polynomial. If you choose other types of regression, you can ignore it.
 
 ##### Return Value (only for standalone usage)
 
-* `myRegression` - `object`. Including points, parameter, and expression. For Example:
-
+* Used as echarts transform (since echarts 5.0)
     ```js
-    myRegression.points = [
-        [1, 2],
-        [3, 4],
-        ...
-    ];
-
-    // This is the parameter of linear regression,
-    // for other types, it should be a little different
-    myRegression.parameter = {
-        gradient: 1.695,
-        intercept: 3.008
-    };
-
-    myRegression.expression = 'y = 1.7x + 3.01';
+    dataset: [{
+        source: [...]
+    }, {
+        transform: 'ecStat:regression',
+        // // The result of this dataset is like:
+        // [
+        //     // ValueOnX, ValueOnY
+        //     [  23,       51      ],
+        //     [  24,       62      ],
+        //     ...
+        // ]
+        // // The rest of the input dimensions that other than
+        // // config.dimensions specified are kept in the output.
+    }]
     ```
+* Standalone
+    * `myRegression` - `object`. Including points, parameter, and expression. For Example:
+
+        ```js
+        myRegression.points = [
+            // ValueOnX, ValueOnY
+            [  23,       51      ],
+            [  24,       62      ],
+            ...
+        ];
+        // The rest of the input dimensions that other than
+        // config.dimensions specified are kept in the output.
+
+        // This is the parameter of linear regression,
+        // for other types, it should be a little different
+        myRegression.parameter = {
+            gradient: 1.695,
+            intercept: 3.008
+        };
+
+        myRegression.expression = 'y = 1.7x + 3.01';
+        ```
 
 #### Examples
 
