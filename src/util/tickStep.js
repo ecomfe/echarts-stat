@@ -1,5 +1,7 @@
 define(function (require) {
 
+    var numberUtil = require('./number');
+
     /**
      * Computing the length of step
      * @see  https://github.com/d3/d3-array/blob/master/src/ticks.js
@@ -10,7 +12,8 @@ define(function (require) {
     return function (start, stop, count) {
 
         var step0 = Math.abs(stop - start) / count;
-        var precision = Math.floor(Math.log(step0) / Math.LN10);
+        var precision = numberUtil.quantityExponent(step0);
+
         var step1 = Math.pow(10, precision);
         var error = step0 / step1;
 
@@ -23,8 +26,16 @@ define(function (require) {
         else if(error >= Math.sqrt(2)) {
             step1 *= 2;
         }
-        return +((stop >= start ? step1 : -step1).toFixed(-precision));
 
+        var toFixedPrecision = precision < 0 ? -precision : 0;
+        var resultStep = +(
+            (stop >= start ? step1 : -step1).toFixed(toFixedPrecision)
+        );
+
+        return {
+            step: resultStep,
+            toFixedPrecision: toFixedPrecision
+        };
     };
 
 });

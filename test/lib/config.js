@@ -5,17 +5,17 @@ require.config({
     packages: [
         {
             main: 'ecStat',
-            location: '../src',
+            location: '../../src',
             name: 'ecStat'
         },
         {
             main: 'echarts',
-            location: '../../echarts/dist',
+            location: '../../../echarts/dist',
             name: 'echarts'
         },
         {
             main: 'zrender',
-            location: '../../zrender/dist',
+            location: '../../../zrender/dist',
             name: 'zrender'
         }
     ]

@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset='utf-8'>
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <script src="../lib/esl.js"></script>
+        <script src="../lib/config.js"></script>
+        <script src="../lib/jquery.min.js"></script>
+    </head>
+    <body>
+        <style>
+            html, body, #main {
+                width: 100%;
+                height: 100%;
+                margin: 0;
+                padding: 0;
+            }
+        </style>
+        <div id="main"></div>
+        <script>
+
+            require([
+                'echarts',
+                'ecStat'
+            ], function (echarts, ecStat) {
+
+                echarts.registerTransform(ecStat.transform.regression);
+
+                var chart = echarts.init(document.getElementById('main'));
+
+                chart.setOption({
+                    dataset: [{
+                        source: [
+                            [0, 0],
+                            [1, 2],
+                            [2, 3],
+                            [3, 4],
+                            [4, 5],
+                            [5, 8],
+                            [6, 7],
+                            [7, 7],
+                            [8, 10],
+                            [9, 14],
+                            [10, 10],
+                            [11, 11],
+                            ['12', '12'],
+                            [13, 15]
+                        ]
+                    }, {
+                        transform: {
+                            type: 'ecStat:regression',
+                            config: { method: 'linearThroughOrigin' }
+                        }
+                    }],
+                    legend: {
+                    },
+                    tooltip: {
+                        trigger: 'axis',
+                        axisPointer: {
+                            type: 'cross'
+                        }
+                    },
+                    xAxis: {
+                        splitLine: {
+                            show: false
+                        },
+                        splitNumber: 20
+                    },
+                    yAxis: {
+                        splitLine: {
+                            show: false
+                        }
+                    },
+                    series: [{
+                        name: 'scatter',
+                        type: 'scatter'
+                     },{
+                        name: 'line',
+                        type: 'line',
+                        datasetIndex: 1,
+                        symbolSize: 0.1,
+                        symbol: 'circle',
+                        label: { show: true, fontSize: 16 },
+                        labelLayout: { dx: -20 },
+                        encode: { label: 2, tooltip: 1 }
+                    }]
+                });
+            });
+        </script>
+    </body>
+</html>

@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset='utf-8'>
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <script src="../lib/esl.js"></script>
+        <script src="../lib/config.js"></script>
+        <script src="../lib/jquery.min.js"></script>
+    </head>
+    <body>
+        <style>
+            html, body, #main {
+                width: 100%;
+                height: 100%;
+                margin: 0;
+                padding: 0;
+            }
+        </style>
+        <div id="main"></div>
+        <script>
+
+            require([
+                'echarts',
+                'ecStat'
+            ], function (echarts, ecStat) {
+
+                var chart = echarts.init(document.getElementById('main'));
+
+                window.onresize = function () {
+                    chart.resize();
+                };
+
+                $.getJSON('../data/clustering_dataset2.json')
+                .done(function (data) {
+
+                    echarts.registerTransform(ecStat.transform.clustering);
+                    var CLUSTER_COUNT = 6;
+                    var DIENSIION_CLUSTER_INDEX = 2;
+                    var COLOR_ALL = [
+                        '#37A2DA', '#e06343', '#37a354', '#b55dba', '#b5bd48', '#8378EA', '#96BFFF'
+                    ];
+                    var pieces = [];
+                    for (var i = 0; i < CLUSTER_COUNT; i++) {
+                        pieces.push({
+                            value: i,
+                            label: 'cluster ' + i,
+                            color: COLOR_ALL[i]
+                        });
+                    }
+
+                    var option = {
+                        dataset: [{
+                            source: data
+                        }, {
+                            transform: {
+                                type: 'ecStat:clustering',
+                                print: true,
+                                config: {
+                                    clusterCount: CLUSTER_COUNT,
+                                    outputType: 'single',
+                                    outputClusterIndexDimension: DIENSIION_CLUSTER_INDEX
+                                }
+                            }
+                        }],
+                        tooltip: {
+                            position: 'top'
+                        },
+                        visualMap: {
+                            type: 'piecewise',
+                            top: 'middle',
+                            min: 0,
+                            max: CLUSTER_COUNT,
+                            left: 10,
+                            splitNumber: CLUSTER_COUNT,
+                            dimension: DIENSIION_CLUSTER_INDEX,
+                            pieces: pieces
+                        },
+                        grid: {
+                            left: 120
+                        },
+                        xAxis: {
+                        },
+                        yAxis: {
+                        },
+                        series: {
+                            type: 'scatter',
+                            encode: { tooltip: [0, 1] },
+                            symbolSize: 15,
+                            itemStyle: {
+                                borderColor: '#555'
+                            },
+                            datasetIndex: 1
+                        }
+                    };
+
+                    chart.setOption(option);
+
+                });
+            });
+        </script>
+    </body>
+</html>

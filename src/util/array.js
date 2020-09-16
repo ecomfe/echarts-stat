@@ -136,7 +136,6 @@ define(function (require) {
         }
     }
 
-
     return {
         size: size,
         isArray: isArray,

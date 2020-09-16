@@ -38,84 +38,113 @@ var result = ecStat.clustering.hierarchicalKMeans(data, clusterNumber, false);
 
 #### 调用方式
 
-```js
-var bins = ecStat.histogram(data, binMethod);
-```
+* 作为 echarts transform 使用（echarts 5.0 开始支持）
+    ```js
+    echarts.registerTransform(ecStat.transform.histogram);
+    ```
+    ```js
+    chart.setOption({
+        dataset: [{
+            source: data
+        }, {
+            type: 'ecStat:histogram',
+            config: config
+        }],
+        ...
+    });
+    ```
+* 独立使用
+    ```js
+    var bins = ecStat.histogram(data, config);
+    ```
 
 ##### 参数说明
 
-* `data` - `Array<number>`. 数值样本.
+* `data` - `number[] | number[][]`. 数值样本.
+    ```js
+    // 一维数组
+    var data = [8.6, 8.8, 10.5, 10.7, 10.8, 11.0, ... ];
+    ```
+    or
+    ```js
+    // 二维数组
+    var data = [[8.3, 143], [8.6, 214], ...];
+    ```
 
-	```js
-	var data = [8.6, 8.8, 10.5, 10.7, 10.8, 11.0, ... ];
-	```
+* `config` - `object`.
+    * `method` - `string`. 可选参数。直方图提供了四种计算小区间间隔个数的方法，分别是 `squareRoot`, `scott`, `freedmanDiaconis` 和 `sturges`。这里的每个小区间间隔又称为 `bin`，所有的小区间间隔组成的数组称为 `bins`。当然，对于一个直方图来说，没有所谓的最佳区间间隔个数，不同的区间间隔大小会揭示数据样本不同的数值特性。
 
-* `binMethod` - `string`. 直方图提供了四种计算小区间间隔个数的方法，分别是 `squareRoot`, `scott`, `freedmanDiaconis` 和 `sturges`。这里的每个小区间间隔又称为 `bin`，所有的小区间间隔组成的数组称为 `bins`。当然，对于一个直方图来说，没有所谓的最佳区间间隔个数，不同的区间间隔大小会揭示数据样本不同的数值特性。
+        * `squareRoot` - 默认方法，Excel 的直方图中也是使用这个方法计算 `bins`。依照 [Square-root choice](https://en.wikipedia.org/wiki/Histogram#Mathematical_definition) 返回 bin 的个数:
+            ```js
+            var bins = ecStat.histogram(data);
+            ```
 
-	 * `squareRoot` - 默认方法，Excel 的直方图中也是使用这个方法计算 `bins`。依照 [Square-root choice](https://en.wikipedia.org/wiki/Histogram#Mathematical_definition) 返回 bin 的个数:
-	 	```js
-		var bins = ecStat.histogram(data);
-		```
+        * `scott` - 依照 [Scott's normal reference Rule](https://en.wikipedia.org/wiki/Histogram#Mathematical_definition) 返回 bin 的个数:
+            ```js
+            var bins = ecStat.histogram(data, 'scott');
+            ```
 
-	* `scott` - 依照 [Scott's normal reference Rule](https://en.wikipedia.org/wiki/Histogram#Mathematical_definition) 返回 bin 的个数:
-		```js
-		var bins = ecStat.histogram(data, 'scott');
-		```
+        * `freedmanDiaconis` - 依照 [The Freedman-Diaconis rule](https://en.wikipedia.org/wiki/Histogram#Mathematical_definition) 返回 bin 的个数:
+            ```js
+            var bins = ecStat.histogram(data, 'freedmanDiaconis');
+            ```
 
-	* `freedmanDiaconis` - 依照 [The Freedman-Diaconis rule](https://en.wikipedia.org/wiki/Histogram#Mathematical_definition) 返回 bin 的个数:
-		```js
-		var bins = ecStat.histogram(data, 'freedmanDiaconis');
-		```
+        * `sturges` - 依照 [Sturges' formula](https://en.wikipedia.org/wiki/Histogram#Mathematical_definition) 返回 bin 的个数:
+            ```js
+            var bins = ecStat.histogram(data, 'sturges');
+            ```
 
-	* `sturges` - 依照 [Sturges' formula](https://en.wikipedia.org/wiki/Histogram#Mathematical_definition) 返回 bin 的个数:
-		```js
-		var bins = ecStat.histogram(data, 'sturges');
-		```
+    * `config.dimensions` - `number`. 可选参数。指定数据的哪些维度会被用于回归计算。默认为 `0`。
+
 
 ##### 返回值说明
 
-* `bins` - `Object`. 返回值包含了每一个 bin 的详细信息，以及用 [ECharts](https://github.com/ecomfe/echarts) 绘制直方图所需要的数据信息。 
-	* `bins.bins` - `Array.<Object>`. 包含所有小区间间隔的数组，其中每个区间间隔是一个对象，包含如下三个属性：
-		* `x0` - `number`. 区间间隔的下界 (包含)。
-		* `x1` - `number`. 区间间隔的上界 (不包含)。
-		* `sample` - `Array.<number>`. 落入该区间间隔的原始输入样本数据。
-	* `bins.data` - `Array.<Array.<number>>`. 用 ECharts 柱状图绘制直方图所需要的数据信息。这是一个二维数据，其中每个数据项是一个一维数组。该一维数组包含了 x0 和 x1 的均值，以及上述 sample 数组的长度，示例如下：
-		```js
-		var bins.data = [
-			[mean1, len1],
-			[mean2, len2],
-				...
-		];
-		```
-	* `bins.customData` - `Array.<Array<number>>`. 用 ECharts 自定义图表绘制直方图所需要的数据信息。这是一个二维数据，其中每个数据项是一个一维数组。该一维数组包含了 x0 和 x1，以及上述 sample 数组的长度，示例如下：
-		```js
-		var bins.customData = [
-			[x0, x1, len1],
-				...
-		];
-		```
+
+* 作为 echarts transform 使用（echarts 5.0 开始支持）
+    ```js
+    dataset: [{
+        source: [...]
+    }, {
+        transform: 'ecStat:histogram'
+        // // 本 dataset 中得到的结果数据如：
+        // [
+        //     // MeanOfX0X1, SampleLength, X0, X1, DisplayableName
+        //     [  11.3,       12,           8,  12, '8 - 12'],
+        //     ...
+        // ]
+        // // config.dimensions 之外的其他维度的数据
+        // // 也会保留在结果中。
+    }]
+    ```
+* 独立使用
+    * `bins` - `object`. 返回值包含了每一个 bin 的详细信息，以及用 [ECharts](https://github.com/ecomfe/echarts) 绘制直方图所需要的数据信息。
+        * `bins.bins` - `BinItem[]`. 包含所有小区间间隔的数组，其中每个区间间隔是一个对象 (`BinItem`)，包含如下三个属性：
+            * `x0` - `number`. 区间间隔的下界 (包含)。
+            * `x1` - `number`. 区间间隔的上界 (不包含)。
+            * `sample` - `number[]`. 落入该区间间隔的原始输入样本数据。
+        * `bins.data` - `[MeanOfX0X1, SampleLength, X0, X1, DisplayableName][]`. 用 ECharts 柱状图绘制直方图所需要的数据信息。这是一个二维数据，其中每个数据项是一个一维数组。该一维数组包含了 x0 和 x1 的均值，以及上述 sample 数组的长度，示例如下：
+            ```js
+            var bins.data = [
+                // MeanOfX0X1, SampleLength, X0, X1, DisplayableName
+                [  11.3,       12,           8,  12, '8 - 12'],
+                ...
+            ];
+            // config.dimensions 之外的其他维度的数据
+            // 也会保留在结果中。
+            ```
+        * `bins.customData` - `[X0, X1, SampleLength][]`. 用 ECharts 自定义图表绘制直方图所需要的数据信息。这是一个二维数据，其中每个数据项是一个一维数组。该一维数组包含了 x0 和 x1，以及上述 sample 数组的长度，示例如下：
+            ```js
+            var bins.customData = [
+                [x0_0, x1_0, len_0],
+                ...
+            ];
+            ```
 
 #### 实例
 
-这个示例使用 ECharts 自定义图表绘制直方图，相较于柱状图我们更推荐使用自定义图表绘制直方图。
+[test/transform/histogram_bar.html](https://github.com/ecomfe/echarts-stat/blob/master/test/transform/histogram_bar.html)
+[test/standalone/histogram_bar.html](https://github.com/ecomfe/echarts-stat/blob/master/test/standalone/histogram_bar.html)
 
-```html
-<script src='https://cdn.bootcss.com/echarts/3.4.0/echarts.js'></script>
-<script src='./dist/ecStat.js'></script>
-<script>
-
-var bins = ecStat.histogram(data);
-var option = {
-	...
-	series: [{
-		type: 'custom',
-		...
-	}],
-	...
-}
-
-</script>
-```
 ![histogram](img/histogram.png)
 
 [Run](http://gallery.echartsjs.com/editor.html?c=xBk5VZddJW)
@@ -126,55 +155,165 @@ var option = {
 聚类可以将原始输入数据分割成多个具有不同特征的数据簇。并且通过 [ECharts](https://github.com/ecomfe/echarts) 既可以可视化聚类的结果，也可以可视化聚类的分割过程。
 
 #### 调用方式
-```
-var result = ecStat.clustering.hierarchicalKMeans(data, clusterNumber, stepByStep);
-```
+
+
+* 作为 echarts transform 使用（echarts 5.0 开始支持）
+    ```js
+    echarts.registerTransform(ecStat.transform.clustering);
+    ```
+    ```js
+    chart.setOption({
+        dataset: [{
+            source: data
+        }, {
+            type: 'ecStat:clustering',
+            config: config
+        }],
+        ...
+    });
+    ```
+* 独立使用
+    ```js
+    var result = ecStat.clustering.hierarchicalKMeans(data, config);
+    // or
+    var result = ecStat.clustering.hierarchicalKMeans(data, clusterCount, stepByStep);
+    ```
+
 ##### 参数说明
 
-* `data` － `Array.<Array.<number>>`. 这是一个二维数组，其中每个数据对象是具有多个数值属性的一维数组。如下，`data[0]` 就是一个数据对象，`data[0][1]` 是该数据对象的一个数值属性。
+* `data` － `number[][]`. 这是一个二维数组，其中每个数据对象是具有多个数值属性的一维数组。如下，`data[0]` 就是一个数据对象，`data[0][1]` 是该数据对象的一个数值属性。
+    ```js
+    var data = [
+        [232, 4.21, 51, 0.323, 19],
+        [321, 1.62, 18, 0.139, 10],
+        [551, 11.21, 13, 0.641, 15],
+        ...
+        ];
+    ```
+* `config` - `object`.
+    * `config.clusterCount` － `number`. 必填参数。要生成的数据簇的个数。 **注意，该数值必须大于 1。**
+    * `config.dimensions` - `number[]`. 可选参数。Specify which dimensions (columns) of data will be used to clustering calculation. The other columns will also be kept in the output data. By default all of the columns of the data will be used as dimensions.
+    * `config.stepByStep` － `boolean`. 可选参数。该参数主要用于可视化聚类算法每一步的分割过程，即动态地展示数据簇如何从 2 个到 3 个，4 个， .... 。默认为 `false`。
+    * `config.outputType` - `'single' | 'multiple'`. 可选参数。指定输出格式。在“独立使用”中，它默认为`'multiple'`。在“transform”中，它不能被指定，总为`'single'`模式。
+    * `config.outputClusterIndexDimension` - `number`. 可选参数。默认取输入数据的最后一列（即维度，dimension）的下一列。簇的索引（clusterIndex）将被写入这列。此设定只在 `config.outputType: 'single'` 时生效。
+    * `config.outputDistanceDimension` - `number`. 可选参数。默认取 `outputClusterIndexDimension` 决定好后的下一列。计算出的每项和簇中心的“平方距离”值，将被写入这一列。
 
-  ```js
-  var data = [
-		[1, 2, 3, 4, 5],
-		[6, 7, 8, 9, 10],
-		[11, 12, 13, 14, 15],
-		...
-	    ];
-  ```
-* `clusterNumer` － `number`. 要生成的数据簇的个数。 **注意，该数值必须大于 1。** 
-* `stepByStep` － `boolean`. 该参数主要用于可视化聚类算法每一步的分割过程，即动态地展示数据簇如何从 2 个到 3 个，4 个， .... 。
 
 ##### 返回值说明
 
-* `result` － `Object`. 包含每个数据簇的中心点 centroids，聚类的评估结果 clusterAssment，以及每个数据簇所包含的原始数据对象 pointsInCluster。如下:
+例如，输入数据是：
+```js
+var data = [
+    // dimensions:
+    // 0    1      2    3      4
+    [ 232,  4.21,  51,  0.323, 'xxx'],
+    [ 321,  1.62,  18,  0.139, 'xzx'],
+    [ 551,  11.21, 13,  0.641, 'yzy'],
+    ...
+];
+```
+然后我们指定的 `config` 是：
+```js
+config = {
+    dimensions: [2, 3],
+    outputClusterIndexDimension: 5
+}
+```
+则结果是：
 
-	```js
-	result.centroids = [
 
-		[-0.460, -2.778],
-		[2.934, 3.128],
-	    	...
-	];
-
-	// indicate which cluster each data point belonging to, and the distance to cluster centroids
-	result.clusterAssment = [
-
-		[1, 0.145],
-		[2, 0.680],
-		[0, 1.022],
-		...
-	];
-
-	// concrete data point in each cluster
-	result.pointsInCluster = [
-		[
-			[0.335, -3.376],
-			[-0.994, -0.884],
-			...
-		],
-		...
-	];
-	```
+* 作为 echarts transform 使用（echarts 5.0 开始支持）
+    ```js
+    dataset: [{
+        source: [ ... ],
+    }, {
+        transform: 'ecStat:clustering',
+        // 本 dataset 得到的结果数据是例如：
+        // [
+        //    // dim2, dim3 被用于聚类计算。
+        //    // 所有其他列被保留在结果数据中。
+        //    // dim5 是计算得到的 cluster index 。
+        //    // dim6 是计算得到的平方距离。
+        //    // dimensions:
+        //    // 0    1      2    3       4       5   6
+        //    [ 232,  4.21,  51,  0.323,  'xxx',  0,  89 ],
+        //    [ 321,  1.62,  18,  0.139,  'xzx',  2,  23 ],
+        //    [ 551,  11.21, 13,  0.641,  'yzy',  0,  ?? ],
+        //    ...
+        // ]
+    }, {
+        fromDatasetIndex: 1,
+        fromTransformResult: 1
+        // 本 dataset 得到的结果数据是例如：
+        // centroids: [
+        //     // cluster0 的中心点数据。
+        //     [14, 0.145],
+        //     // cluster1 的中心点数据。
+        //     [24, 0.321],
+        //     ...
+        // ]
+    }]
+    ```
+* 独立使用
+    * `outputType: 'single'`:
+        * `result` - `object`. 例如
+            ```js
+            result = {
+                data: [
+                    // dim2, dim3 被用于聚类计算。
+                    // 所有其他列被保留在结果数据中。
+                    // dim5 是计算得到的 cluster index 。
+                    // dim6 是计算得到的 squared distance 。
+                    // dimensions:
+                    // 0    1      2    3      4      5  6
+                    [ 232,  4.21,  51,  0.323, 'xxx', 0, 89 ],
+                    [ 321,  1.62,  18,  0.139, 'xzx', 2, 23 ],
+                    [ 551,  11.21, 13,  0.641, 'yzy', 0, ?? ],
+                    ...
+                ],
+                centroids: [
+                    // cluster0 的中心。
+                    [14, 0.145],
+                    // cluster1 的中心。
+                    [24, 0.321],
+                    ...
+                ]
+            }
+            ```
+    * `outputType: 'multiple'`:
+        * `result` － `object`. Including the centroids, clusterAssment, and pointsInCluster. For example:
+            ```js
+            result = {
+                pointsInCluster: [
+                    // cluster0 中的数据项
+                    [
+                        [ 232,  4.21,  51,  0.323, 'xxx' ],
+                        [ 551,  11.21, 13,  0.641, 'yzy' ],
+                        ...
+                    ],
+                    // cluster1 中的数据项
+                    [
+                        [ 321,  1.62,  18,  0.139, 'xzx' ],
+                        ...
+                    ],
+                    ...
+                ],
+                centroids: [
+                    // cluster0 的中心。
+                    [14, 0.145],
+                    // cluster1 的中心。
+                    [24, 0.321],
+                    ...
+                ],
+                clusterAssment: [
+                    // cluster index,   squared distance
+                    [  1,               0.145            ],
+                    [  2,               0.680            ],
+                    [  0,               1.022            ],
+                    ...
+                ]
+            };
+            ```
 
 #### 实例
 
@@ -184,16 +323,9 @@ var result = ecStat.clustering.hierarchicalKMeans(data, clusterNumber, stepBySte
 
 ##### 直接可视化聚类算法的最终结果
 
-```html
-<script src='https://cdn.bootcss.com/echarts/3.4.0/echarts.js'></script>
-<script src='./dist/ecStat.js'></script>
-<script>
+[test/transform/clustering_bikmeans.html](https://github.com/ecomfe/echarts-stat/blob/master/test/transform/clustering_bikmeans.html)
+[test/standalone/clustering_bikmeans.html](https://github.com/ecomfe/echarts-stat/blob/master/test/standalone/clustering_bikmeans.html)
 
-var clusterNumber = 3;
-var result = ecStat.clustering.hierarchicalKMeans(data, clusterNumber, false);
-
-</script>
-```
 
 ![static clustering](img/static-clustering.png)
 
@@ -201,16 +333,7 @@ var result = ecStat.clustering.hierarchicalKMeans(data, clusterNumber, false);
 
 ##### 可视化聚类的过程
 
-```html
-<script src='https://cdn.bootcss.com/echarts/3.4.0/echarts.js'></script>
-<script src='./dist/ecStat.js'></script>
-<script>
-
-var clusterNumber = 6;
-var result = ecStat.clustering.hierarchicalKMeans(data, clusterNumber, true);
-
-</script>
-```
+[test/standalone/clustering_animation.html](https://github.com/ecomfe/echarts-stat/blob/master/test/standalone/clustering_animation.html)
 
 ![dynamic clustering](http://g.recordit.co/DTTS8d0D4O.gif)
 
@@ -222,42 +345,88 @@ var result = ecStat.clustering.hierarchicalKMeans(data, clusterNumber, true);
 回归算法根据原始输入数据集中自变量和因变量的值拟合出一条曲线，以反映它们的变化趋势。目前只支持单个自变量的回归算法。
 
 #### 调用方式
-```
-var myRegression = ecStat.regression(regressionType, data, order);
-```
+
+* 作为 echarts transform 使用（echarts 5.0 开始支持）
+    ```js
+    echarts.registerTransform(ecStat.transform.regression);
+    ```
+    ```js
+    chart.setOption({
+        dataset: [{
+            source: data
+        }, {
+            type: 'ecStat:regression',
+            config: {
+                method: regressionType,
+                ...opt
+            }
+        }],
+        ...
+    });
+    ```
+* 独立使用
+    ```js
+    var myRegression = ecStat.regression(regressionType, data, opt);
+    // or
+    var myRegression = ecStat.regression('polynomial', data, order);
+    ```
+
 ##### 参数说明
 
-* `regressionType` - `string`. 回归类型，提供了四种类型的回归算法，分别是 `'linear'`, `'exponential'`, `'logarithmic'`, `'polynomial'`。
-* `data` - `Array.<Array.<number>>`. 原始的输入数据是一个二维的数值数组，其中每个数据对象是包含两个数值属性的一维数组，分别表示自变量和因变量的值。如下：
-	```js
-	var data = [
-
-		[1, 2],
-		[3, 5],
-		...
-	];
-	```
-* `order` - `number`. 多项式的阶数。对于非多项式回归，可以忽略该参数。
+* `regressionType` - `string`. 必填参数。回归类型，提供了四种类型的回归算法，分别是 `'linear'`, `'exponential'`, `'logarithmic'`, `'polynomial'`。
+* `data` - `number[][]`. 原始的输入数据是一个二维的数值数组，其中每个数据对象是包含两个数值属性的一维数组，分别表示自变量和因变量的值。如下：
+    ```js
+    var data = [
+        [1, 2],
+        [3, 5],
+        ...
+    ];
+    ```
+* `opt` - `object`.
+    * `opt.dimensions` - `number[]`. 可选参数。指定数据的哪些维度会被用于回归计算。默认为 `[0, 1]`。
+    * `order` - `number`. 可选参数。默认为 `2`。多项式的阶数（只在 `'polynomial'` 中生效）。对于非多项式回归，可以忽略该参数。
 
 ##### 返回值说明
 
-* `myRegression` - `Object`. 包括用于绘制折线图的拟合数据点 `points`，回归曲线的参数 `parameter`，以及拟合出的曲线表达式 `expression`。如下：
+* 作为 echarts transform 使用（echarts 5.0 开始支持）
+    ```js
+    dataset: [{
+        source: [...]
+    }, {
+        transform: 'ecStat:regression',
+        // // 本 dataset 得到的结果数据例如：
+        // [
+        //     // ValueOnX, ValueOnY
+        //     [  23,       51      ],
+        //     [  24,       62      ],
+        //     ...
+        // ]
+        // // config.dimensions 之外的其他维度的数据
+        // // 也会保留在结果中。
+    }]
+    ```
+* 独立使用
+    * `myRegression` - `object`. 包括用于绘制折线图的拟合数据点 `points`，回归曲线的参数 `parameter`，以    及拟合出的曲线表达式 `expression`。如下：
 
-	```js
-	myRegression.points = [
-		[1, 2],
-		[3, 4],
-		...
-	];
+        ```js
+        myRegression.points = [
+            // ValueOnX, ValueOnY
+            [  23,       51      ],
+            [  24,       62      ],
+            ...
+        ];
+        // config.dimensions 之外的其他维度的数据
+        // 也会保留在结果中。
 
-	// this is the parameter of linear regression, for other types, it shoule be a little different
-	myRegression.parameter = {
-		gradient: 1.695,
-		intercept: 3.008
-	};
+        // this is the parameter of linear regression,
+        // for other types, it shoule be a little different
+        myRegression.parameter = {
+            gradient: 1.695,
+            intercept: 3.008
+        };
 
-	myRegression.expression = 'y = 1.7x + 3.01';
-	```
+        myRegression.expression = 'y = 1.7x + 3.01';
+        ```
 
 #### 实例
 
@@ -265,15 +434,8 @@ var myRegression = ecStat.regression(regressionType, data, order);
 
 ##### 线性回归
 
-```html
-<script src='https://cdn.bootcss.com/echarts/3.4.0/echarts.js'></script>
-<script src='./dist/ecStat.js'></script>
-<script>
-
-var myRegression = ecStat.regression('linear', data);
-
-</script>
-```
+[test/transform/regression_linear.html](https://github.com/ecomfe/echarts-stat/blob/master/test/transform/regression_linear.html)
+[test/standalone/regression_linear.html](https://github.com/ecomfe/echarts-stat/blob/master/test/standalone/regression_linear.html)
 
 ![linear regression](img/linear.png)
 
@@ -281,15 +443,8 @@ var myRegression = ecStat.regression('linear', data);
 
 ##### 指数回归
 
-```html
-<script src='https://cdn.bootcss.com/echarts/3.4.0/echarts.js'></script>
-<script src='./dist/ecStat.js'></script>
-<script>
-
-var myRegression = ecStat.regression('exponential', data);
-
-</script>
-```
+[test/transform/regression_exponential.html](https://github.com/ecomfe/echarts-stat/blob/master/test/transform/regression_exponential.html)
+[test/standalone/regression_exponential.html](https://github.com/ecomfe/echarts-stat/blob/master/test/standalone/regression_exponential.html)
 
 ![exponential regression](img/exponential.png)
 
@@ -297,15 +452,8 @@ var myRegression = ecStat.regression('exponential', data);
 
 ##### 对数回归
 
-```html
-<script src='https://cdn.bootcss.com/echarts/3.4.0/echarts.js'></script>
-<script src='./dist/ecStat.js'></script>
-<script>
-
-var myRegression = ecStat.regression('logarithmic', data);
-
-</script>
-```
+[test/transform/regression_logarithmic.html](https://github.com/ecomfe/echarts-stat/blob/master/test/transform/regression_logarithmic.html)
+[test/standalone/regression_logarithmic.html](https://github.com/ecomfe/echarts-stat/blob/master/test/standalone/regression_logarithmic.html)
 
 ![logarithmic regression](img/logarithmic.png)
 
@@ -313,15 +461,8 @@ var myRegression = ecStat.regression('logarithmic', data);
 
 ##### 多项式回归
 
-```html
-<script src='https://cdn.bootcss.com/echarts/3.4.0/echarts.js'></script>
-<script src='./dist/ecStat.js'></script>
-<script>
-
-var myRegression = ecStat.regression('polynomial', data, 3);
-
-</script>
-```
+[test/transform/regression_polynomial.html](https://github.com/ecomfe/echarts-stat/blob/master/test/transform/regression_polynomial.html)
+[test/standalone/regression_polynomial.html](https://github.com/ecomfe/echarts-stat/blob/master/test/standalone/regression_polynomial.html)
 
 ![polynomial regression](img/polynomial.png)
 
@@ -336,12 +477,12 @@ var myRegression = ecStat.regression('polynomial', data, 3);
 #### ecStat.statistics.deviation()
 
 ##### 调用方式
-```
+```js
 var sampleDeviation = ecStat.statistics.deviation(dataList);
 ```
 ##### 参数说明
 
-* `dataList` : `Array.<number>`. 输入的数值样本集。
+* `dataList` : `number[]`. 输入的数值样本集。
 
 ##### 返回值说明
 
@@ -351,27 +492,27 @@ var sampleDeviation = ecStat.statistics.deviation(dataList);
 #### ecStat.statistics.sampleVariance()
 
 ##### 调用方式
-```
+```js
 var varianceValue = ecStat.statistics.sampleVariance(dataList);
 ```
 ##### 参数说明
 
-* `dataList` : `Array.<number>`. 输入的数值样本集。
+* `dataList` : `number[]`. 输入的数值样本集。
 
 ##### 返回值说明
 
-* `varianceValue`: `number`. 返回输入数组 *dataList* 的样本方差。如果 *dataList* 为空或者长度小于 2，返回 0. 
+* `varianceValue`: `number`. 返回输入数组 *dataList* 的样本方差。如果 *dataList* 为空或者长度小于 2，返回 0.
 
 
 #### ecStat.statistics.quantile()
 
 ##### 调用方式
-```
+```js
 var quantileValue = ecStat.statistics.quantile(dataList, p);
 ```
 ##### 参数说明
 
-* `dataList` : `Array.<number>`. 输入的数值数组，该数组必须是按从小到大有序排列的.
+* `dataList` : `number[]`. 输入的数值数组，该数组必须是按从小到大有序排列的.
 * `p`: `number`. 分位数，取值在 [0, 1] 之间. 例如, 第一四分位数对应的 p 值是 0.25；第二四分位数，也就是中位数，对应的 p 值是 0.5；第三四分位数对应的 p 值是 0.75.
 
 ##### 返回值说明
@@ -382,12 +523,12 @@ var quantileValue = ecStat.statistics.quantile(dataList, p);
 #### ecStat.statistics.max()
 
 ##### 调用方式
-```
+```js
 var maxValue = ecStat.statistics.max(dataList);
 ```
 ##### 参数说明
 
-* `dataList` : `Array.<number>`. 输入的数值样本集。
+* `dataList` : `number[]`. 输入的数值样本集。
 
 ##### 返回值说明
 
@@ -397,12 +538,12 @@ var maxValue = ecStat.statistics.max(dataList);
 #### ecStat.statistics.min()
 
 ##### 调用方式
-```
+```js
 var minValue = ecStat.statistics.min(dataList);
 ```
 ##### 参数说明
 
-* `dataList` : `Array.<number>`. 输入的数值样本集。
+* `dataList` : `number[]`. 输入的数值样本集。
 
 ##### 返回值说明
 
@@ -412,12 +553,12 @@ var minValue = ecStat.statistics.min(dataList);
 #### ecStat.statistics.mean()
 
 ##### 调用方式
-```
+```js
 var meanValue = ecStat.statistics.mean(dataList);
 ```
 ##### 参数说明
 
-* `dataList` : `Array.<number>`. 输入的数值样本集。
+* `dataList` : `number[]`. 输入的数值样本集。
 
 ##### 返回值说明
 
@@ -427,12 +568,12 @@ var meanValue = ecStat.statistics.mean(dataList);
 #### ecStat.statistics.median()
 
 ##### 调用方式
-```
+```js
 var medianValue = ecStat.statistics.median(dataList);
 ```
 ##### 参数说明
 
-* `dataList` : `Array.<number>`. 输入的数值数组，该数组必须是按从小到大有序排列的.
+* `dataList` : `number[]`. 输入的数值数组，该数组必须是按从小到大有序排列的.
 
 ##### 返回值说明
 
@@ -442,12 +583,12 @@ var medianValue = ecStat.statistics.median(dataList);
 #### ecStat.statistics.sum()
 
 ##### 调用方式
-```
+```js
 var sumValue = ecStat.statistics.sum(dataList);
 ```
 ##### 参数说明
 
-* `dataList` : `Array.<number>`. 输入的数值样本集。
+* `dataList` : `number[]`. 输入的数值样本集。
 
 ##### 返回值说明
 

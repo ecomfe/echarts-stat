@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset='utf-8'>
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <script src="../lib/esl.js"></script>
+        <script src="../lib/config.js"></script>
+        <script src="../lib/jquery.min.js"></script>
+    </head>
+    <body>
+        <style>
+            html, body, #main {
+                width: 100%;
+                height: 100%;
+                margin: 0;
+                padding: 0;
+            }
+        </style>
+        <div id="main"></div>
+        <script>
+
+            require([
+                'echarts',
+                'ecStat'
+            ], function (echarts, ecStat) {
+
+                echarts.registerTransform(ecStat.transform.regression);
+
+                var chart = echarts.init(document.getElementById('main'));
+
+                $.getJSON('../data/regression_data0.json')
+                .done(function (data) {
+
+                    chart.setOption({
+                        dataset: [{
+                            source: data
+                        }, {
+                            transform: {
+                                type: 'ecStat:regression'
+                                // 'linear' by default.
+                                // config: { method: 'linear', formulaOn: 'end'}
+                            }
+                        }],
+                        legend: {},
+                        tooltip: {
+                            trigger: 'axis',
+                            axisPointer: {
+                                type: 'cross'
+                            }
+                        },
+                        xAxis: {
+                            splitLine: {
+                                lineStyle: {
+                                    type: 'dashed'
+                                }
+                            },
+                        },
+                        yAxis: {
+                            splitLine: {
+                                lineStyle: {
+                                    type: 'dashed'
+                                }
+                            },
+                        },
+                        series: [{
+                            name: 'scatter',
+                            type: 'scatter'
+                         }, {
+                            name: 'line',
+                            type: 'line',
+                            datasetIndex: 1,
+                            symbolSize: 0.1,
+                            symbol: 'circle',
+                            label: { show: true, fontSize: 16 },
+                            labelLayout: { dx: -20 },
+                            encode: { label: 2, tooltip: 1 }
+                        }]
+                    });
+                });
+            });
+        </script>
+    </body>
+</html>
