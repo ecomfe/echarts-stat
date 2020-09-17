@@ -303,17 +303,14 @@ define(function (require) {
 
         if (!config.stepByStep) {
             while (oneStep(), !result.isEnd);
-            return result;
         }
         else {
-            return {
-                next: function () {
-                    oneStep();
-                    return result;
-                }
+            result.next = function () {
+                oneStep();
+                return result;
             };
         }
-
+        return result;
     }
 
     /**
