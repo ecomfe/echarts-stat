@@ -196,7 +196,6 @@ var result = ecStat.clustering.hierarchicalKMeans(data, clusterNumber, false);
     * `config.stepByStep` － `boolean`. 可选参数。该参数主要用于可视化聚类算法每一步的分割过程，即动态地展示数据簇如何从 2 个到 3 个，4 个， .... 。默认为 `false`。
     * `config.outputType` - `'single' | 'multiple'`. 可选参数。指定输出格式。在“独立使用”中，它默认为`'multiple'`。在“transform”中，它不能被指定，总为`'single'`模式。
     * `config.outputClusterIndexDimension` - `(number | {index: number, name?: string})`. 必填参数。簇的索引（clusterIndex）将被写入这列。此设定只在 `config.outputType: 'single'` 时生效。如果只给一个 `number`，则表示 dimension index 。 dimension index 是必须给出的，但是 dimension name 是可选的，只用于后续的 dataset 能用 name 来引用。
-    * `config.outputDistanceDimension` - `(number | {index: number, name?: string})`. 必填参数。计算出的每项和簇中心的“平方距离”值，将被写入这一列。如果只给一个 `number`，则表示 dimension index 。 dimension index 是必须给出的，但是 dimension name 是可选的，只用于后续的 dataset 能用 name 来引用。
     * `config.outputCentroidDimensions` - `(number | {index: number, name?: string})` 可选参数。此设定只在 `config.outputType: 'single'` 时生效。如果指定，会把每蔟的中心写入 `result.data` 指定的维度中。默认每蔟的中心不会被写入 `result.data` 中。如果只给一个 `number`，则表示 dimension index 。 dimension index 是必须给出的，但是 dimension name 是可选的，只用于后续的 dataset 能用 name 来引用。
 
 
@@ -232,20 +231,19 @@ config = {
         config: {
             clusterCount: 6,
             outputClusterIndexDimension: 5,
-            outputDistanceDimension: 6,
-            outputCentroidDimensions: [7, 8]
+            outputCentroidDimensions: [6, 7]
         }
         // 本 dataset 得到的结果数据是例如：
         // [
         //    // dim2, dim3 被用于聚类计算。
         //    // 所有其他列被保留在结果数据中。
         //    // dim5 是计算得到的 cluster index 。
-        //    // dim6 是计算得到的平方距离。
+        //    // dim6 是计算得到的距离值。
         //    // dimensions:
-        //    // 0    1      2    3       4       5   6
-        //    [ 232,  4.21,  51,  0.323,  'xxx',  0,  89, 14, 0.145 ],
-        //    [ 321,  1.62,  18,  0.139,  'xzx',  2,  23, 24, 0.321 ],
-        //    [ 551,  11.21, 13,  0.641,  'yzy',  0,  ??, 14, 0.145 ],
+        //    // 0    1      2    3       4       5   6   7
+        //    [ 232,  4.21,  51,  0.323,  'xxx',  0,  14, 0.145 ],
+        //    [ 321,  1.62,  18,  0.139,  'xzx',  2,  24, 0.321 ],
+        //    [ 551,  11.21, 13,  0.641,  'yzy',  0,  14, 0.145 ],
         //    ...
         // ]
     }, {
@@ -288,7 +286,7 @@ config = {
             }
             ```
     * `outputType: 'multiple'`:
-        * `result` － `object`. Including the centroids, clusterAssment, and pointsInCluster. For example:
+        * `result` － `object`. Including the centroids, and pointsInCluster. For example:
             ```js
             result = {
                 pointsInCluster: [
@@ -310,13 +308,6 @@ config = {
                     [14, 0.145],
                     // cluster1 的中心。
                     [24, 0.321],
-                    ...
-                ],
-                clusterAssment: [
-                    // cluster index,   squared distance
-                    [  1,               0.145            ],
-                    [  2,               0.680            ],
-                    [  0,               1.022            ],
                     ...
                 ]
             };

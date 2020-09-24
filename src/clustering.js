@@ -137,8 +137,6 @@ define(function (require) {
      *        See `OutputType`.
      * @param {number} [clusterCountOrConfig.outputClusterIndexDimension] Mandatory.
      *        Only work in `OutputType.SINGLE`.
-     * @param {number} [clusterCountOrConfig.outputDistanceDimension] Mandatory.
-     *        Only work in `OutputType.SINGLE`.
      * @param {number} [clusterCountOrConfig.outputCentroidDimensions] Optional.
      *        If specified, the centroid will be set to those dimensions of the result data one by one.
      *        By default not set centroid to result.
@@ -166,24 +164,22 @@ define(function (require) {
 
         var dataSet = dataPreprocess(data, {dimensions: dataMeta.dimensions});
 
-        var clusterAssment;
+        var clusterAssment = zeros(dataSet.length, 2);
         var outputSingleData;
-        var setDistance;
         var setClusterIndex;
-        var getDistance;
         var getClusterIndex;
+
+        function setDistance(dataIndex, dist) {
+            clusterAssment[dataIndex][1] = dist;
+        }
+        function getDistance(dataIndex) {
+            return clusterAssment[dataIndex][1];
+        };
 
         if (isOutputTypeSingle) {
             outputSingleData = [];
-            var outputDistanceDimension = dataMeta.outputDistanceDimension;
             var outputClusterIndexDimension = dataMeta.outputClusterIndexDimension;
 
-            setDistance = function (dataIndex, dist) {
-                outputSingleData[dataIndex][outputDistanceDimension] = dist;
-            };
-            getDistance = function (dataIndex) {
-                return outputSingleData[dataIndex][outputDistanceDimension];
-            };
             setClusterIndex = function (dataIndex, clusterIndex) {
                 outputSingleData[dataIndex][outputClusterIndexDimension] = clusterIndex;
             };
@@ -198,13 +194,6 @@ define(function (require) {
             }
         }
         else {
-            clusterAssment = zeros(dataSet.length, 2);
-            setDistance = function (dataIndex, dist) {
-                clusterAssment[dataIndex][1] = dist;
-            };
-            getDistance = function (dataIndex) {
-                return clusterAssment[dataIndex][1];
-            };
             setClusterIndex = function (dataIndex, clusterIndex) {
                 clusterAssment[dataIndex][0] = clusterIndex;
             };
@@ -231,9 +220,12 @@ define(function (require) {
         var result = {
             data: outputSingleData,
             centroids: centList,
-            clusterAssment: clusterAssment,
             isEnd: false
         };
+        if (!isOutputTypeSingle) {
+            // Only for backward compat.
+            result.clusterAssment = clusterAssment;
+        }
 
         function oneStep() {
             //the existing clusters are continuously divided
@@ -374,10 +366,15 @@ define(function (require) {
         //     return mathSqrt(mathPow(vec1 - vec2, 2));
         // }
 
+        // The distance should be normalized between different dimensions,
+        // otherwise they may provide different weight in the final distance.
+        // The greater weight offers more effect in the cluster determination.
+
         var powerSum = 0;
+        var dimensions = dataMeta.dimensions;
         //subtract the corresponding elements in the vectors
-        for (var i = 0; i < dataMeta.dimensions.length; i++) {
-            var dimIdx = dataMeta.dimensions[i];
+        for (var i = 0; i < dimensions.length; i++) {
+            var dimIdx = dimensions[i];
             powerSum += mathPow(dataItem[dimIdx] - centroid[i], 2);
         }
 
@@ -401,20 +398,33 @@ define(function (require) {
         if (outputType === OutputType.SINGLE && !numberUtil.isNumber(outputClusterIndexDimension)) {
             throw new Error('outputClusterIndexDimension is required as a number.');
         }
-        // outputClusterIndexDimension == null && (outputClusterIndexDimension = colCount);
-        // colCount = Math.max(outputClusterIndexDimension + 1, colCount);
-        var outputDistanceDimension = config.outputDistanceDimension;
-        if (outputType === OutputType.SINGLE && !numberUtil.isNumber(outputDistanceDimension)) {
-            throw new Error('outputDistanceDimension is required as a number.');
-        }
-        // outputDistanceDimension == null && (outputDistanceDimension = colCount);
+
+        var extents = calcExtent(dataSet, dimensions);
+
         return {
             dimensions: dimensions,
+            extents: extents,
             outputType: outputType,
             outputClusterIndexDimension: outputClusterIndexDimension,
-            outputDistanceDimension: outputDistanceDimension,
-            outputCentroidDimensions: config.outputCentroidDimensions
+            outputCentroidDimensions: config.outputCentroidDimensions,
         };
+    }
+
+    function calcExtent(dataSet, dimensions) {
+        var extents = [];
+        for (var i = 0; i < dimensions.length; i++) {
+            extents.push({ min: Infinity, max: -Infinity });
+        }
+        for (var i = 0; i < dataSet.length; i++) {
+            var line = dataSet[i];
+            for (var j = 0; j < dimensions.length; j++) {
+                var extentItem = extents[j];
+                var val = line[dimensions[j]];
+                extentItem.min > val && (extentItem.min = val);
+                extentItem.max < val && (extentItem.max = val);
+            }
+        }
+        return extents;
     }
 
     return {

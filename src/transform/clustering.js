@@ -17,7 +17,6 @@ define(function (require) {
          *        Target dimensions to calculate the regression.
          *        By default: use all of the data.
          * @param {(DimensionIndex | {name?: DimensionName, index: DimensionIndex})} [params.config.outputClusterIndexDimension] Mandatory.
-         * @param {(DimensionIndex | {name?: DimensionName, index: DimensionIndex})} [params.config.outputDistanceDimension] Mandatory.
          * @param {(DimensionIndex | {name?: DimensionName, index: DimensionIndex})[]} [params.config.outputCentroidDimensions] Optional.
          *        If specified, the centroid will be set to those dimensions of the result data one by one.
          *        By default not set centroid to result.
@@ -42,18 +41,12 @@ define(function (require) {
             var outputClusterIndexDimension = transformHelper.normalizeNewDimensions(
                 config.outputClusterIndexDimension
             );
-            var outputDistanceDimension = transformHelper.normalizeNewDimensions(
-                config.outputDistanceDimension
-            );
             var outputCentroidDimensions = transformHelper.normalizeNewDimensions(
                 config.outputCentroidDimensions
             );
 
             if (outputClusterIndexDimension == null) {
                 throw new Error('outputClusterIndexDimension is required as a number.');
-            }
-            if (outputDistanceDimension == null) {
-                throw new Error('outputDistanceDimension is required as a number.');
             }
 
             var result = clustering.hierarchicalKMeans(source.data, {
@@ -62,7 +55,6 @@ define(function (require) {
                 dimensions: transformHelper.normalizeExistingDimensions(params, config.dimensions),
                 outputType: clustering.OutputType.SINGLE,
                 outputClusterIndexDimension: outputClusterIndexDimension.index,
-                outputDistanceDimension: outputDistanceDimension.index,
                 outputCentroidDimensions: (outputCentroidDimensions || {}).index
             });
 
@@ -78,7 +70,6 @@ define(function (require) {
                 // Always set to dims def even if name not exists, because the resultDimsDef.length
                 // need to be enlarged to tell echarts that there is "cluster index dimension" and "dist dimension".
                 resultDimsDef[outputClusterIndexDimension.index] = outputClusterIndexDimension.name;
-                resultDimsDef[outputDistanceDimension.index] = outputDistanceDimension.name;
 
                 if (outputCentroidDimensions) {
                     for (var i = 0; i < outputCentroidDimensions.index.length; i++) {
