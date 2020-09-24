@@ -62,7 +62,8 @@ define(function (require) {
 
         // create array to assign data points to centroids, also holds SE of each point
         var clusterAssigned = zeros(data.length, 2);
-        var centroids = createRandCent(data, k, dataMeta);
+        var extents = calcExtents(data, dataMeta.dimensions);
+        var centroids = createRandCent(k, extents);
         var clusterChanged = true;
         var minDist;
         var minIndex;
@@ -75,7 +76,7 @@ define(function (require) {
                 minDist = Infinity;
                 minIndex = -1;
                 for (var j = 0; j < k; j++) {
-                    distIJ = distEuclid(data[i], centroids[j], dataMeta);
+                    distIJ = distEuclid(data[i], centroids[j], dataMeta.dimensions, extents);
                     if (distIJ < minDist) {
                         minDist = distIJ;
                         minIndex = j;
@@ -205,8 +206,9 @@ define(function (require) {
         // initial center point.
         var centroid0 = meanInColumns(dataSet, dataMeta);
         var centList = [centroid0];
+        var extents = calcExtents(dataSet, dataMeta.dimensions);
         for (var i = 0; i < dataSet.length; i++) {
-            var dist = distEuclid(dataSet[i], centroid0, dataMeta);
+            var dist = distEuclid(dataSet[i], centroid0, dataMeta.dimensions, extents);
             setDistance(i, dist);
         }
 
@@ -332,26 +334,14 @@ define(function (require) {
     /**
      * Create random centroid of kmeans.
      */
-    function createRandCent(dataSet, k, dataMeta) {
+    function createRandCent(k, extents) {
         //constructs a two-dimensional array with all values 0
-        var centroids = zeros(k, dataMeta.dimensions.length);
+        var centroids = zeros(k, extents.length);
         //create random cluster centers, within bounds of each dimension
-        for (var j = 0; j < dataMeta.dimensions.length; j++) {
-            var dimIdx = dataMeta.dimensions[j];
-            var minJ = Infinity;
-            var maxJ = -Infinity;
-            for (var i = 0; i < dataSet.length; i++) {
-                var val = dataSet[i][dimIdx];
-                if (val < minJ) {
-                    minJ = val;
-                }
-                if (val > maxJ) {
-                    maxJ = val;
-                }
-            }
-            var rangeJ = maxJ - minJ;
+        for (var j = 0; j < extents.length; j++) {
+            var extentItem = extents[j];
             for (var i = 0; i < k; i++) {
-                centroids[i][j] = minJ + rangeJ * Math.random();
+                centroids[i][j] = extentItem.min + extentItem.span * Math.random();
             }
         }
         return centroids;
@@ -360,22 +350,21 @@ define(function (require) {
     /**
      * Distance method for calculating similarity
      */
-    function distEuclid(dataItem, centroid, dataMeta) {
-        // Never happen.
-        // if (!isArray(vec1) && !isArray(vec2)) {
-        //     return mathSqrt(mathPow(vec1 - vec2, 2));
-        // }
-
+    function distEuclid(dataItem, centroid, dimensions, extents) {
         // The distance should be normalized between different dimensions,
         // otherwise they may provide different weight in the final distance.
         // The greater weight offers more effect in the cluster determination.
 
         var powerSum = 0;
-        var dimensions = dataMeta.dimensions;
         //subtract the corresponding elements in the vectors
         for (var i = 0; i < dimensions.length; i++) {
-            var dimIdx = dimensions[i];
-            powerSum += mathPow(dataItem[dimIdx] - centroid[i], 2);
+            var span = extents[i].span;
+            // If span is 0, do not count.
+            if (span) {
+                var dimIdx = dimensions[i];
+                var dist = (dataItem[dimIdx] - centroid[i]) / span;
+                powerSum += mathPow(dist, 2);
+            }
         }
 
         return powerSum;
@@ -399,30 +388,31 @@ define(function (require) {
             throw new Error('outputClusterIndexDimension is required as a number.');
         }
 
-        var extents = calcExtent(dataSet, dimensions);
-
         return {
             dimensions: dimensions,
-            extents: extents,
             outputType: outputType,
             outputClusterIndexDimension: outputClusterIndexDimension,
             outputCentroidDimensions: config.outputCentroidDimensions,
         };
     }
 
-    function calcExtent(dataSet, dimensions) {
+    function calcExtents(dataSet, dimensions) {
         var extents = [];
-        for (var i = 0; i < dimensions.length; i++) {
+        var dimLen = dimensions.length;
+        for (var i = 0; i < dimLen; i++) {
             extents.push({ min: Infinity, max: -Infinity });
         }
         for (var i = 0; i < dataSet.length; i++) {
             var line = dataSet[i];
-            for (var j = 0; j < dimensions.length; j++) {
+            for (var j = 0; j < dimLen; j++) {
                 var extentItem = extents[j];
                 var val = line[dimensions[j]];
                 extentItem.min > val && (extentItem.min = val);
                 extentItem.max < val && (extentItem.max = val);
             }
+        }
+        for (var i = 0; i < dimLen; i++) {
+            extents[i].span = extents[i].max - extents[i].min;
         }
         return extents;
     }
