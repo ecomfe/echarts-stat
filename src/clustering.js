@@ -62,8 +62,7 @@ define(function (require) {
 
         // create array to assign data points to centroids, also holds SE of each point
         var clusterAssigned = zeros(data.length, 2);
-        var extents = calcExtents(data, dataMeta.dimensions);
-        var centroids = createRandCent(k, extents);
+        var centroids = createRandCent(k, calcExtents(data, dataMeta.dimensions));
         var clusterChanged = true;
         var minDist;
         var minIndex;
@@ -76,7 +75,7 @@ define(function (require) {
                 minDist = Infinity;
                 minIndex = -1;
                 for (var j = 0; j < k; j++) {
-                    distIJ = distEuclid(data[i], centroids[j], dataMeta.dimensions, extents);
+                    distIJ = distEuclid(data[i], centroids[j], dataMeta);
                     if (distIJ < minDist) {
                         minDist = distIJ;
                         minIndex = j;
@@ -206,9 +205,8 @@ define(function (require) {
         // initial center point.
         var centroid0 = meanInColumns(dataSet, dataMeta);
         var centList = [centroid0];
-        var extents = calcExtents(dataSet, dataMeta.dimensions);
         for (var i = 0; i < dataSet.length; i++) {
-            var dist = distEuclid(dataSet[i], centroid0, dataMeta.dimensions, extents);
+            var dist = distEuclid(dataSet[i], centroid0, dataMeta);
             setDistance(i, dist);
         }
 
@@ -350,12 +348,14 @@ define(function (require) {
     /**
      * Distance method for calculating similarity
      */
-    function distEuclid(dataItem, centroid, dimensions, extents) {
+    function distEuclid(dataItem, centroid, dataMeta) {
         // The distance should be normalized between different dimensions,
         // otherwise they may provide different weight in the final distance.
         // The greater weight offers more effect in the cluster determination.
 
         var powerSum = 0;
+        var dimensions = dataMeta.dimensions;
+        var extents = dataMeta.rawExtents;
         //subtract the corresponding elements in the vectors
         for (var i = 0; i < dimensions.length; i++) {
             var span = extents[i].span;
@@ -387,9 +387,11 @@ define(function (require) {
         if (outputType === OutputType.SINGLE && !numberUtil.isNumber(outputClusterIndexDimension)) {
             throw new Error('outputClusterIndexDimension is required as a number.');
         }
+        var extents = calcExtents(dataSet, dimensions);
 
         return {
             dimensions: dimensions,
+            rawExtents: extents,
             outputType: outputType,
             outputClusterIndexDimension: outputClusterIndexDimension,
             outputCentroidDimensions: config.outputCentroidDimensions,
