@@ -94,7 +94,7 @@ var result = ecStat.clustering.hierarchicalKMeans(data, clusterNumber, false);
             var bins = ecStat.histogram(data, 'sturges');
             ```
 
-    * `config.dimensions` - `number`. 可选参数。指定数据的哪些维度会被用于回归计算。默认为 `0`。
+    * `config.dimensions` - `(number | string)`. 可选参数。指定数据的哪些维度会被用于回归计算。默认为 `0`。在“echarts transform”模式下，维度名（`string`）和维度序数（`number`）都可被指定。在“独立使用”模式下，只有维度序数可被指定（因为此模式下并没有支持定义维度名）。
 
 
 ##### 返回值说明
@@ -192,11 +192,12 @@ var result = ecStat.clustering.hierarchicalKMeans(data, clusterNumber, false);
     ```
 * `config` - `object`.
     * `config.clusterCount` － `number`. 必填参数。要生成的数据簇的个数。 **注意，该数值必须大于 1。**
-    * `config.dimensions` - `number[]`. 可选参数。Specify which dimensions (columns) of data will be used to clustering calculation. The other columns will also be kept in the output data. By default all of the columns of the data will be used as dimensions.
+    * `config.dimensions` - `(number | string)[]`. 可选参数。指定哪些维度（即，列）要被用于聚类的计算。没有被用于计算的其他维度的值也会被拷贝到结果中。默认所有维度都会被用用于计算。在“echarts transform”模式下，维度名（`string`）和维度序数（`number`）都可被指定。在“独立使用”模式下，只有维度序数可被指定（因为此模式下并没有支持定义维度名）。
     * `config.stepByStep` － `boolean`. 可选参数。该参数主要用于可视化聚类算法每一步的分割过程，即动态地展示数据簇如何从 2 个到 3 个，4 个， .... 。默认为 `false`。
     * `config.outputType` - `'single' | 'multiple'`. 可选参数。指定输出格式。在“独立使用”中，它默认为`'multiple'`。在“transform”中，它不能被指定，总为`'single'`模式。
-    * `config.outputClusterIndexDimension` - `number`. 可选参数。默认取输入数据的最后一列（即维度，dimension）的下一列。簇的索引（clusterIndex）将被写入这列。此设定只在 `config.outputType: 'single'` 时生效。
-    * `config.outputDistanceDimension` - `number`. 可选参数。默认取 `outputClusterIndexDimension` 决定好后的下一列。计算出的每项和簇中心的“平方距离”值，将被写入这一列。
+    * `config.outputClusterIndexDimension` - `(number | {index: number, name?: string})`. 必填参数。簇的索引（clusterIndex）将被写入这列。此设定只在 `config.outputType: 'single'` 时生效。如果只给一个 `number`，则表示 dimension index 。 dimension index 是必须给出的，但是 dimension name 是可选的，只用于后续的 dataset 能用 name 来引用。
+    * `config.outputDistanceDimension` - `(number | {index: number, name?: string})`. 必填参数。计算出的每项和簇中心的“平方距离”值，将被写入这一列。如果只给一个 `number`，则表示 dimension index 。 dimension index 是必须给出的，但是 dimension name 是可选的，只用于后续的 dataset 能用 name 来引用。
+    * `config.outputCentroidDimensions` - `(number | {index: number, name?: string})` 可选参数。此设定只在 `config.outputType: 'single'` 时生效。如果指定，会把每蔟的中心写入 `result.data` 指定的维度中。默认每蔟的中心不会被写入 `result.data` 中。如果只给一个 `number`，则表示 dimension index 。 dimension index 是必须给出的，但是 dimension name 是可选的，只用于后续的 dataset 能用 name 来引用。
 
 
 ##### 返回值说明
@@ -228,6 +229,12 @@ config = {
         source: [ ... ],
     }, {
         transform: 'ecStat:clustering',
+        config: {
+            clusterCount: 6,
+            outputClusterIndexDimension: 5,
+            outputDistanceDimension: 6,
+            outputCentroidDimensions: [7, 8]
+        }
         // 本 dataset 得到的结果数据是例如：
         // [
         //    // dim2, dim3 被用于聚类计算。
@@ -236,9 +243,9 @@ config = {
         //    // dim6 是计算得到的平方距离。
         //    // dimensions:
         //    // 0    1      2    3       4       5   6
-        //    [ 232,  4.21,  51,  0.323,  'xxx',  0,  89 ],
-        //    [ 321,  1.62,  18,  0.139,  'xzx',  2,  23 ],
-        //    [ 551,  11.21, 13,  0.641,  'yzy',  0,  ?? ],
+        //    [ 232,  4.21,  51,  0.323,  'xxx',  0,  89, 14, 0.145 ],
+        //    [ 321,  1.62,  18,  0.139,  'xzx',  2,  23, 24, 0.321 ],
+        //    [ 551,  11.21, 13,  0.641,  'yzy',  0,  ??, 14, 0.145 ],
         //    ...
         // ]
     }, {
@@ -383,7 +390,7 @@ config = {
     ];
     ```
 * `opt` - `object`.
-    * `opt.dimensions` - `number[]`. 可选参数。指定数据的哪些维度会被用于回归计算。默认为 `[0, 1]`。
+    * `opt.dimensions` - `(number | string)[]`. 可选参数。指定数据的哪些维度会被用于回归计算。默认为 `[0, 1]`。在“echarts transform”模式下，维度名（`string`）和维度序数（`number`）都可被指定。在“独立使用”模式下，只有维度序数可被指定（因为此模式下并没有支持定义维度名）。
     * `order` - `number`. 可选参数。默认为 `2`。多项式的阶数（只在 `'polynomial'` 中生效）。对于非多项式回归，可以忽略该参数。
 
 ##### 返回值说明
@@ -406,7 +413,7 @@ config = {
     }]
     ```
 * 独立使用
-    * `myRegression` - `object`. 包括用于绘制折线图的拟合数据点 `points`，回归曲线的参数 `parameter`，以    及拟合出的曲线表达式 `expression`。如下：
+    * `myRegression` - `object`. 包括用于绘制折线图的拟合数据点 `points`，回归曲线的参数 `parameter`，以及拟合出的曲线表达式 `expression`。如下：
 
         ```js
         myRegression.points = [

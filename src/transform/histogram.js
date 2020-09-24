@@ -1,6 +1,7 @@
 define(function (require) {
 
     var histogram = require('../histogram');
+    var transformHelper = require('./helper');
 
     return {
 
@@ -8,7 +9,7 @@ define(function (require) {
 
         /**
          * @param {'squareRoot' | 'scott' | 'freedmanDiaconis' | 'sturges'} [params.config.method='squareRoot']
-         * @param {numer[]} [params.config.dimensions=[0, 1]] dimensions that used to calculate regression.
+         * @param {DimnensionLoose[]} [params.config.dimensions=[0, 1]] dimensions that used to calculate regression.
          *        By default [0, 1].
          */
         transform: function transform(params) {
@@ -17,7 +18,7 @@ define(function (require) {
 
             var result = histogram(source.data, {
                 method: config.method,
-                dimensions: config.dimensions
+                dimensions: transformHelper.normalizeExistingDimensions(params, config.dimensions)
             });
 
             return [{

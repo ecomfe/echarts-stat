@@ -2,6 +2,7 @@ define(function (require) {
 
     var clustering = require('../clustering');
     var numberUtil = require('../util/number');
+    var transformHelper = require('./helper');
 
     var isNumber = numberUtil.isNumber;
 
@@ -12,13 +13,14 @@ define(function (require) {
         /**
          * @param {number} params.config.clusterCount Mandatory.
          *        The number of clusters in a dataset. It has to be greater than 1.
-         * @param {numer[]} [params.config.dimensions] Optional.
+         * @param {(DimensionName | DimensionIndex)[]} [params.config.dimensions] Optional.
          *        Target dimensions to calculate the regression.
          *        By default: use all of the data.
-         * @param {number} [params.config.outputClusterIndexDimension] Optional.
-         *        By default next to the last dimension of input data.
-         * @param {number} [params.config.outputDistanceDimension] Optional.
-         *        By default next to the `outputClusterIndexDimension`.
+         * @param {(DimensionIndex | {name?: DimensionName, index: DimensionIndex})} [params.config.outputClusterIndexDimension] Mandatory.
+         * @param {(DimensionIndex | {name?: DimensionName, index: DimensionIndex})} [params.config.outputDistanceDimension] Mandatory.
+         * @param {(DimensionIndex | {name?: DimensionName, index: DimensionIndex})[]} [params.config.outputCentroidDimensions] Optional.
+         *        If specified, the centroid will be set to those dimensions of the result data one by one.
+         *        By default not set centroid to result.
          */
         transform: function transform(params) {
             var source = params.source;
@@ -37,16 +39,58 @@ define(function (require) {
                 }];
             }
 
+            var outputClusterIndexDimension = transformHelper.normalizeNewDimensions(
+                config.outputClusterIndexDimension
+            );
+            var outputDistanceDimension = transformHelper.normalizeNewDimensions(
+                config.outputDistanceDimension
+            );
+            var outputCentroidDimensions = transformHelper.normalizeNewDimensions(
+                config.outputCentroidDimensions
+            );
+
+            if (outputClusterIndexDimension == null) {
+                throw new Error('outputClusterIndexDimension is required as a number.');
+            }
+            if (outputDistanceDimension == null) {
+                throw new Error('outputDistanceDimension is required as a number.');
+            }
+
             var result = clustering.hierarchicalKMeans(source.data, {
                 clusterCount: clusterCount,
                 stepByStep: false,
-                dimensions: config.dimensions,
+                dimensions: transformHelper.normalizeExistingDimensions(params, config.dimensions),
                 outputType: clustering.OutputType.SINGLE,
-                outputClusterIndexDimension: config.outputClusterIndexDimension,
-                outputDistanceDimension: config.outputDistanceDimension
+                outputClusterIndexDimension: outputClusterIndexDimension.index,
+                outputDistanceDimension: outputDistanceDimension.index,
+                outputCentroidDimensions: (outputCentroidDimensions || {}).index
             });
 
+            var resultDimsDef;
+            if (source.isDimensionsDefined()) {
+                var sourceDimAll = source.getDimensionInfoAll();
+                resultDimsDef = [];
+                for (var i = 0; i < sourceDimAll.length; i++) {
+                    var sourceDimItem = sourceDimAll[i];
+                    resultDimsDef.push(sourceDimItem.name);
+                }
+
+                // Always set to dims def even if name not exists, because the resultDimsDef.length
+                // need to be enlarged to tell echarts that there is "cluster index dimension" and "dist dimension".
+                resultDimsDef[outputClusterIndexDimension.index] = outputClusterIndexDimension.name;
+                resultDimsDef[outputDistanceDimension.index] = outputDistanceDimension.name;
+
+                if (outputCentroidDimensions) {
+                    for (var i = 0; i < outputCentroidDimensions.index.length; i++) {
+                        if (outputCentroidDimensions.name[i] != null) {
+                            resultDimsDef[outputCentroidDimensions.index[i]] = outputCentroidDimensions.name[i];
+                        }
+                    }
+                }
+            }
+
             return [{
+                dimensions: resultDimsDef,
                 data: result.data
             }, {
                 data: result.centroids

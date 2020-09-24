@@ -1,6 +1,7 @@
 define(function (require) {
 
     var regression = require('../regression');
+    var transformHelper = require('./helper');
     var FORMULA_DIMENSION = 2;
 
     return {
@@ -10,7 +11,7 @@ define(function (require) {
         /**
          * @param {Paramter<typeof regression>[0]} [params.config.method='linear'] 'linear' by default
          * @param {Paramter<typeof regression>[2]} [params.config.order=2] Only work when method is `polynomial`.
-         * @param {numer[]|number} [params.config.dimensions=[0, 1]] dimensions that used to calculate regression.
+         * @param {DimensionLoose[]|DimensionLoose} [params.config.dimensions=[0, 1]] dimensions that used to calculate regression.
          *        By default [0, 1].
          * @param {'start' | 'end' | 'all'} params.config.formulaOn Include formula on the last (third) dimension of the:
          *        'start': first data item.
@@ -25,7 +26,7 @@ define(function (require) {
 
             var result = regression(method, source.data, {
                 order: config.order,
-                dimensions: config.dimensions
+                dimensions: transformHelper.normalizeExistingDimensions(params, config.dimensions)
             });
             var points = result.points;
 

@@ -97,7 +97,7 @@ A histogram is a graphical representation of the distribution of numerical data.
             var bins = ecStat.histogram(data, 'sturges');
             ```
 
-    * `config.dimensions` - `number`. Optional. Specify the dimensions of data that are used to regression calculation. By default `0`, which means the column 0 and 1 is used in the regression calculation.
+    * `config.dimensions` - `(number | string)`. Optional. Specify the dimensions of data that are used to regression calculation. By default `0`, which means the column 0 and 1 is used in the regression calculation. In echarts transform usage, both dimension name (`string`) and dimension index (`number`) can be specified. In standalone usage, only dimension index can be specified (not able to define dimension name).
 
 
 ##### Return Value (only for standalone usage)
@@ -192,11 +192,12 @@ Clustering can divide the original data set into multiple data clusters with dif
 
 * `config` - `object`.
     * `config.clusterCount` － `number`. Mandatory. The number of clusters generated. **Note that it must be greater than 1.**
-    * `config.dimensions` - `number[]`. Optional. Specify which dimensions (columns) of data will be used to clustering calculation. The other columns will also be kept in the output data. By default all of the columns of the data will be used as dimensions.
+    * `config.dimensions` - `(number | string)[]`. Optional. Specify which dimensions (columns) of data will be used to clustering calculation. The other columns will also be kept in the output data. By default all of the columns of the data will be used as dimensions. In echarts transform usage, both dimension name (`string`) and dimension index (`number`) can be specified. In standalone usage, only dimension index can be specified (not able to define dimension name).
     * `config.stepByStep` － `boolean`. Optional. Control whether doing the clustering step by step. By default `false`.
     * `config.outputType` - `'single' | 'multiple'`. Optional. Specify the format of the output. In "standalone" usage, it is by default `'multiple'`. In "transform" usage, it can not be specified, always be `'single'`.
-    * `config.outputClusterIndexDimension` - `number`. Optional. By default next to the last dimension of input data. It only works in `config.outputType: 'single'`. In this mode, the cluster index will be written to that dimension of the output data.
-    * `config.outputDistanceDimension` - `number`. Optional. By default next to the last dimension of input data having `config.outputClusterIndexDimension` decided. It only works in `config.outputType: 'single'`. In this mode, the distance value (squared distance) to the centroid of the cluster will be written to the dimension of the output data.
+    * `config.outputClusterIndexDimension` - `(number | {index: number, name?: string})`. Mandatory. It only works in `config.outputType: 'single'`. In this mode, the cluster index will be written to that dimension index of the output data. If be a `number`, it means dimension index. Dimension index is mandatory, while dimension name is optional, which only enables the downstream refer this dimension by name.
+    * `config.outputDistanceDimension` - `(number | {index: number, name?: string})`. Mandatory. It only works in `config.outputType: 'single'`. In this mode, the distance value (squared distance) to the centroid of the cluster will be written to the dimension of the output data. If be a `number`, it means dimension index. Dimension index is mandatory, while dimension name is optional, which only enables the downstream refer this dimension by name.
+    * `config.outputCentroidDimensions` - `(number | {index: number, name?: string})[]` Optional. It only works in `config.outputType: 'single'`. If specify, the cluster centroid will be written to those dimensions of the result data. By default the centroids will not be written to the result data. If be a `number`, it means dimension index. Dimension index is mandatory, while dimension name is optional, which only enables the downstream refer this dimension by name.
 
 ##### Return Value
 
@@ -226,6 +227,12 @@ The result will be:
         source: [ ... ],
     }, {
         transform: 'ecStat:clustering',
+        config: {
+            clusterCount: 6,
+            outputClusterIndexDimension: 5,
+            outputDistanceDimension: 6,
+            outputCentroidDimensions: [7, 8]
+        }
         // The result data of this dataset will be:
         // [
         //    // dim2, dim3 are used in clustering.
@@ -233,10 +240,10 @@ The result will be:
         //    // dim5 is the output cluster index.
         //    // dim6 is the output squared distance.
         //    // dimensions:
-        //    // 0    1      2    3       4       5   6
-        //    [ 232,  4.21,  51,  0.323,  'xxx',  0,  89 ],
-        //    [ 321,  1.62,  18,  0.139,  'xzx',  2,  23 ],
-        //    [ 551,  11.21, 13,  0.641,  'yzy',  0,  ?? ],
+        //    // 0    1      2    3       4       5   6   7   8
+        //    [ 232,  4.21,  51,  0.323,  'xxx',  0,  89, 14, 0.145 ],
+        //    [ 321,  1.62,  18,  0.139,  'xzx',  2,  23, 24, 0.321 ],
+        //    [ 551,  11.21, 13,  0.641,  'yzy',  0,  ??, 14, 0.145 ],
         //    ...
         // ]
     }, {
@@ -381,7 +388,7 @@ Regression algorithm can according to the value of the dependent and independent
     ];
     ```
 * `opt` - `object`.
-    * `opt.dimensions` - `number[]|number`. Optional. Specify the dimensions of data that are used to regression calculation. By default `[0, 1]`, which means the column 0 and 1 is used in the regression calculation.
+    * `opt.dimensions` - `(number | string)[] | (number | string)`. Optional. Specify the dimensions of data that are used to regression calculation. By default `[0, 1]`, which means the column 0 and 1 is used in the regression calculation. In echarts transform usage, both dimension name (`string`) and dimension index (`number`) can be specified. In standalone usage, only dimension index can be specified (not able to define dimension name).
     * `opt.order` - `number`. Optional. By default `2`. The order of polynomial. If you choose other types of regression, you can ignore it.
 
 ##### Return Value (only for standalone usage)

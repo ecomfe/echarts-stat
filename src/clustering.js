@@ -4,11 +4,12 @@ define(function (require) {
     var dataPreprocess = dataProcess.dataPreprocess;
     var normalizeDimensions = dataProcess.normalizeDimensions;
     var arrayUtil = require('./util/array');
+    var numberUtil = require('./util/number');
     var arraySize = arrayUtil.size;
     var sumOfColumn = arrayUtil.sumOfColumn;
     var arraySum = arrayUtil.sum;
     var zeros = arrayUtil.zeros;
-    var isArray = arrayUtil.isArray;
+    // var isArray = arrayUtil.isArray;
     var numberUtil = require('./util/number');
     var isNumber = numberUtil.isNumber;
     var mathPow = Math.pow;
@@ -134,11 +135,13 @@ define(function (require) {
      * @param {boolean} [clusterCountOrConfig.stepByStep=false] Optional.
      * @param {OutputType} [clusterCountOrConfig.outputType='multiple'] Optional.
      *        See `OutputType`.
-     * @param {number} [clusterCountOrConfig.outputClusterIndexDimension] Optional.
-     *        By default next to the last dimension of input data.
+     * @param {number} [clusterCountOrConfig.outputClusterIndexDimension] Mandatory.
      *        Only work in `OutputType.SINGLE`.
-     * @param {number} [clusterCountOrConfig.outputDistanceDimension] Optional.
-     *        By default next to the `outputClusterIndexDimension`.
+     * @param {number} [clusterCountOrConfig.outputDistanceDimension] Mandatory.
+     *        Only work in `OutputType.SINGLE`.
+     * @param {number} [clusterCountOrConfig.outputCentroidDimensions] Optional.
+     *        If specified, the centroid will be set to those dimensions of the result data one by one.
+     *        By default not set centroid to result.
      *        Only work in `OutputType.SINGLE`.
      * @param {Array.<number>} [clusterCountOrConfig.dimensions] Optional.
      *        Target dimensions to calculate the regression.
@@ -307,10 +310,31 @@ define(function (require) {
         else {
             result.next = function () {
                 oneStep();
+                setCentroidToResultData(result, dataMeta);
                 return result;
             };
         }
+        setCentroidToResultData(result, dataMeta);
         return result;
+    }
+
+    function setCentroidToResultData(result, dataMeta) {
+        var outputCentroidDimensions = dataMeta.outputCentroidDimensions;
+        if (dataMeta.outputType !== OutputType.SINGLE || outputCentroidDimensions == null) {
+            return;
+        }
+        var outputSingleData = result.data;
+        var centroids = result.centroids;
+
+        for (var i = 0; i < outputSingleData.length; i++) {
+            var line = outputSingleData[i];
+            var clusterIndex = line[dataMeta.outputClusterIndexDimension];
+            var centroid = centroids[clusterIndex];
+            var dimLen = Math.min(centroid.length, outputCentroidDimensions.length);
+            for (var j = 0; j < dimLen; j++) {
+                line[outputCentroidDimensions[j]] = centroid[j];
+            }
+        }
     }
 
     /**
@@ -372,16 +396,24 @@ define(function (require) {
         }
         var dimensions = normalizeDimensions(config.dimensions, defaultDimensions);
         var outputType = config.outputType || OutputType.MULTIPLE;
+
         var outputClusterIndexDimension = config.outputClusterIndexDimension;
-        outputClusterIndexDimension == null && (outputClusterIndexDimension = colCount);
-        colCount = Math.max(outputClusterIndexDimension + 1, colCount);
+        if (outputType === OutputType.SINGLE && !numberUtil.isNumber(outputClusterIndexDimension)) {
+            throw new Error('outputClusterIndexDimension is required as a number.');
+        }
+        // outputClusterIndexDimension == null && (outputClusterIndexDimension = colCount);
+        // colCount = Math.max(outputClusterIndexDimension + 1, colCount);
         var outputDistanceDimension = config.outputDistanceDimension;
-        outputDistanceDimension == null && (outputDistanceDimension = colCount);
+        if (outputType === OutputType.SINGLE && !numberUtil.isNumber(outputDistanceDimension)) {
+            throw new Error('outputDistanceDimension is required as a number.');
+        }
+        // outputDistanceDimension == null && (outputDistanceDimension = colCount);
         return {
             dimensions: dimensions,
             outputType: outputType,
             outputClusterIndexDimension: outputClusterIndexDimension,
-            outputDistanceDimension: outputDistanceDimension
+            outputDistanceDimension: outputDistanceDimension,
+            outputCentroidDimensions: config.outputCentroidDimensions
         };
     }
 

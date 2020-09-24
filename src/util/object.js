@@ -5,7 +5,7 @@ define(function (require) {
             Object.assign(target, source);
         }
         else {
-            for (let key in source) {
+            for (var key in source) {
                 if (source.hasOwnProperty(key)) {
                     target[key] = source[key];
                 }
@@ -14,8 +14,14 @@ define(function (require) {
         return target;
     }
 
+    function isObject(value) {
+        const type = typeof value;
+        return type === 'function' || (!!value && type === 'object');
+    }
+
     return {
-        extend: extend
+        extend: extend,
+        isObject: isObject
     };
 
 });
