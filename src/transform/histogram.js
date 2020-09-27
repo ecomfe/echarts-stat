@@ -9,19 +9,20 @@ define(function (require) {
 
         /**
          * @param {'squareRoot' | 'scott' | 'freedmanDiaconis' | 'sturges'} [params.config.method='squareRoot']
-         * @param {DimnensionLoose[]} [params.config.dimensions=[0, 1]] dimensions that used to calculate regression.
-         *        By default [0, 1].
+         * @param {DimnensionLoose[]} [params.config.dimensions=[0, 1]] dimensions that used to calculate histogram.
+         *        By default [0].
          */
         transform: function transform(params) {
-            var source = params.source;
+            var upstream = params.upstream;
             var config = params.config || {};
 
-            var result = histogram(source.data, {
+            var result = histogram(upstream.getRawData(), {
                 method: config.method,
                 dimensions: transformHelper.normalizeExistingDimensions(params, config.dimensions)
             });
 
             return [{
+                dimensions: ['MeanOfV0V1', 'VCount', 'V0', 'V1', 'DisplayableName'],
                 data: result.data
             }, {
                 data: result.customData

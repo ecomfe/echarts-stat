@@ -108,8 +108,8 @@ var result = ecStat.clustering.hierarchicalKMeans(data, clusterNumber, false);
         transform: 'ecStat:histogram'
         // // 本 dataset 中得到的结果数据如：
         // [
-        //     // MeanOfX0X1, SampleLength, X0, X1, DisplayableName
-        //     [  11.3,       12,           8,  12, '8 - 12'],
+        //     // MeanOfV0V1, VCount, V0, V1, DisplayableName
+        //     [  10,         212,          8,  12, '8 - 12'],
         //     ...
         // ]
         // // config.dimensions 之外的其他维度的数据
@@ -122,17 +122,17 @@ var result = ecStat.clustering.hierarchicalKMeans(data, clusterNumber, false);
             * `x0` - `number`. 区间间隔的下界 (包含)。
             * `x1` - `number`. 区间间隔的上界 (不包含)。
             * `sample` - `number[]`. 落入该区间间隔的原始输入样本数据。
-        * `bins.data` - `[MeanOfX0X1, SampleLength, X0, X1, DisplayableName][]`. 用 ECharts 柱状图绘制直方图所需要的数据信息。这是一个二维数据，其中每个数据项是一个一维数组。该一维数组包含了 x0 和 x1 的均值，以及上述 sample 数组的长度，示例如下：
+        * `bins.data` - `[MeanOfV0V1, VCount, V0, V1, DisplayableName][]`. 用 ECharts 柱状图绘制直方图所需要的数据信息。这是一个二维数据，其中每个数据项是一个一维数组。该一维数组包含了 x0 和 x1 的均值，以及上述 sample 数组的长度，示例如下：
             ```js
             var bins.data = [
-                // MeanOfX0X1, SampleLength, X0, X1, DisplayableName
-                [  11.3,       12,           8,  12, '8 - 12'],
+                // MeanOfV0V1, VCount, V0, V1, DisplayableName
+                [  10,         212,          8,  12, '8 - 12'],
                 ...
             ];
             // config.dimensions 之外的其他维度的数据
             // 也会保留在结果中。
             ```
-        * `bins.customData` - `[X0, X1, SampleLength][]`. 用 ECharts 自定义图表绘制直方图所需要的数据信息。这是一个二维数据，其中每个数据项是一个一维数组。该一维数组包含了 x0 和 x1，以及上述 sample 数组的长度，示例如下：
+        * `bins.customData` - `[V0, V1, VCount][]`. 用 ECharts 自定义图表绘制直方图所需要的数据信息。这是一个二维数据，其中每个数据项是一个一维数组。该一维数组包含了 x0 和 x1，以及上述 sample 数组的长度，示例如下：
             ```js
             var bins.customData = [
                 [x0_0, x1_0, len_0],

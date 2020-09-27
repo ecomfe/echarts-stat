@@ -22,7 +22,7 @@ define(function (require) {
          *        By default not set centroid to result.
          */
         transform: function transform(params) {
-            var source = params.source;
+            var upstream = params.upstream;
             var config = params.config || {};
             var clusterCount = config.clusterCount;
 
@@ -32,7 +32,6 @@ define(function (require) {
 
             if (clusterCount === 1) {
                 return [{
-                    data: source.data
                 }, {
                     data: []
                 }];
@@ -49,7 +48,7 @@ define(function (require) {
                 throw new Error('outputClusterIndexDimension is required as a number.');
             }
 
-            var result = clustering.hierarchicalKMeans(source.data, {
+            var result = clustering.hierarchicalKMeans(upstream.getRawData(), {
                 clusterCount: clusterCount,
                 stepByStep: false,
                 dimensions: transformHelper.normalizeExistingDimensions(params, config.dimensions),
@@ -58,24 +57,21 @@ define(function (require) {
                 outputCentroidDimensions: (outputCentroidDimensions || {}).index
             });
 
-            var resultDimsDef;
-            if (source.isDimensionsDefined()) {
-                var sourceDimAll = source.getDimensionInfoAll();
-                resultDimsDef = [];
-                for (var i = 0; i < sourceDimAll.length; i++) {
-                    var sourceDimItem = sourceDimAll[i];
-                    resultDimsDef.push(sourceDimItem.name);
-                }
+            var sourceDimAll = upstream.cloneAllDimensionInfo();
+            var resultDimsDef = [];
+            for (var i = 0; i < sourceDimAll.length; i++) {
+                var sourceDimItem = sourceDimAll[i];
+                resultDimsDef.push(sourceDimItem.name);
+            }
 
-                // Always set to dims def even if name not exists, because the resultDimsDef.length
-                // need to be enlarged to tell echarts that there is "cluster index dimension" and "dist dimension".
-                resultDimsDef[outputClusterIndexDimension.index] = outputClusterIndexDimension.name;
+            // Always set to dims def even if name not exists, because the resultDimsDef.length
+            // need to be enlarged to tell echarts that there is "cluster index dimension" and "dist dimension".
+            resultDimsDef[outputClusterIndexDimension.index] = outputClusterIndexDimension.name;
 
-                if (outputCentroidDimensions) {
-                    for (var i = 0; i < outputCentroidDimensions.index.length; i++) {
-                        if (outputCentroidDimensions.name[i] != null) {
-                            resultDimsDef[outputCentroidDimensions.index[i]] = outputCentroidDimensions.name[i];
-                        }
+            if (outputCentroidDimensions) {
+                for (var i = 0; i < outputCentroidDimensions.index.length; i++) {
+                    if (outputCentroidDimensions.name[i] != null) {
+                        resultDimsDef[outputCentroidDimensions.index[i]] = outputCentroidDimensions.name[i];
                     }
                 }
             }

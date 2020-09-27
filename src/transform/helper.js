@@ -17,19 +17,19 @@ define(function (require) {
         if (dimensionsConfig == null) {
             return;
         }
-        var source = transformParams.source;
+        var upstream = transformParams.upstream;
 
         if (arrayUtil.isArray(dimensionsConfig)) {
             var result = [];
             for (var i = 0; i < dimensionsConfig.length; i++) {
-                var dimInfo = source.getDimensionInfo(dimensionsConfig[i]);
+                var dimInfo = upstream.getDimensionInfo(dimensionsConfig[i]);
                 validateDimensionExists(dimInfo, dimensionsConfig[i]);
                 result[i] = dimInfo.index;
             }
             return result;
         }
         else {
-            var dimInfo = source.getDimensionInfo(dimensionsConfig);
+            var dimInfo = upstream.getDimensionInfo(dimensionsConfig);
             validateDimensionExists(dimInfo, dimensionsConfig);
             return dimInfo.index;
         }

@@ -110,8 +110,8 @@ A histogram is a graphical representation of the distribution of numerical data.
         transform: 'ecStat:histogram'
         // // The result data of this dataset is like:
         // [
-        //     // MeanOfX0X1, SampleLength, X0, X1, DisplayableName
-        //     [  11.3,       12,           8,  12, '8 - 12'],
+        //     // MeanOfV0V1, VCount, V0, V1, DisplayableName
+        //     [  10,         212           8,  12, '8 - 12'],
         //     ...
         // ]
         // // The rest of the input dimensions that other than
@@ -124,17 +124,17 @@ A histogram is a graphical representation of the distribution of numerical data.
             * `x0` - `number`. The lower bound of the bin (inclusive).
             * `x1` - `number`. The upper bound of the bin (exclusive).
             * `sample` - `number[]`. Containing the associated elements from the input data.
-        * `result.data` - `[MeanOfX0X1, SampleLength, X0, X1, DisplayableName][]`. Used for bar chart to draw the histogram, where the length of `sample` is the number of sample values in this bin. For example:
+        * `result.data` - `[MeanOfV0V1, VCount, V0, V1, DisplayableName][]`. Used for bar chart to draw the histogram, where the length of `sample` is the number of sample values in this bin. For example:
             ```js
             var bins.data = [
-                // MeanOfX0X1, SampleLength, X0, X1, DisplayableName
-                [  11.3,       12,           8,  12, '8 - 12'],
+                // MeanOfV0V1, VCount, V0, V1, DisplayableName
+                [  10,         212,          8,  12, '8 - 12'],
                 ...
             ];
             // The rest of the input dimensions that other than
             // config.dimensions specified are kept in the output.
             ```
-        * `result.customData` - `[X0, X1, SampleLength][]`. Used for custom chart to draw the histogram, where the length of `sample` is the number of sample values in this bin.
+        * `result.customData` - `[V0, V1, VCount][]`. Used for custom chart to draw the histogram, where the length of `sample` is the number of sample values in this bin.
 
 #### Examples
 

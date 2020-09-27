@@ -20,11 +20,11 @@ define(function (require) {
          *        'none': no data item.
          */
         transform: function transform(params) {
-            var source = params.source;
+            var upstream = params.upstream;
             var config = params.config || {};
             var method = config.method || 'linear';
 
-            var result = regression(method, source.data, {
+            var result = regression(method, upstream.getRawData(), {
                 order: config.order,
                 dimensions: transformHelper.normalizeExistingDimensions(params, config.dimensions)
             });
@@ -35,6 +35,7 @@ define(function (require) {
                 formulaOn = 'end';
             }
 
+            var dimensions;
             if (formulaOn !== 'none') {
                 for (var i = 0; i < points.length; i++) {
                     points[i][FORMULA_DIMENSION] =
@@ -44,9 +45,12 @@ define(function (require) {
                         || (formulaOn === 'end' && i === points.length - 1)
                     ) ? result.expression : '';
                 }
+                dimensions = upstream.cloneAllDimensionInfo();
+                dimensions[FORMULA_DIMENSION] = {};
             }
 
             return [{
+                dimensions: dimensions,
                 data: points
             }];
         }
