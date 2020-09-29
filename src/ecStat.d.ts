@@ -8,10 +8,11 @@ declare namespace EChartsStat {
 	interface HistogramBins {
 		bins: Array<HistogramBinsBin>
 		data: OutputData
+		customData:OutputData
 	}
 	interface HistogramBinsBin {
 		x0: number
-		y0: number
+		x1: number
 		sample: Array<number>
 	}
 	function histogram(data: Array<number>, binMethod: 'squareRoot' | 'scott' | 'freedmanDiaconis' | 'sturges'): HistogramBins
