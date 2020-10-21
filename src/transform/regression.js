@@ -24,7 +24,7 @@ define(function (require) {
             var config = params.config || {};
             var method = config.method || 'linear';
 
-            var result = regression(method, upstream.getRawData(), {
+            var result = regression(method, upstream.cloneRawData(), {
                 order: config.order,
                 dimensions: transformHelper.normalizeExistingDimensions(params, config.dimensions)
             });

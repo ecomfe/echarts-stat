@@ -16,7 +16,7 @@ define(function (require) {
             var upstream = params.upstream;
             var config = params.config || {};
 
-            var result = histogram(upstream.getRawData(), {
+            var result = histogram(upstream.cloneRawData(), {
                 method: config.method,
                 dimensions: transformHelper.normalizeExistingDimensions(params, config.dimensions)
             });

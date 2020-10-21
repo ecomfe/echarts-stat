@@ -48,7 +48,7 @@ define(function (require) {
                 throw new Error('outputClusterIndexDimension is required as a number.');
             }
 
-            var result = clustering.hierarchicalKMeans(upstream.getRawData(), {
+            var result = clustering.hierarchicalKMeans(upstream.cloneRawData(), {
                 clusterCount: clusterCount,
                 stepByStep: false,
                 dimensions: transformHelper.normalizeExistingDimensions(params, config.dimensions),
