@@ -61,7 +61,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	        clustering: __webpack_require__(1),
 	        regression: __webpack_require__(5),
 	        statistics: __webpack_require__(6),
-	        histogram: __webpack_require__(15)
+	        histogram: __webpack_require__(15),
+
+	        transform: {
+	            regression: __webpack_require__(18),
+	            histogram: __webpack_require__(21),
+	            clustering: __webpack_require__(22)
+	        }
 
 	    };
 
@@ -75,27 +81,67 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	    var dataProcess = __webpack_require__(2);
 	    var dataPreprocess = dataProcess.dataPreprocess;
-	    var array = __webpack_require__(3);
-	    var arraySize = array.size;
-	    var sumOfColumn = array.sumOfColumn;
-	    var arraySum = array.sum;
-	    var zeros = array.zeros;
-	    var isArray = array.isArray;
-	    var mathSqrt = Math.sqrt;
+	    var normalizeDimensions = dataProcess.normalizeDimensions;
+	    var arrayUtil = __webpack_require__(3);
+	    var numberUtil = __webpack_require__(4);
+	    var arraySize = arrayUtil.size;
+	    var sumOfColumn = arrayUtil.sumOfColumn;
+	    var arraySum = arrayUtil.sum;
+	    var zeros = arrayUtil.zeros;
+	    // var isArray = arrayUtil.isArray;
+	    var numberUtil = __webpack_require__(4);
+	    var isNumber = numberUtil.isNumber;
 	    var mathPow = Math.pow;
 
+	    var OutputType = {
+	        /**
+	         * Data are all in one. Cluster info are added as an attribute of data.
+	         * ```ts
+	         * type OutputDataSingle = {
+	         *     // Each index of `data` is the index of the input data.
+	         *     data: OutputDataItem[];
+	         *     // The index of `centroids` is the cluster index.
+	         *     centroids: [ValueOnX, ValueOnY][];
+	         * };
+	         * type InputDataItem = (ValueOnX | ValueOnY | OtherValue)[];
+	         * type OutputDataItem = (...InputDataItem | ClusterIndex | SquareDistanceToCentroid)[];
+	         * ```
+	         */
+	        SINGLE: 'single',
+	        /**
+	         * Data are separated by cluster. Suitable for retrieving data form each cluster.
+	         * ```ts
+	         * type OutputDataMultiple = {
+	         *     // Each index of `clusterAssment` is the index of the input data.
+	         *     clusterAssment: [ClusterIndex, SquareDistanceToCentroid][];
+	         *     // The index of `centroids` is the cluster index.
+	         *     centroids: [ValueOnX, ValueOnY][];
+	         *     // The index of `pointsInCluster` is the cluster index.
+	         *     pointsInCluster: DataItemListInOneCluster[];
+	         * }
+	         * type DataItemListInOneCluster = InputDataItem[];
+	         * type InputDataItem = (ValueOnX | ValueOnY | OtherValue)[];
+	         * type SquareDistanceToCentroid = number;
+	         * type ClusterIndex = number;
+	         * type ValueOnX = number;
+	         * type ValueOnY = number;
+	         * type OtherValue = unknown;
+	         * ```
+	         */
+	        MULTIPLE: 'multiple'
+	    }
+
 	    /**
-	     * KMeans of clustering algorithm
-	     * @param  {Array.<Array.<number>>} data  two-dimension array
-	     * @param  {number} k   the number of clusters in a dataset
+	     * KMeans of clustering algorithm.
+	     * @param {Array.<Array.<number>>} data two-dimension array
+	     * @param {number} k the number of clusters in a dataset
 	     * @return {Object}
 	     */
-	    function kMeans(data, k) {
+	    function kMeans(data, k, dataMeta) {
 
-	        var size = arraySize(data);
 	        // create array to assign data points to centroids, also holds SE of each point
-	        var clusterAssigned = zeros(size[0], 2);
-	        var centroids = createRandCent(data, k);
+	        var clusterAssigned = zeros(data.length, 2);
+	        var centroids = createRandCent(k, calcExtents(data, dataMeta.dimensions));
 	        var clusterChanged = true;
 	        var minDist;
 	        var minIndex;
@@ -104,11 +150,11 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	        while (clusterChanged) {
 	            clusterChanged = false;
-	            for (var i = 0; i < size[0]; i++) {
+	            for (var i = 0; i < data.length; i++) {
 	                minDist = Infinity;
 	                minIndex = -1;
 	                for (var j = 0; j < k; j++) {
-	                    distIJ = distEuclid(data[i], centroids[j]);
+	                    distIJ = distEuclid(data[i], centroids[j], dataMeta);
 	                    if (distIJ < minDist) {
 	                        minDist = distIJ;
 	                        minIndex = j;
@@ -118,7 +164,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                    clusterChanged = true;
 	                }
 	                clusterAssigned[i][0] = minIndex;
-	                clusterAssigned[i][1] = mathPow(minDist, 2);
+	                clusterAssigned[i][1] = minDist;
 	            }
 	            //recalculate centroids
 	            for (var i = 0; i < k; i++) {
@@ -128,7 +174,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                        ptsInClust.push(data[j]);
 	                    }
 	                }
-	                centroids[i] = meanInColumns(ptsInClust);
+	                centroids[i] = meanInColumns(ptsInClust, dataMeta);
 	            }
 	        }
 
@@ -141,22 +187,19 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	    /**
 	     * Calculate the average of each column in a two-dimensional array
-	     *  and returns the values as an array.
-	     * @param  {Array.<Array>} dataList two-dimensional array
-	     * @return {Array}
+	     * and returns the values as an array.
 	     */
-	    function meanInColumns(dataList) {
-
-	        var size = arraySize(dataList);
+	    function meanInColumns(dataList, dataMeta) {
 	        var meanArray = [];
 	        var sum;
 	        var mean;
-	        for (var j = 0; j < size[1]; j++) {
+	        for (var j = 0; j < dataMeta.dimensions.length; j++) {
+	            var dimIdx = dataMeta.dimensions[j];
 	            sum = 0;
-	            for (var i = 0; i < size[0]; i++) {
-	                sum += dataList[i][j];
+	            for (var i = 0; i < dataList.length; i++) {
+	                sum += dataList[i][dimIdx];
 	            }
-	            mean = sum / size[0];
+	            mean = sum / dataList.length;
 	            meanArray.push(mean);
 	        }
 	        return meanArray;
@@ -164,26 +207,88 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	    /**
 	     * The combine of hierarchical clustering and k-means.
-	     * @param  {Array} data   two-dimension array.
-	     * @param  {[type]} k   the number of clusters in a dataset. It has to be greater than 1.
-	     * @param  {boolean}  stepByStep
-	     * @return {}
+	     * @param {Array} data two-dimension array.
+	     * @param {Object|number} [clusterCountOrConfig] config or clusterCountOrConfig.
+	     * @param {number} clusterCountOrConfig.clusterCount Mandatory.
+	     *        The number of clusters in a dataset. It has to be greater than 1.
+	     * @param {boolean} [clusterCountOrConfig.stepByStep=false] Optional.
+	     * @param {OutputType} [clusterCountOrConfig.outputType='multiple'] Optional.
+	     *        See `OutputType`.
+	     * @param {number} [clusterCountOrConfig.outputClusterIndexDimension] Mandatory.
+	     *        Only work in `OutputType.SINGLE`.
+	     * @param {number} [clusterCountOrConfig.outputCentroidDimensions] Optional.
+	     *        If specified, the centroid will be set to those dimensions of the result data one by one.
+	     *        By default not set centroid to result.
+	     *        Only work in `OutputType.SINGLE`.
+	     * @param {Array.<number>} [clusterCountOrConfig.dimensions] Optional.
+	     *        Target dimensions to calculate the regression.
+	     *        By default: use all of the data.
+	     * @return {Array} See `OutputType`.
 	     */
-	    function hierarchicalKMeans(data, k, stepByStep) {
-	        if (k < 2 ) {
+	    function hierarchicalKMeans(data, clusterCountOrConfig, stepByStep) {
+	        var config = (
+	            isNumber(clusterCountOrConfig)
+	                ? {clusterCount: clusterCountOrConfig, stepByStep: stepByStep}
+	                : clusterCountOrConfig
+	        ) || {clusterCount: 2};
+
+	        var k = config.clusterCount;
+
+	        if (k < 2) {
 	            return;
 	        }
-	        var dataSet = dataPreprocess(data);
-	        var size = arraySize(dataSet);
-	        var clusterAssment = zeros(size[0], 2);
-	        // initial center point
-	        var centroid0 = meanInColumns(dataSet);
-	        var centList = [centroid0];
-	        var squareError;
-	        for (var i = 0; i < size[0]; i++) {
-	            squareError = distEuclid(dataSet[i], centroid0);
-	            clusterAssment[i][1] = mathPow(squareError, 2);
+
+	        var dataMeta = parseDataMeta(data, config);
+	        var isOutputTypeSingle = dataMeta.outputType === OutputType.SINGLE;
+
+	        var dataSet = dataPreprocess(data, {dimensions: dataMeta.dimensions});
+
+	        var clusterAssment = zeros(dataSet.length, 2);
+	        var outputSingleData;
+	        var setClusterIndex;
+	        var getClusterIndex;
+
+	        function setDistance(dataIndex, dist) {
+	            clusterAssment[dataIndex][1] = dist;
 	        }
+	        function getDistance(dataIndex) {
+	            return clusterAssment[dataIndex][1];
+	        };
+
+	        if (isOutputTypeSingle) {
+	            outputSingleData = [];
+	            var outputClusterIndexDimension = dataMeta.outputClusterIndexDimension;
+
+	            setClusterIndex = function (dataIndex, clusterIndex) {
+	                outputSingleData[dataIndex][outputClusterIndexDimension] = clusterIndex;
+	            };
+	            getClusterIndex = function (dataIndex) {
+	                return outputSingleData[dataIndex][outputClusterIndexDimension];
+	            };
+
+	            for (var i = 0; i < dataSet.length; i++) {
+	                outputSingleData.push(dataSet[i].slice());
+	                setDistance(i, 0);
+	                setClusterIndex(i, 0);
+	            }
+	        }
+	        else {
+	            setClusterIndex = function (dataIndex, clusterIndex) {
+	                clusterAssment[dataIndex][0] = clusterIndex;
+	            };
+	            getClusterIndex = function (dataIndex) {
+	                return clusterAssment[dataIndex][0];
+	            };
+	        }
+
+	        // initial center point.
+	        var centroid0 = meanInColumns(dataSet, dataMeta);
+	        var centList = [centroid0];
+	        for (var i = 0; i < dataSet.length; i++) {
+	            var dist = distEuclid(dataSet[i], centroid0, dataMeta);
+	            setDistance(i, dist);
+	        }
+
 	        var lowestSSE;
 	        var ptsInClust;
 	        var ptsNotClust;
@@ -192,8 +297,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var sseNotSplit;
 	        var index = 1;
 	        var result = {
+	            data: outputSingleData,
+	            centroids: centList,
 	            isEnd: false
 	        };
+	        if (!isOutputTypeSingle) {
+	            // Only for backward compat.
+	            result.clusterAssment = clusterAssment;
+	        }
 
 	        function oneStep() {
 	            //the existing clusters are continuously divided
@@ -207,15 +318,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	                for (var j = 0; j < centList.length; j++) {
 	                    ptsInClust = [];
 	                    ptsNotClust = [];
-	                    for (var i = 0; i < clusterAssment.length; i++) {
-	                        if (clusterAssment[i][0] === j) {
+	                    for (var i = 0; i < dataSet.length; i++) {
+	                        if (getClusterIndex(i) === j) {
 	                            ptsInClust.push(dataSet[i]);
 	                        }
 	                        else {
-	                            ptsNotClust.push(clusterAssment[i][1]);
+	                            ptsNotClust.push(getDistance(i));
 	                        }
 	                    }
-	                    clusterInfo = kMeans(ptsInClust, 2);
+	                    clusterInfo = kMeans(ptsInClust, 2, dataMeta);
 	                    sseSplit = sumOfColumn(clusterInfo.clusterAssigned, 1);
 	                    sseNotSplit = arraySum(ptsNotClust);
 	                    if (sseSplit + sseNotSplit < lowestSSE) {
@@ -237,80 +348,77 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	                centList[centSplit] = newCentroid[0];
 	                centList.push(newCentroid[1]);
-	                for ( i = 0, j = 0; i < clusterAssment.length && j < newClusterAss.length; i++) {
-	                    if (clusterAssment[i][0] === centSplit) {
-	                        clusterAssment[i][0] = newClusterAss[j][0];
-	                        clusterAssment[i][1] = newClusterAss[j++][1];
+	                for (var i = 0, j = 0; i < dataSet.length && j < newClusterAss.length; i++) {
+	                    if (getClusterIndex(i) === centSplit) {
+	                        setClusterIndex(i, newClusterAss[j][0]);
+	                        setDistance(i, newClusterAss[j++][1]);
 	                    }
 	                }
 
 	                var pointInClust = [];
-	                for (var i = 0; i < centList.length; i++) {
-	                    pointInClust[i] = [];
-	                    for (var j = 0; j < clusterAssment.length; j++) {
-	                        if (clusterAssment[j][0] === i) {
-	                            pointInClust[i].push(dataSet[j]);
+	                if (!isOutputTypeSingle) {
+	                    for (var i = 0; i < centList.length; i++) {
+	                        pointInClust[i] = [];
+	                        for (var j = 0; j < dataSet.length; j++) {
+	                            if (getClusterIndex(j) === i) {
+	                                pointInClust[i].push(dataSet[j]);
+	                            }
 	                        }
 	                    }
+	                    result.pointsInCluster = pointInClust;
 	                }
-
-	                result.clusterAssment = clusterAssment;
-	                result.centroids = centList;
-	                result.pointsInCluster = pointInClust;
-
 
 	                index++;
 	            }
 	            else {
 	                result.isEnd = true;
 	            }
-
-	            return result;
 	        }
 
-	        var step = {
-	            next: oneStep
-	        };
-
-	        if (!stepByStep) {
-	            var result;
-	            while (!(result = step.next()).isEnd);
-	            return result;
+	        if (!config.stepByStep) {
+	            while (oneStep(), !result.isEnd);
 	        }
 	        else {
-	            return step;
+	            result.next = function () {
+	                oneStep();
+	                setCentroidToResultData(result, dataMeta);
+	                return result;
+	            };
 	        }
+	        setCentroidToResultData(result, dataMeta);
+	        return result;
+	    }
 
+	    function setCentroidToResultData(result, dataMeta) {
+	        var outputCentroidDimensions = dataMeta.outputCentroidDimensions;
+	        if (dataMeta.outputType !== OutputType.SINGLE || outputCentroidDimensions == null) {
+	            return;
+	        }
+	        var outputSingleData = result.data;
+	        var centroids = result.centroids;
+
+	        for (var i = 0; i < outputSingleData.length; i++) {
+	            var line = outputSingleData[i];
+	            var clusterIndex = line[dataMeta.outputClusterIndexDimension];
+	            var centroid = centroids[clusterIndex];
+	            var dimLen = Math.min(centroid.length, outputCentroidDimensions.length);
+	            for (var j = 0; j < dimLen; j++) {
+	                line[outputCentroidDimensions[j]] = centroid[j];
+	            }
+	        }
 	    }
 
 	    /**
 	     * Create random centroid of kmeans.
-	     * @param  {Array.<number>} dataSet  two-dimension array
-	     * @param  {number} k   the number of centroids to be created
-	     * @return {Array.<number>}   random centroids of kmeans
 	     */
-	    function createRandCent(dataSet, k) {
-	        var size = arraySize(dataSet);
+	    function createRandCent(k, extents) {
 	        //constructs a two-dimensional array with all values 0
-	        var centroids = zeros(k, size[1]);
-	        var minJ;
-	        var maxJ;
-	        var rangeJ;
+	        var centroids = zeros(k, extents.length);
 	        //create random cluster centers, within bounds of each dimension
-	        for (var j = 0; j < size[1]; j++) {
-	            minJ = dataSet[0][j];
-	            maxJ = dataSet[0][j];
-	            for (var i = 1; i < size[0]; i++) {
-	                if (dataSet[i][j] < minJ) {
-	                    minJ = dataSet[i][j];
-	                }
-	                if (dataSet[i][j] > maxJ) {
-	                    maxJ = dataSet[i][j];
-	                }
-	            }
-	            rangeJ = maxJ - minJ;
+	        for (var j = 0; j < extents.length; j++) {
+	            var extentItem = extents[j];
 	            for (var i = 0; i < k; i++) {
-	                centroids[i][j] = minJ + rangeJ * Math.random();
+	                centroids[i][j] = extentItem.min + extentItem.span * Math.random();
 	            }
 	        }
 	        return centroids;
@@ -318,27 +426,80 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	    /**
 	     * Distance method for calculating similarity
-	     * @param  {Array.<number>}  vec1
-	     * @param  {Array.<nnumber>}  vec2
-	     * @return {number}
 	     */
-	    function distEuclid(vec1, vec2) {
-
-	        if (!isArray(vec1) && !isArray(vec2)) {
-	            return mathSqrt(mathPow(vec1 - vec2, 2));
-	        }
+	    function distEuclid(dataItem, centroid, dataMeta) {
+	        // The distance should be normalized between different dimensions,
+	        // otherwise they may provide different weight in the final distance.
+	        // The greater weight offers more effect in the cluster determination.
 
 	        var powerSum = 0;
+	        var dimensions = dataMeta.dimensions;
+	        var extents = dataMeta.rawExtents;
 	        //subtract the corresponding elements in the vectors
-	        for (var i = 0; i < vec1.length; i++) {
-	            powerSum += mathPow(vec1[i] - vec2[i], 2);
+	        for (var i = 0; i < dimensions.length; i++) {
+	            var span = extents[i].span;
+	            // If span is 0, do not count.
+	            if (span) {
+	                var dimIdx = dimensions[i];
+	                var dist = (dataItem[dimIdx] - centroid[i]) / span;
+	                powerSum += mathPow(dist, 2);
+	            }
 	        }
 
-	        return mathSqrt(powerSum);
+	        return powerSum;
+	    }
+
+	    function parseDataMeta(dataSet, config) {
+	        var size = arraySize(dataSet);
+	        if (size.length < 1) {
+	            throw new Error('The input data of clustering should be two-dimension array.');
+	        }
+	        var colCount = size[1];
+	        var defaultDimensions = [];
+	        for (var i = 0; i < colCount; i++) {
+	            defaultDimensions.push(i);
+	        }
+	        var dimensions = normalizeDimensions(config.dimensions, defaultDimensions);
+	        var outputType = config.outputType || OutputType.MULTIPLE;
+
+	        var outputClusterIndexDimension = config.outputClusterIndexDimension;
+	        if (outputType === OutputType.SINGLE && !numberUtil.isNumber(outputClusterIndexDimension)) {
+	            throw new Error('outputClusterIndexDimension is required as a number.');
+	        }
+	        var extents = calcExtents(dataSet, dimensions);
+
+	        return {
+	            dimensions: dimensions,
+	            rawExtents: extents,
+	            outputType: outputType,
+	            outputClusterIndexDimension: outputClusterIndexDimension,
+	            outputCentroidDimensions: config.outputCentroidDimensions,
+	        };
+	    }
+
+	    function calcExtents(dataSet, dimensions) {
+	        var extents = [];
+	        var dimLen = dimensions.length;
+	        for (var i = 0; i < dimLen; i++) {
+	            extents.push({ min: Infinity, max: -Infinity });
+	        }
+	        for (var i = 0; i < dataSet.length; i++) {
+	            var line = dataSet[i];
+	            for (var j = 0; j < dimLen; j++) {
+	                var extentItem = extents[j];
+	                var val = line[dimensions[j]];
+	                extentItem.min > val && (extentItem.min = val);
+	                extentItem.max < val && (extentItem.max = val);
+	            }
+	        }
+	        for (var i = 0; i < dimLen; i++) {
+	            extents[i].span = extents[i].max - extents[i].min;
+	        }
+	        return extents;
 	    }
 
 	    return {
-	        kMeans: kMeans,
+	        OutputType: OutputType,
 	        hierarchicalKMeans: hierarchicalKMeans
 	    };
 
@@ -357,15 +518,50 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var isNumber = number.isNumber;
 
 	    /**
+	     * @param  {Array.<number>|number} dimensions like `[2, 4]` or `4`
+	     * @param  {Array.<number>} [defaultDimensions=undefined] By default `undefined`.
+	     * @return {Array.<number>} number like `4` is normalized to `[4]`,
+	     *         `null`/`undefined` is normalized to `defaultDimensions`.
+	     */
+	    function normalizeDimensions(dimensions, defaultDimensions) {
+	        return typeof dimensions === 'number'
+	            ? [dimensions]
+	            : dimensions == null
+	            ? defaultDimensions
+	            : dimensions;
+	    }
+
+	    /**
 	     * Data preprocessing, filter the wrong data object.
 	     *  for example [12,] --- missing y value
 	     *              [,12] --- missing x value
 	     *              [12, b] --- incorrect y value
 	     *              ['a', 12] --- incorrect x value
 	     * @param  {Array.<Array>} data
+	     * @param  {Object?} [opt]
+	     * @param  {Array.<number>} [opt.dimensions] Optional. Like [2, 4],
+	     *         means that dimension index 2 and dimension index 4 need to be number.
+	     *         If null/undefined (by default), all dimensions need to be number.
+	     * @param  {boolean} [opt.toOneDimensionArray] Convert to one dimension array.
+	     *         Each value is from `opt.dimensions[0]` or dimension 0.
 	     * @return {Array.<Array.<number>>}
 	     */
-	    function dataPreprocess(data) {
+	    function dataPreprocess(data, opt) {
+	        opt = opt || {};
+	        var dimensions = opt.dimensions;
+	        var numberDimensionMap = {};
+	        if (dimensions != null) {
+	            for (var i = 0; i < dimensions.length; i++) {
+	                numberDimensionMap[dimensions[i]] = true;
+	            }
+	        }
+	        var targetOneDim = opt.toOneDimensionArray
+	            ? (dimensions ? dimensions[0] : 0)
+	            : null;
+
+	        function shouldBeNumberDimension(dimIdx) {
+	            return !dimensions || numberDimensionMap.hasOwnProperty(dimIdx);
+	        }
 
 	        if (!isArray(data)) {
 	            throw new Error('Invalid data type, you should input an array');
@@ -374,26 +570,28 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var arraySize = size(data);
 
 	        if (arraySize.length === 1) {
-
 	            for (var i = 0; i < arraySize[0]; i++) {
-
-	                if (isNumber(data[i])) {
-	                    predata.push(data[i]);
+	                var item = data[i];
+	                if (isNumber(item)) {
+	                    predata.push(item);
 	                }
 	            }
 	        }
 	        else if (arraySize.length === 2) {
-
 	            for (var i = 0; i < arraySize[0]; i++) {
-
 	                var isCorrect = true;
+	                var item = data[i];
 	                for (var j = 0; j < arraySize[1]; j++) {
-	                    if (!isNumber(data[i][j])) {
+	                    if (shouldBeNumberDimension(j) && !isNumber(item[j])) {
 	                        isCorrect = false;
 	                    }
 	                }
 	                if (isCorrect) {
-	                    predata.push(data[i]);
+	                    predata.push(
+	                        targetOneDim != null
+	                            ? item[targetOneDim]
+	                            : item
+	                    );
 	                }
 	            }
 	        }
@@ -412,6 +610,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 
 	    return {
+	        normalizeDimensions: normalizeDimensions,
 	        dataPreprocess: dataPreprocess,
 	        getPrecision: getPrecision
 	    };
@@ -560,7 +759,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	    }
 
-
 	    return {
 	        size: size,
 	        isArray: isArray,
@@ -600,9 +798,22 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return isFinite(value) && value === Math.round(value);
 	    }
 
+	    function quantityExponent(val) {
+	        if (val === 0) {
+	            return 0;
+	        }
+	        var exp = Math.floor(Math.log(val) / Math.LN10);
+	        // Fix pricision loss.
+	        if (val / Math.pow(10, exp) >= 10) {
+	            exp++;
+	        }
+	        return exp;
+	    }
+
 	    return {
 	        isNumber: isNumber,
-	        isInteger: isInteger
+	        isInteger: isInteger,
+	        quantityExponent: quantityExponent
 	    };
 
 	}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
@@ -615,17 +826,17 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	    var dataProcess = __webpack_require__(2);
 	    var dataPreprocess = dataProcess.dataPreprocess;
+	    var normalizeDimensions = dataProcess.normalizeDimensions;
 
 	    var regreMethods = {
 
 	        /**
 	         * Common linear regression algorithm
-	         * @param  {Array.<Array.<number>>} data two-dimensional array
-	         * @return {Object}
 	         */
-	        linear: function (data) {
+	        linear: function (predata, opt) {
 
-	            var predata = dataPreprocess(data);
+	            var xDimIdx = opt.dimensions[0];
+	            var yDimIdx = opt.dimensions[1];
 	            var sumX = 0;
 	            var sumY = 0;
 	            var sumXY = 0;
@@ -633,10 +844,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	            var len = predata.length;
 
 	            for (var i = 0; i < len; i++) {
-	                sumX += predata[i][0];
-	                sumY += predata[i][1];
-	                sumXY += predata[i][0] * predata[i][1];
-	                sumXX += predata[i][0] * predata[i][0];
+	                var rawItem = predata[i];
+	                sumX += rawItem[xDimIdx];
+	                sumY += rawItem[yDimIdx];
+	                sumXY += rawItem[xDimIdx] * rawItem[yDimIdx];
+	                sumXX += rawItem[xDimIdx] * rawItem[xDimIdx];
 	            }
 
 	            var gradient = ((len * sumXY) - (sumX * sumY)) / ((len * sumXX) - (sumX * sumX));
@@ -644,11 +856,14 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	            var result = [];
 	            for (var j = 0; j < predata.length; j++) {
-	                var coordinate = [predata[j][0], gradient * predata[j][0] + intercept];
-	                result.push(coordinate);
+	                var rawItem = predata[j];
+	                var resultItem = rawItem.slice();
+	                resultItem[xDimIdx] = rawItem[xDimIdx];
+	                resultItem[yDimIdx] = gradient * rawItem[xDimIdx] + intercept;
+	                result.push(resultItem);
 	            }
 
-	            var string = 'y = ' + Math.round(gradient * 100) / 100 + 'x + ' + Math.round(intercept * 100) / 100;
+	            var expression = 'y = ' + Math.round(gradient * 100) / 100 + 'x + ' + Math.round(intercept * 100) / 100;
 
 	            return {
 	                points: result,
@@ -656,54 +871,56 @@ return /******/ (function(modules) { // webpackBootstrap
 	                    gradient: gradient,
 	                    intercept: intercept
 	                },
-	                expression: string
+	                expression: expression
 	            };
 	        },
 
 	        /**
 	         * If the raw data include [0,0] point, we should choose linearThroughOrigin
 	         *   instead of linear.
-	         * @param  {Array.<Array>} data  two-dimensional number array
-	         * @return {Object}
 	         */
-	        linearThroughOrigin: function (data) {
+	        linearThroughOrigin: function (predata, opt) {
 
-	            var predata = dataPreprocess(data);
+	            var xDimIdx = opt.dimensions[0];
+	            var yDimIdx = opt.dimensions[1];
 	            var sumXX = 0;
 	            var sumXY = 0;
 
 	            for (var i = 0; i < predata.length; i++) {
-	                sumXX += predata[i][0] * predata[i][0];
-	                sumXY += predata[i][0] * predata[i][1];
+	                var rawItem = predata[i];
+	                sumXX += rawItem[xDimIdx] * rawItem[xDimIdx];
+	                sumXY += rawItem[xDimIdx] * rawItem[yDimIdx];
 	            }
 
 	            var gradient = sumXY / sumXX;
 	            var result = [];
 
 	            for (var j = 0; j < predata.length; j++) {
-	                var coordinate = [predata[j][0], predata[j][0] * gradient];
-	                result.push(coordinate);
+	                var rawItem = predata[j];
+	                var resultItem = rawItem.slice();
+	                resultItem[xDimIdx] = rawItem[xDimIdx];
+	                resultItem[yDimIdx] = rawItem[xDimIdx] * gradient;
+	                result.push(resultItem);
 	            }
 
-	            var string = 'y = ' + Math.round(gradient * 100) / 100 + 'x';
+	            var expression = 'y = ' + Math.round(gradient * 100) / 100 + 'x';
 
 	            return {
 	                points: result,
 	                parameter: {
 	                    gradient: gradient
 	                },
-	                expression: string
+	                expression: expression
 	            };
 	        },
 
 	        /**
 	         * Exponential regression
-	         * @param  {Array.<Array.<number>>} data  two-dimensional number array
-	         * @return {Object}
 	         */
-	        exponential: function (data) {
+	        exponential: function (predata, opt) {
 
-	            var predata = dataPreprocess(data);
+	            var xDimIdx = opt.dimensions[0];
+	            var yDimIdx = opt.dimensions[1];
 	            var sumX = 0;
 	            var sumY = 0;
 	            var sumXXY = 0;
@@ -712,12 +929,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	            var sumXY = 0;
 
 	            for (var i = 0; i < predata.length; i++) {
-	                sumX += predata[i][0];
-	                sumY += predata[i][1];
-	                sumXY += predata[i][0] * predata[i][1];
-	                sumXXY += predata[i][0] * predata[i][0] * predata[i][1];
-	                sumYlny += predata[i][1] * Math.log(predata[i][1]);
-	                sumXYlny += predata[i][0] * predata[i][1] * Math.log(predata[i][1]);
+	                var rawItem = predata[i];
+	                sumX += rawItem[xDimIdx];
+	                sumY += rawItem[yDimIdx];
+	                sumXY += rawItem[xDimIdx] * rawItem[yDimIdx];
+	                sumXXY += rawItem[xDimIdx] * rawItem[xDimIdx] * rawItem[yDimIdx];
+	                sumYlny += rawItem[yDimIdx] * Math.log(rawItem[yDimIdx]);
+	                sumXYlny += rawItem[xDimIdx] * rawItem[yDimIdx] * Math.log(rawItem[yDimIdx]);
 	            }
 
 	            var denominator = (sumY * sumXXY) - (sumXY * sumXY);
@@ -726,11 +944,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	            var result = [];
 
 	            for (var j = 0; j < predata.length; j++) {
-	                var coordinate = [predata[j][0], coefficient * Math.pow(Math.E, index * predata[j][0])];
-	                result.push(coordinate);
+	                var rawItem = predata[j];
+	                var resultItem = rawItem.slice();
+	                resultItem[xDimIdx] = rawItem[xDimIdx];
+	                resultItem[yDimIdx] = coefficient * Math.pow(Math.E, index * rawItem[xDimIdx]);
+	                result.push(resultItem);
 	            }
 
-	            var string = 'y = ' + Math.round(coefficient * 100) / 100 + 'e^(' + Math.round(index * 100) / 100 + 'x)';
+	            var expression = 'y = ' + Math.round(coefficient * 100) / 100 + 'e^(' + Math.round(index * 100) / 100 + 'x)';
 
 	            return {
 	                points: result,
@@ -738,29 +959,29 @@ return /******/ (function(modules) { // webpackBootstrap
 	                    coefficient: coefficient,
 	                    index: index
 	                },
-	                expression: string
+	                expression: expression
 	            };
 
 	        },
 
 	        /**
 	         * Logarithmic regression
-	         * @param  {Array.<Array.<number>>} data  two-dimensional number array
-	         * @return {Object}
 	         */
-	        logarithmic: function (data) {
+	        logarithmic: function (predata, opt) {
 
-	            var predata = dataPreprocess(data);
+	            var xDimIdx = opt.dimensions[0];
+	            var yDimIdx = opt.dimensions[1];
 	            var sumlnx = 0;
 	            var sumYlnx = 0;
 	            var sumY = 0;
 	            var sumlnxlnx = 0;
 
 	            for (var i = 0; i < predata.length; i++) {
-	                sumlnx += Math.log(predata[i][0]);
-	                sumYlnx += predata[i][1] * Math.log(predata[i][0]);
-	                sumY += predata[i][1];
-	                sumlnxlnx += Math.pow(Math.log(predata[i][0]), 2);
+	                var rawItem = predata[i];
+	                sumlnx += Math.log(rawItem[xDimIdx]);
+	                sumYlnx += rawItem[yDimIdx] * Math.log(rawItem[xDimIdx]);
+	                sumY += rawItem[yDimIdx];
+	                sumlnxlnx += Math.pow(Math.log(rawItem[xDimIdx]), 2);
 	            }
 
 	            var gradient = (i * sumYlnx - sumY * sumlnx) / (i * sumlnxlnx - sumlnx * sumlnx);
@@ -768,11 +989,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	            var result = [];
 
 	            for (var j = 0; j < predata.length; j++) {
-	                var coordinate = [predata[j][0], gradient * Math.log(predata[j][0]) + intercept];
-	                result.push(coordinate);
+	                var rawItem = predata[j];
+	                var resultItem = rawItem.slice();
+	                resultItem[xDimIdx] = rawItem[xDimIdx];
+	                resultItem[yDimIdx] = gradient * Math.log(rawItem[xDimIdx]) + intercept;
+	                result.push(resultItem);
 	            }
 
-	            var string =
+	            var expression =
 	                'y = '
 	                + Math.round(intercept * 100) / 100
 	                + ' + '
@@ -784,21 +1008,21 @@ return /******/ (function(modules) { // webpackBootstrap
 	                    gradient: gradient,
 	                    intercept: intercept
 	                },
-	                expression: string
+	                expression: expression
 	            };
 
 	        },
 
 	        /**
 	         * Polynomial regression
-	         * @param  {Array.<Array.<number>>} data  two-dimensional number array
-	         * @param  {number} order  order of polynomials
-	         * @return {Object}
 	         */
-	        polynomial: function (data, order) {
+	        polynomial: function (predata, opt) {
 
-	            var predata = dataPreprocess(data);
-	            if (typeof order === 'undefined') {
+	            var xDimIdx = opt.dimensions[0];
+	            var yDimIdx = opt.dimensions[1];
+	            var order = opt.order;
+
+	            if (order == null) {
 	                order = 2;
 	            }
 	            //coefficient matrix
@@ -809,7 +1033,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	            for (var i = 0; i < k; i++) {
 	                var sumA = 0;
 	                for (var n = 0; n < predata.length; n++) {
-	                    sumA += predata[n][1] * Math.pow(predata[n][0], i);
+	                    var rawItem = predata[n];
+	                    sumA += rawItem[yDimIdx] * Math.pow(rawItem[xDimIdx], i);
 	                }
 	                lhs.push(sumA);
 
@@ -817,7 +1042,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                for (var j = 0; j < k; j++) {
 	                    var sumB = 0;
 	                    for (var m = 0; m < predata.length; m++) {
-	                        sumB += Math.pow(predata[m][0], i + j);
+	                        sumB += Math.pow(predata[m][xDimIdx], i + j);
 	                    }
 	                    temp.push(sumB);
 	                }
@@ -831,29 +1056,33 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	            for (var i = 0; i < predata.length; i++) {
 	                var value = 0;
+	                var rawItem = predata[i];
 	                for (var n = 0; n < coeArray.length; n++) {
-	                    value += coeArray[n] * Math.pow(predata[i][0], n);
+	                    value += coeArray[n] * Math.pow(rawItem[xDimIdx], n);
 	                }
-	                result.push([predata[i][0], value]);
+	                var resultItem = rawItem.slice();
+	                resultItem[xDimIdx] = rawItem[xDimIdx];
+	                resultItem[yDimIdx] = value;
+	                result.push(resultItem);
 	            }
 
-	            var string = 'y = ';
+	            var expression = 'y = ';
 	            for (var i = coeArray.length - 1; i >= 0; i--) {
 	                if (i > 1) {
-	                    string += Math.round(coeArray[i] * Math.pow(10, i + 1)) / Math.pow(10, i + 1) + 'x^' + i + ' + ';
+	                    expression += Math.round(coeArray[i] * Math.pow(10, i + 1)) / Math.pow(10, i + 1) + 'x^' + i + ' + ';
 	                }
 	                else if (i === 1) {
-	                    string += Math.round(coeArray[i] * 100) / 100 + 'x' + ' + ';
+	                    expression += Math.round(coeArray[i] * 100) / 100 + 'x' + ' + ';
 	                }
 	                else {
-	                    string += Math.round(coeArray[i] * 100) / 100;
+	                    expression += Math.round(coeArray[i] * 100) / 100;
 	                }
 	            }
 
 	            return {
 	                points: result,
 	                parameter: coeArray,
-	                expression: string
+	                expression: expression
 	            };
 
 	        }
@@ -904,10 +1133,35 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return data;
 	    }
 
-	    var regression = function (regreMethod, data, order) {
+	    /**
+	     * @param  {string} regreMethod
+	     * @param  {Array.<Array.<number>>} data   two-dimensional number array
+	     * @param  {Object|number} [optOrOrder]  opt or order
+	     * @param  {number} [optOrOrder.order]  order of polynomials
+	     * @param  {Array.<number>|number} [optOrOrder.dimensions=[0, 1]]  Target dimensions to calculate the regression.
+	     *         By defualt: use [0, 1] as [x, y].
+	     * @return {Array}
+	     */
+	    var regression = function (regreMethod, data, optOrOrder) {
+	        var opt = typeof optOrOrder === 'number'
+	            ? { order: optOrOrder }
+	            : (optOrOrder || {});
 
-	        return regreMethods[regreMethod](data, order);
+	        var dimensions = normalizeDimensions(opt.dimensions, [0, 1]);
 
+	        var predata = dataPreprocess(data, { dimensions: dimensions });
+	        var result = regreMethods[regreMethod](predata, {
+	            order: opt.order,
+	            dimensions: dimensions
+	        });
+
+	        // Sort for line chart.
+	        var xDimIdx = dimensions[0];
+	        result.points.sort(function (itemA, itemB) {
+	            return itemA[xDimIdx] - itemB[xDimIdx];
+	        });
+
+	        return result;
 	    };
 
 	    return regression;
@@ -1194,7 +1448,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var deviation = __webpack_require__(8);
 	    var dataProcess = __webpack_require__(2);
 	    var dataPreprocess = dataProcess.dataPreprocess;
-	    var getPrecision = dataProcess.getPrecision;
+	    var normalizeDimensions = dataProcess.normalizeDimensions;
 	    var array = __webpack_require__(3);
 	    var ascending = array.ascending;
 	    var map = array.map;
@@ -1205,32 +1459,41 @@ return /******/ (function(modules) { // webpackBootstrap
 	    /**
 	     * Compute bins for histogram
 	     * @param  {Array.<number>} data
-	     * @param  {string} threshold
+	     * @param  {Object|string} optOrMethod Optional settings or `method`.
+	     * @param  {Object|string} optOrMethod.method 'squareRoot' | 'scott' | 'freedmanDiaconis' | 'sturges'
+	     * @param  {Array.<number>|number} optOrMethod.dimensions If data is a 2-d array,
+	     *         which dimension will be used to calculate histogram.
 	     * @return {Object}
 	     */
-	    function computeBins(data, threshold) {
+	    function computeBins(data, optOrMethod) {
+	        var opt = typeof optOrMethod === 'string'
+	            ? { method: optOrMethod }
+	            : (optOrMethod || {});
 
-	        if (threshold == null) {
-	            threshold = thresholdMethod.squareRoot;
-	        }
-	        else {
-	            threshold = thresholdMethod[threshold];
-	        }
-	        var values = dataPreprocess(data);
+	        var threshold = opt.method == null
+	            ? thresholdMethod.squareRoot
+	            : thresholdMethod[opt.method];
+	        var dimensions = normalizeDimensions(opt.dimensions);
+
+	        var values = dataPreprocess(data, {
+	            dimensions: dimensions,
+	            toOneDimensionArray: true
+	        });
 	        var maxValue = max(values);
 	        var minValue = min(values);
 	        var binsNumber = threshold(values, minValue, maxValue);
-	        var step = tickStep(minValue, maxValue, binsNumber);
-	        var precision = -Math.floor(Math.log(Math.abs(maxValue - minValue) / binsNumber) / Math.LN10);
-	        
+	        var tickStepResult = tickStep(minValue, maxValue, binsNumber);
+	        var step = tickStepResult.step;
+	        var toFixedPrecision = tickStepResult.toFixedPrecision;
+
 	        // return the xAxis coordinate for each bins, except the end point of the value
 	        var rangeArray = range(
-	                // use function toFixed() to avoid data like '0.700000001'
-	                +((Math.ceil(minValue / step) * step).toFixed(precision)),
-	                +((Math.floor(maxValue / step) * step).toFixed(precision)),
-	                step,
-	                precision
-	            );
+	            // use function toFixed() to avoid data like '0.700000001'
+	            +((Math.ceil(minValue / step) * step).toFixed(toFixedPrecision)),
+	            +((Math.floor(maxValue / step) * step).toFixed(toFixedPrecision)),
+	            step,
+	            toFixedPrecision
+	        );
 
 	        var len = rangeArray.length;
 
@@ -1239,7 +1502,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        for (var i = 0; i <= len; i++) {
 	            bins[i] = {};
 	            bins[i].sample = [];
-	            bins[i].x0 = i > 0 
+	            bins[i].x0 = i > 0
 	                ? rangeArray[i - 1]
 	                : (rangeArray[i] - minValue) === step
 	                ? minValue
@@ -1259,7 +1522,13 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	        var data = map(bins, function (bin) {
 	            // use function toFixed() to avoid data like '6.5666638489'
-	            return [+((bin.x0 + bin.x1) / 2).toFixed(precision), bin.sample.length];
+	            return [
+	                +((bin.x0 + bin.x1) / 2).toFixed(toFixedPrecision),
+	                bin.sample.length,
+	                bin.x0,
+	                bin.x1,
+	                bin.x0 + ' - ' + bin.x1
+	            ];
 	        });
 
 	        var customData = map(bins, function (bin) {
@@ -1367,6 +1636,8 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_RESULT__ = function (require) {
 
+	    var numberUtil = __webpack_require__(4);
+
 	    /**
 	     * Computing the length of step
 	     * @see  https://github.com/d3/d3-array/blob/master/src/ticks.js
@@ -1377,7 +1648,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return function (start, stop, count) {
 
 	        var step0 = Math.abs(stop - start) / count;
-	        var precision = Math.floor(Math.log(step0) / Math.LN10);
+	        var precision = numberUtil.quantityExponent(step0);
+
 	        var step1 = Math.pow(10, precision);
 	        var error = step0 / step1;
 
@@ -1390,8 +1662,331 @@ return /******/ (function(modules) { // webpackBootstrap
 	        else if(error >= Math.sqrt(2)) {
 	            step1 *= 2;
 	        }
-	        return +((stop >= start ? step1 : -step1).toFixed(-precision));
 
+	        var toFixedPrecision = precision < 0 ? -precision : 0;
+	        var resultStep = +(
+	            (stop >= start ? step1 : -step1).toFixed(toFixedPrecision)
+	        );
+
+	        return {
+	            step: resultStep,
+	            toFixedPrecision: toFixedPrecision
+	        };
+	    };
+
+	}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
+
+
+/***/ }),
+/* 18 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	var __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_RESULT__ = function (require) {
+
+	    var regression = __webpack_require__(5);
+	    var transformHelper = __webpack_require__(19);
+	    var FORMULA_DIMENSION = 2;
+
+	    return {
+
+	        type: 'ecStat:regression',
+
+	        /**
+	         * @param {Paramter<typeof regression>[0]} [params.config.method='linear'] 'linear' by default
+	         * @param {Paramter<typeof regression>[2]} [params.config.order=2] Only work when method is `polynomial`.
+	         * @param {DimensionLoose[]|DimensionLoose} [params.config.dimensions=[0, 1]] dimensions that used to calculate regression.
+	         *        By default [0, 1].
+	         * @param {'start' | 'end' | 'all'} params.config.formulaOn Include formula on the last (third) dimension of the:
+	         *        'start': first data item.
+	         *        'end': last data item (by default).
+	         *        'all': all data items.
+	         *        'none': no data item.
+	         */
+	        transform: function transform(params) {
+	            var upstream = params.upstream;
+	            var config = params.config || {};
+	            var method = config.method || 'linear';
+
+	            var result = regression(method, upstream.cloneRawData(), {
+	                order: config.order,
+	                dimensions: transformHelper.normalizeExistingDimensions(params, config.dimensions)
+	            });
+	            var points = result.points;
+
+	            var formulaOn = config.formulaOn;
+	            if (formulaOn == null) {
+	                formulaOn = 'end';
+	            }
+
+	            var dimensions;
+	            if (formulaOn !== 'none') {
+	                for (var i = 0; i < points.length; i++) {
+	                    points[i][FORMULA_DIMENSION] =
+	                    (
+	                        (formulaOn === 'start' && i === 0)
+	                        || (formulaOn === 'all')
+	                        || (formulaOn === 'end' && i === points.length - 1)
+	                    ) ? result.expression : '';
+	                }
+	                dimensions = upstream.cloneAllDimensionInfo();
+	                dimensions[FORMULA_DIMENSION] = {};
+	            }
+
+	            return [{
+	                dimensions: dimensions,
+	                data: points
+	            }];
+	        }
+	    };
+
+	}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
+
+
+/***/ }),
+/* 19 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	var __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_RESULT__ = function (require) {
+
+	    var arrayUtil = __webpack_require__(3);
+	    var numberUtil = __webpack_require__(4);
+	    var objectUtil = __webpack_require__(20);
+
+	    /**
+	     * type DimensionLoose = DimensionIndex | DimensionName;
+	     * type DimensionIndex = number;
+	     * type DimensionName = string;
+	     *
+	     * @param {object} transformParams The parameter of echarts transfrom.
+	     * @param {DimensionLoose | DimensionLoose[]} dimensionsConfig
+	     * @return {DimensionIndex | DimensionIndex[]}
+	     */
+	    function normalizeExistingDimensions(transformParams, dimensionsConfig) {
+	        if (dimensionsConfig == null) {
+	            return;
+	        }
+	        var upstream = transformParams.upstream;
+
+	        if (arrayUtil.isArray(dimensionsConfig)) {
+	            var result = [];
+	            for (var i = 0; i < dimensionsConfig.length; i++) {
+	                var dimInfo = upstream.getDimensionInfo(dimensionsConfig[i]);
+	                validateDimensionExists(dimInfo, dimensionsConfig[i]);
+	                result[i] = dimInfo.index;
+	            }
+	            return result;
+	        }
+	        else {
+	            var dimInfo = upstream.getDimensionInfo(dimensionsConfig);
+	            validateDimensionExists(dimInfo, dimensionsConfig);
+	            return dimInfo.index;
+	        }
+
+	        function validateDimensionExists(dimInfo, dimConfig) {
+	            if (!dimInfo) {
+	                throw new Error('Can not find dimension by ' + dimConfig);
+	            }
+	        }
+	    }
+
+	    /**
+	     * @param {object} transformParams The parameter of echarts transfrom.
+	     * @param {(DimensionIndex | {name: DimensionName, index: DimensionIndex})[]} dimensionsConfig
+	     * @param {{name: DimensionName | DimensionName[], index: DimensionIndex | DimensionIndex[]}}
+	     */
+	    function normalizeNewDimensions(dimensionsConfig) {
+	        if (arrayUtil.isArray(dimensionsConfig)) {
+	            var names = [];
+	            var indices = [];
+	            for (var i = 0; i < dimensionsConfig.length; i++) {
+	                var item = parseDimensionNewItem(dimensionsConfig[i]);
+	                names.push(item.name);
+	                indices.push(item.index);
+	            }
+	            return {name: names, index: indices};
+	        }
+	        else if (dimensionsConfig != null) {
+	            return parseDimensionNewItem(dimensionsConfig);
+	        }
+
+	        function parseDimensionNewItem(dimConfig) {
+	            if (numberUtil.isNumber(dimConfig)) {
+	                return { index: dimConfig };
+	            }
+	            else if (objectUtil.isObject(dimConfig) && numberUtil.isNumber(dimConfig.index)) {
+	                return dimConfig;
+	            }
+	            throw new Error('Illegle new dimensions config. Expect `{ name: string, index: number }`.');
+	        }
+	    }
+
+	    return {
+	        normalizeExistingDimensions: normalizeExistingDimensions,
+	        normalizeNewDimensions: normalizeNewDimensions
+	    };
+	}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
+
+
+/***/ }),
+/* 20 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	var __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_RESULT__ = function (require) {
+
+	    function extend(target, source) {
+	        if (Object.assign) {
+	            Object.assign(target, source);
+	        }
+	        else {
+	            for (var key in source) {
+	                if (source.hasOwnProperty(key)) {
+	                    target[key] = source[key];
+	                }
+	            }
+	        }
+	        return target;
+	    }
+
+	    function isObject(value) {
+	        const type = typeof value;
+	        return type === 'function' || (!!value && type === 'object');
+	    }
+
+	    return {
+	        extend: extend,
+	        isObject: isObject
+	    };
+
+	}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
+
+/***/ }),
+/* 21 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	var __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_RESULT__ = function (require) {
+
+	    var histogram = __webpack_require__(15);
+	    var transformHelper = __webpack_require__(19);
+
+	    return {
+
+	        type: 'ecStat:histogram',
+
+	        /**
+	         * @param {'squareRoot' | 'scott' | 'freedmanDiaconis' | 'sturges'} [params.config.method='squareRoot']
+	         * @param {DimnensionLoose[]} [params.config.dimensions=[0, 1]] dimensions that used to calculate histogram.
+	         *        By default [0].
+	         */
+	        transform: function transform(params) {
+	            var upstream = params.upstream;
+	            var config = params.config || {};
+
+	            var result = histogram(upstream.cloneRawData(), {
+	                method: config.method,
+	                dimensions: transformHelper.normalizeExistingDimensions(params, config.dimensions)
+	            });
+
+	            return [{
+	                dimensions: ['MeanOfV0V1', 'VCount', 'V0', 'V1', 'DisplayableName'],
+	                data: result.data
+	            }, {
+	                data: result.customData
+	            }];
+	        }
+	    };
+
+	}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
+
+
+/***/ }),
+/* 22 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	var __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_RESULT__ = function (require) {
+
+	    var clustering = __webpack_require__(1);
+	    var numberUtil = __webpack_require__(4);
+	    var transformHelper = __webpack_require__(19);
+
+	    var isNumber = numberUtil.isNumber;
+
+	    return {
+
+	        type: 'ecStat:clustering',
+
+	        /**
+	         * @param {number} params.config.clusterCount Mandatory.
+	         *        The number of clusters in a dataset. It has to be greater than 1.
+	         * @param {(DimensionName | DimensionIndex)[]} [params.config.dimensions] Optional.
+	         *        Target dimensions to calculate the regression.
+	         *        By default: use all of the data.
+	         * @param {(DimensionIndex | {name?: DimensionName, index: DimensionIndex})} [params.config.outputClusterIndexDimension] Mandatory.
+	         * @param {(DimensionIndex | {name?: DimensionName, index: DimensionIndex})[]} [params.config.outputCentroidDimensions] Optional.
+	         *        If specified, the centroid will be set to those dimensions of the result data one by one.
+	         *        By default not set centroid to result.
+	         */
+	        transform: function transform(params) {
+	            var upstream = params.upstream;
+	            var config = params.config || {};
+	            var clusterCount = config.clusterCount;
+
+	            if (!isNumber(clusterCount) || clusterCount <= 0) {
+	                throw new Error('config param "clusterCount" need to be specified as an interger greater than 1.');
+	            }
+
+	            if (clusterCount === 1) {
+	                return [{
+	                }, {
+	                    data: []
+	                }];
+	            }
+
+	            var outputClusterIndexDimension = transformHelper.normalizeNewDimensions(
+	                config.outputClusterIndexDimension
+	            );
+	            var outputCentroidDimensions = transformHelper.normalizeNewDimensions(
+	                config.outputCentroidDimensions
+	            );
+
+	            if (outputClusterIndexDimension == null) {
+	                throw new Error('outputClusterIndexDimension is required as a number.');
+	            }
+
+	            var result = clustering.hierarchicalKMeans(upstream.cloneRawData(), {
+	                clusterCount: clusterCount,
+	                stepByStep: false,
+	                dimensions: transformHelper.normalizeExistingDimensions(params, config.dimensions),
+	                outputType: clustering.OutputType.SINGLE,
+	                outputClusterIndexDimension: outputClusterIndexDimension.index,
+	                outputCentroidDimensions: (outputCentroidDimensions || {}).index
+	            });
+
+	            var sourceDimAll = upstream.cloneAllDimensionInfo();
+	            var resultDimsDef = [];
+	            for (var i = 0; i < sourceDimAll.length; i++) {
+	                var sourceDimItem = sourceDimAll[i];
+	                resultDimsDef.push(sourceDimItem.name);
+	            }
+
+	            // Always set to dims def even if name not exists, because the resultDimsDef.length
+	            // need to be enlarged to tell echarts that there is "cluster index dimension" and "dist dimension".
+	            resultDimsDef[outputClusterIndexDimension.index] = outputClusterIndexDimension.name;
+
+	            if (outputCentroidDimensions) {
+	                for (var i = 0; i < outputCentroidDimensions.index.length; i++) {
+	                    if (outputCentroidDimensions.name[i] != null) {
+	                        resultDimsDef[outputCentroidDimensions.index[i]] = outputCentroidDimensions.name[i];
+	                    }
+	                }
+	            }
+
+	            return [{
+	                dimensions: resultDimsDef,
+	                data: result.data
+	            }, {
+	                data: result.centroids
+	            }];
+	        }
 	    };
 
 	}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
