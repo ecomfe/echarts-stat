@@ -513,7 +513,7 @@ var quantileValue = ecStat.statistics.quantile(dataList, p);
 ##### Parameter
 
 * `dataList` : `number[]`. Sorted array of numbers.
-* `p`: `number`.  where 0 =< *p* <= 1. For example, the first quartile at p = 0.25, the seconed quartile at p = 0.5(same as the median), and the third quartile at p = 0.75.
+* `p`: `number`.  where 0 =< *p* <= 1. For example, the first quartile at p = 0.25, the second quartile at p = 0.5(same as the median), and the third quartile at p = 0.75.
 
 ##### Return Value
 
