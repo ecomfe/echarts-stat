@@ -46,6 +46,17 @@ declare namespace EChartsStat {
 		function sum(data: Array<number>): number
 	}
 
+	type Transform = {
+		type: string;
+		transform: any;
+	}
+	
+	let transform: {
+		regression: Transform
+		histogram: Transform
+		clustering: Transform
+	};
+	
 }
 
 declare module 'echarts-stat' {
