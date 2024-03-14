@@ -27,13 +27,28 @@ declare namespace EChartsStat {
 		function kMeans(data: InputData, clusterNumer: number): Result
 	}
 
-	interface RegressionResult {
+	interface RegressionParameter {
+		linear: {
+			gradient: number
+			intercept: number
+		}
+		exponential: {
+			coefficient: number
+			index: number
+		}
+		logarithmic: {
+			gradient: number
+			intercept: number
+		}
+		polynomial: any[]
+	}
+
+	interface RegressionResult<T extends keyof RegressionParameter> {
 		points: OutputData
 		expression: string
-		gradient: number
-		intercept: number
+		parameter: RegressionParameter[T]
 	}
-	function regression(regreMethod: 'linear' | 'exponential' | 'logarithmic' | 'polynomial', data: InputData, order: number): RegressionResult
+	function regression<T extends keyof RegressionParameter>(regreMethod: T, data: InputData, order: number): RegressionResult<T>
 
 	namespace statistics {
 		function deviation(data: Array<number>): number
