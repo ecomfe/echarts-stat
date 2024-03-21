@@ -101,7 +101,8 @@ define(function (require) {
 
         var clusterWithKmeans = {
             centroids: centroids,
-            clusterAssigned: clusterAssigned
+            clusterAssigned: clusterAssigned,
+            ptsInClust: ptsInClust
         };
         return clusterWithKmeans;
     }
