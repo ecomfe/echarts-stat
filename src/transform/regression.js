@@ -18,6 +18,8 @@ define(function (require) {
          *        'end': last data item (by default).
          *        'all': all data items.
          *        'none': no data item.
+         * @param {boolean} [params.config.showR2=true] Whether to show R² value in the formula.
+         * @param {number} [params.config.precision=5] Precision of the formula.
          */
         transform: function transform(params) {
             var upstream = params.upstream;
@@ -26,7 +28,9 @@ define(function (require) {
 
             var result = regression(method, upstream.cloneRawData(), {
                 order: config.order,
-                dimensions: transformHelper.normalizeExistingDimensions(params, config.dimensions)
+                dimensions: transformHelper.normalizeExistingDimensions(params, config.dimensions),
+                showR2: config.showR2,
+                precision: config.precision
             });
             var points = result.points;
 

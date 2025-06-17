@@ -835,12 +835,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	         */
 	        linear: function (predata, opt) {
 
+	            var showR2 = opt.showR2 !== false;
+	            var precision = opt.precision || 5;
 	            var xDimIdx = opt.dimensions[0];
 	            var yDimIdx = opt.dimensions[1];
 	            var sumX = 0;
 	            var sumY = 0;
 	            var sumXY = 0;
 	            var sumXX = 0;
+	            var sumYY = 0;
 	            var len = predata.length;
 
 	            for (var i = 0; i < len; i++) {
@@ -849,10 +852,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	                sumY += rawItem[yDimIdx];
 	                sumXY += rawItem[xDimIdx] * rawItem[yDimIdx];
 	                sumXX += rawItem[xDimIdx] * rawItem[xDimIdx];
+	                sumYY += rawItem[yDimIdx] * rawItem[yDimIdx];
 	            }
 
 	            var gradient = ((len * sumXY) - (sumX * sumY)) / ((len * sumXX) - (sumX * sumX));
 	            var intercept = (sumY / len) - ((gradient * sumX) / len);
+	            var r2 = Math.pow(
+	                (len * sumXY - sumX * sumY) /
+	                Math.sqrt((len * sumXX - sumX * sumX) * (len * sumYY - sumY * sumY)),
+	                2
+	            );
 
 	            var result = [];
 	            for (var j = 0; j < predata.length; j++) {
@@ -863,13 +872,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	                result.push(resultItem);
 	            }
 
-	            var expression = 'y = ' + Math.round(gradient * 100) / 100 + 'x + ' + Math.round(intercept * 100) / 100;
+	            var expression
+	            if (showR2) {
+	                expression = `y = ${gradient.toFixed(precision)}x ${intercept >= 0 ? '+' : ''} ${intercept.toFixed(precision)}, R2 = ${r2.toFixed(precision)}`
+	            } else {
+	                expression = `y = ${gradient.toFixed(precision)}x ${intercept >= 0 ? '+' : ''} ${intercept.toFixed(precision)}`
+	            }
 
 	            return {
 	                points: result,
 	                parameter: {
 	                    gradient: gradient,
-	                    intercept: intercept
+	                    intercept: intercept,
+	                    r2: r2
 	                },
 	                expression: expression
 	            };
@@ -1152,7 +1167,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var predata = dataPreprocess(data, { dimensions: dimensions });
 	        var result = regreMethods[regreMethod](predata, {
 	            order: opt.order,
-	            dimensions: dimensions
+	            dimensions: dimensions,
+	            showR2: opt.showR2,
+	            precision: opt.precision
 	        });
 
 	        // Sort for line chart.
@@ -1701,6 +1718,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	         *        'end': last data item (by default).
 	         *        'all': all data items.
 	         *        'none': no data item.
+	         * @param {boolean} [params.config.showR2=true] Whether to show R² value in the formula.
+	         * @param {number} [params.config.precision=5] Precision of the formula.
 	         */
 	        transform: function transform(params) {
 	            var upstream = params.upstream;
@@ -1709,7 +1728,9 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	            var result = regression(method, upstream.cloneRawData(), {
 	                order: config.order,
-	                dimensions: transformHelper.normalizeExistingDimensions(params, config.dimensions)
+	                dimensions: transformHelper.normalizeExistingDimensions(params, config.dimensions),
+	                showR2: config.showR2,
+	                precision: config.precision
 	            });
 	            var points = result.points;
 
