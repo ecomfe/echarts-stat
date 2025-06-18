@@ -896,19 +896,24 @@ return /******/ (function(modules) { // webpackBootstrap
 	         */
 	        linearThroughOrigin: function (predata, opt) {
 
+	            var showR2 = opt.showR2 !== false;
+	            var precision = opt.precision || 5;
 	            var xDimIdx = opt.dimensions[0];
 	            var yDimIdx = opt.dimensions[1];
 	            var sumXX = 0;
 	            var sumXY = 0;
+	            var sumYY = 0;
 
 	            for (var i = 0; i < predata.length; i++) {
 	                var rawItem = predata[i];
 	                sumXX += rawItem[xDimIdx] * rawItem[xDimIdx];
 	                sumXY += rawItem[xDimIdx] * rawItem[yDimIdx];
+	                sumYY += rawItem[yDimIdx] * rawItem[yDimIdx];
 	            }
 
 	            var gradient = sumXY / sumXX;
 	            var result = [];
+	            var r2 = Math.pow(sumXY / Math.sqrt(sumXX * sumYY), 2);
 
 	            for (var j = 0; j < predata.length; j++) {
 	                var rawItem = predata[j];
@@ -918,12 +923,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	                result.push(resultItem);
 	            }
 
-	            var expression = 'y = ' + Math.round(gradient * 100) / 100 + 'x';
+	            var expression;
+	            if (showR2) {
+	                expression = `y = ${gradient.toFixed(precision)}x, R2 = ${r2.toFixed(precision)}`;
+	            } else {
+	                expression = `y = ${gradient.toFixed(precision)}x`;
+	            }
 
 	            return {
 	                points: result,
 	                parameter: {
-	                    gradient: gradient
+	                    gradient: gradient,
+	                    r2: r2
 	                },
 	                expression: expression
 	            };
@@ -934,6 +945,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	         */
 	        exponential: function (predata, opt) {
 
+	            var showR2 = opt.showR2 !== false;
+	            var precision = opt.precision || 5;
 	            var xDimIdx = opt.dimensions[0];
 	            var yDimIdx = opt.dimensions[1];
 	            var sumX = 0;
@@ -942,6 +955,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	            var sumYlny = 0;
 	            var sumXYlny = 0;
 	            var sumXY = 0;
+	            var sumlnY = 0;
+	            var sumXlnY = 0;
+	            var sumlnYlnY = 0;
 
 	            for (var i = 0; i < predata.length; i++) {
 	                var rawItem = predata[i];
@@ -951,12 +967,20 @@ return /******/ (function(modules) { // webpackBootstrap
 	                sumXXY += rawItem[xDimIdx] * rawItem[xDimIdx] * rawItem[yDimIdx];
 	                sumYlny += rawItem[yDimIdx] * Math.log(rawItem[yDimIdx]);
 	                sumXYlny += rawItem[xDimIdx] * rawItem[yDimIdx] * Math.log(rawItem[yDimIdx]);
+	                sumlnY += Math.log(rawItem[yDimIdx]);
+	                sumXlnY += rawItem[xDimIdx] * Math.log(rawItem[yDimIdx]);
+	                sumlnYlnY += Math.pow(Math.log(rawItem[yDimIdx]), 2);
 	            }
 
 	            var denominator = (sumY * sumXXY) - (sumXY * sumXY);
 	            var coefficient = Math.pow(Math.E, (sumXXY * sumYlny - sumXY * sumXYlny) / denominator);
 	            var index = (sumY * sumXYlny - sumXY * sumYlny) / denominator;
 	            var result = [];
+	            var r2 = Math.pow(
+	                (predata.length * sumXlnY - sumX * sumlnY) /
+	                Math.sqrt((predata.length * sumX * sumX - sumX * sumX) * (predata.length * sumlnYlnY - sumlnY * sumlnY)),
+	                2
+	            );
 
 	            for (var j = 0; j < predata.length; j++) {
 	                var rawItem = predata[j];
@@ -966,13 +990,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	                result.push(resultItem);
 	            }
 
-	            var expression = 'y = ' + Math.round(coefficient * 100) / 100 + 'e^(' + Math.round(index * 100) / 100 + 'x)';
+	            var expression;
+	            if (showR2) {
+	                expression = `y = ${coefficient.toFixed(precision)}e^(${index.toFixed(precision)}x), R2 = ${r2.toFixed(precision)}`;
+	            } else {
+	                expression = `y = ${coefficient.toFixed(precision)}e^(${index.toFixed(precision)}x)`;
+	            }
 
 	            return {
 	                points: result,
 	                parameter: {
 	                    coefficient: coefficient,
-	                    index: index
+	                    index: index,
+	                    r2: r2
 	                },
 	                expression: expression
 	            };
@@ -984,12 +1014,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	         */
 	        logarithmic: function (predata, opt) {
 
+	            var showR2 = opt.showR2 !== false;
+	            var precision = opt.precision || 5;
 	            var xDimIdx = opt.dimensions[0];
 	            var yDimIdx = opt.dimensions[1];
 	            var sumlnx = 0;
 	            var sumYlnx = 0;
 	            var sumY = 0;
 	            var sumlnxlnx = 0;
+	            var sumYY = 0;
 
 	            for (var i = 0; i < predata.length; i++) {
 	                var rawItem = predata[i];
@@ -997,11 +1030,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	                sumYlnx += rawItem[yDimIdx] * Math.log(rawItem[xDimIdx]);
 	                sumY += rawItem[yDimIdx];
 	                sumlnxlnx += Math.pow(Math.log(rawItem[xDimIdx]), 2);
+	                sumYY += Math.pow(rawItem[yDimIdx], 2);
 	            }
 
 	            var gradient = (i * sumYlnx - sumY * sumlnx) / (i * sumlnxlnx - sumlnx * sumlnx);
 	            var intercept = (sumY - gradient * sumlnx) / i;
 	            var result = [];
+	            var r2 = Math.pow(
+	                (predata.length * sumYlnx - sumY * sumlnx) /
+	                Math.sqrt((predata.length * sumlnxlnx - sumlnx * sumlnx) * (predata.length * sumYY - sumY * sumY)),
+	                2
+	            );
 
 	            for (var j = 0; j < predata.length; j++) {
 	                var rawItem = predata[j];
@@ -1011,17 +1050,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	                result.push(resultItem);
 	            }
 
-	            var expression =
-	                'y = '
-	                + Math.round(intercept * 100) / 100
-	                + ' + '
-	                + Math.round(gradient * 100) / 100 + 'ln(x)';
+	            var expression;
+	            if (showR2) {
+	                expression = `y = ${intercept.toFixed(precision)} + ${gradient.toFixed(precision)}ln(x), R2 = ${r2.toFixed(precision)}`;
+	            } else {
+	                expression = `y = ${intercept.toFixed(precision)} + ${gradient.toFixed(precision)}ln(x)`;
+	            }
 
 	            return {
 	                points: result,
 	                parameter: {
 	                    gradient: gradient,
-	                    intercept: intercept
+	                    intercept: intercept,
+	                    r2: r2
 	                },
 	                expression: expression
 	            };
@@ -1033,13 +1074,27 @@ return /******/ (function(modules) { // webpackBootstrap
 	         */
 	        polynomial: function (predata, opt) {
 
+	            var showR2 = opt.showR2 !== false;
+	            var precision = opt.precision || 5;
 	            var xDimIdx = opt.dimensions[0];
 	            var yDimIdx = opt.dimensions[1];
 	            var order = opt.order;
+	            var sumY = 0;
+	            var sumYY = 0;
+	            var sumX = 0;
+	            var sumXX = 0;
+	            var sumXY = 0;
 
 	            if (order == null) {
 	                order = 2;
 	            }
+
+	            for (var i = 0; i < predata.length; i++) {
+	                var rawItem = predata[i];
+	                sumY += rawItem[yDimIdx];
+	                sumYY += Math.pow(rawItem[yDimIdx], 2);
+	            }
+
 	            //coefficient matrix
 	            var coeMatrix = [];
 	            var lhs = [];
@@ -1068,7 +1123,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            var coeArray = gaussianElimination(coeMatrix, k);
 
 	            var result = [];
-
+	            
 	            for (var i = 0; i < predata.length; i++) {
 	                var value = 0;
 	                var rawItem = predata[i];
@@ -1078,25 +1133,41 @@ return /******/ (function(modules) { // webpackBootstrap
 	                var resultItem = rawItem.slice();
 	                resultItem[xDimIdx] = rawItem[xDimIdx];
 	                resultItem[yDimIdx] = value;
+	                sumX += value;
+	                sumXX += value * value;
+	                sumXY += rawItem[yDimIdx] * value;
 	                result.push(resultItem);
 	            }
+
+	            var r2 = Math.pow(
+	                (predata.length * sumXY - sumX * sumY) /
+	                Math.sqrt((predata.length * sumXX - sumX * sumX) * (predata.length * sumYY - sumY * sumY)),
+	                2
+	            );
 
 	            var expression = 'y = ';
 	            for (var i = coeArray.length - 1; i >= 0; i--) {
 	                if (i > 1) {
-	                    expression += Math.round(coeArray[i] * Math.pow(10, i + 1)) / Math.pow(10, i + 1) + 'x^' + i + ' + ';
+	                    expression += coeArray[i].toFixed(precision) + 'x^' + i + ' + ';
 	                }
 	                else if (i === 1) {
-	                    expression += Math.round(coeArray[i] * 100) / 100 + 'x' + ' + ';
+	                    expression += coeArray[i].toFixed(precision) + 'x' + ' + ';
 	                }
 	                else {
-	                    expression += Math.round(coeArray[i] * 100) / 100;
+	                    expression += coeArray[i].toFixed(precision);
 	                }
+	            }
+
+	            if (showR2) {
+	                expression += `, R2 = ${r2.toFixed(precision)}`;
 	            }
 
 	            return {
 	                points: result,
-	                parameter: coeArray,
+	                parameter: {
+	                    cofficients: coeArray,
+	                    r2: r2
+	                },
 	                expression: expression
 	            };
 
