@@ -1482,18 +1482,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var maxValue = max(values);
 	        var minValue = min(values);
 	        var binsNumber = threshold(values, minValue, maxValue);
-	        var tickStepResult = tickStep(minValue, maxValue, binsNumber);
+	        // Scott and Freedman-Diaconis give 0 / 0 for a constant sample.
+	        var tickStepResult = tickStep(minValue, maxValue, minValue === maxValue ? 1 : binsNumber);
 	        var step = tickStepResult.step;
 	        var toFixedPrecision = tickStepResult.toFixedPrecision;
 
-	        // return the xAxis coordinate for each bins, except the end point of the value
-	        var rangeArray = range(
-	            // use function toFixed() to avoid data like '0.700000001'
-	            +((Math.ceil(minValue / step) * step).toFixed(toFixedPrecision)),
-	            +((Math.floor(maxValue / step) * step).toFixed(toFixedPrecision)),
-	            step,
-	            toFixedPrecision
-	        );
+	        // Keep the tick limits even when there is no tick inside the data range.
+	        var firstTick = +(Math.ceil(minValue / step) * step).toFixed(toFixedPrecision);
+	        var lastTick = +(Math.floor(maxValue / step) * step).toFixed(toFixedPrecision);
+	        var rangeArray = range(firstTick, lastTick, step, toFixedPrecision);
 
 	        var len = rangeArray.length;
 
@@ -1504,14 +1501,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	            bins[i].sample = [];
 	            bins[i].x0 = i > 0
 	                ? rangeArray[i - 1]
-	                : (rangeArray[i] - minValue) === step
+	                : (firstTick - minValue) === step
 	                ? minValue
-	                : (rangeArray[i] - step);
+	                : (firstTick - step);
 	            bins[i].x1 = i < len
 	                ? rangeArray[i]
-	                : (maxValue - rangeArray[i-1]) === step
+	                : (maxValue - lastTick) === step
 	                ? maxValue
-	                : rangeArray[i - 1] + step;
+	                : lastTick + step;
 	        }
 
 	        for (var i = 0; i < values.length; i++) {
